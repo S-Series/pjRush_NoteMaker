@@ -41,3 +41,12 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: BackGround
+    uniqueID: 332485017
+    locked: 0
+  - name: NoteBox
+    uniqueID: 3578580769
+    locked: 0
+  - name: FrontEffect
+    uniqueID: 4115472163
+    locked: 0
