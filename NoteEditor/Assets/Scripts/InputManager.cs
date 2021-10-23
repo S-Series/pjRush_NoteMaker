@@ -7,7 +7,10 @@ public class InputManager : MonoBehaviour
     public static InputManager input;
 
     [SerializeField]
-    GameObject[] NoteField;
+    GameObject NoteField;
+
+    [SerializeField]
+    GameObject[] PreviewNoteField;
 
     [SerializeField]
     GameObject[] PreviewNote;
@@ -25,7 +28,7 @@ public class InputManager : MonoBehaviour
     // { Field Number (0 ~ 4), Line Number (1 ~ 5), Prefab Number (1 ~ 4) }
     public int[] InputNoteData;
 
-    public float pos_y;
+    public float posY;
 
     private void Awake()
     {
@@ -42,27 +45,27 @@ public class InputManager : MonoBehaviour
     {
         if (isNoteInputAble == true)
         {
-            float pos_x;
+            float posX;
             switch (InputNoteData[1]) 
             {
-                case 1: 
-                    pos_x = -300;
+                case 1:
+                    posX = -300;
                     break;
 
-                case 2: 
-                    pos_x = -100;
+                case 2:
+                    posX = -100;
                     break;
 
                 case 3:
-                    pos_x = +100;
+                    posX = +100;
                     break;
 
                 case 4:
-                    pos_x = +300;
+                    posX = +300;
                     break;
 
                 case 5:
-                    pos_x = 0;
+                    posX = 0;
                     break;
 
                 default:
@@ -80,10 +83,57 @@ public class InputManager : MonoBehaviour
             try
             {
                 InputObject = PreviewNote[InputNoteData[2]];
-                InputObject.transform.parent = NoteField[InputNoteData[0]].transform;
-                InputObject.transform.localPosition = new Vector3(pos_x, pos_y, 0);
+                InputObject.transform.parent = PreviewNoteField[InputNoteData[0]].transform;
+                InputObject.transform.localPosition = new Vector3(posX, posY, 0);
             }
             catch { InputObject = NullObject; return; }
+
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                isNoteInputAble = false;
+            }
+
+            if (Input.GetMouseButtonDown(0))
+            {
+                GameObject copy;
+                copy = Instantiate(NotePrefab[InputNoteData[2]], NoteField.transform);
+
+                float copiedPosX;
+                switch (InputNoteData[1])
+                {
+                    case 1:
+                        copiedPosX = -300.0f;
+                        break;
+
+                    case 2:
+                        copiedPosX = -100.0f;
+                        break;
+
+                    case 3:
+                        copiedPosX = +100.0f;
+                        break;
+
+                    case 4:
+                        copiedPosX = +300.0f;
+                        break;
+
+                    case 5:
+                        copiedPosX = 0.0f;
+                        break;
+
+                    default:
+                        Debug.LogError("Out of Range");
+                        return;
+                }
+
+                float copiedPosY;
+                copiedPosY = (PageSystem.pageSystem.firstPage - 1) * 1600
+                    + InputNoteData[0] * 4800 + posY;
+
+                copy.transform.localPosition = new Vector3(copiedPosX, copiedPosY, 0);
+
+                PageSystem.pageSystem.PageSet(PageSystem.pageSystem.firstPage);
+            }
         }
         else
         {

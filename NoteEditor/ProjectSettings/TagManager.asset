@@ -47,6 +47,9 @@ TagManager:
   - name: NoteBox
     uniqueID: 3578580769
     locked: 0
+  - name: SideLayer
+    uniqueID: 1641223929
+    locked: 0
   - name: FrontEffect
     uniqueID: 4115472163
     locked: 0

@@ -4,15 +4,64 @@ using UnityEngine;
 
 public class NoteFieldMouseOver : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    // InputManager input;
+    // public int[] InputNoteData;
+    // { Field Number (0 ~ 4), Line Number (1 ~ 5), Prefab Number (1 ~ 4) }
 
-    // Update is called once per frame
-    void Update()
+    private void OnMouseOver()
     {
-        
+        InputManager input = InputManager.input;
+
+        input.posY = this.transform.parent.parent.localPosition.y;
+
+        switch (this.transform.parent.parent.localPosition.x)
+        {
+            case 0.0f:
+                input.InputNoteData[0] = 0;
+                break;
+
+            case 925.926f:
+                input.InputNoteData[0] = 1;
+                break;
+
+            case 1851.852f:
+                input.InputNoteData[0] = 2;
+                break;
+
+            case 2777.778f:
+                input.InputNoteData[0] = 3;
+                break;
+
+            case 3703.704f:
+                input.InputNoteData[0] = 4;
+                break;
+
+            default:
+                input.isNoteInputAble = false;
+                break;
+        }
+
+        switch (this.transform.parent.gameObject.name)
+        {
+            case "1":
+                input.InputNoteData[1] = 1;
+                break;
+
+            case "2":
+                input.InputNoteData[1] = 2;
+                break;
+
+            case "3":
+                input.InputNoteData[1] = 3;
+                break;
+
+            case "4":
+                input.InputNoteData[1] = 4;
+                break;
+
+            default:
+                input.isNoteInputAble = false;
+                break;
+        }
     }
 }
