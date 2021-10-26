@@ -13,13 +13,18 @@ public class MusicLoad : MonoBehaviour
     [SerializeField]
     TMP_InputField songName;
 
+    [SerializeField]
+    GameObject loadSuccessCheck;
+
     private void Start()
     {
         audioSource = GetComponent<AudioSource>();
+        loadSuccessCheck.SetActive(false);
     }
 
     IEnumerator GetAudioClip()
     {
+        loadSuccessCheck.SetActive(false);
         string path;
         path = Application.dataPath + "/" + songName.text + ".mp3";
         Debug.Log(path);
@@ -33,9 +38,9 @@ public class MusicLoad : MonoBehaviour
             }
             else
             {
+                loadSuccessCheck.SetActive(true);
                 MusicClip = DownloadHandlerAudioClip.GetContent(www);
                 audioSource.clip = MusicClip;
-                audioSource.Play();
             }
         }
     }

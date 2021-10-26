@@ -41,27 +41,39 @@ public class NoteFieldMouseOver : MonoBehaviour
                 break;
         }
 
-        switch (this.transform.parent.gameObject.name)
+        if (input.isNoteBottom == true)
         {
-            case "1":
-                input.InputNoteData[1] = 1;
-                break;
-
-            case "2":
-                input.InputNoteData[1] = 2;
-                break;
-
-            case "3":
-                input.InputNoteData[1] = 3;
-                break;
-
-            case "4":
-                input.InputNoteData[1] = 4;
-                break;
-
-            default:
-                input.isNoteInputAble = false;
-                break;
+            input.InputNoteData[1] = 5;
         }
+        else
+        {
+            switch (this.transform.parent.gameObject.name)
+            {
+                case "1":
+                    input.InputNoteData[1] = 1;
+                    break;
+
+                case "2":
+                    input.InputNoteData[1] = 2;
+                    break;
+
+                case "3":
+                    input.InputNoteData[1] = 3;
+                    break;
+
+                case "4":
+                    input.InputNoteData[1] = 4;
+                    break;
+
+                default:
+                    input.isNoteInputAble = false;
+                    break;
+            }
+        }
+    }
+
+    private void OnMouseDown()
+    {
+        InputManager.input.NoteGenerate();
     }
 }

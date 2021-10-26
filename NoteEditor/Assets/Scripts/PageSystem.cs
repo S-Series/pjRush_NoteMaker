@@ -14,7 +14,7 @@ public class PageSystem : MonoBehaviour
     readonly float[] posX = new float[4] {925.926f, 1851.852f, 2777.778f, 3703.704f };
 
     [SerializeField]
-    GameObject NoteField;
+    public GameObject NoteField;
 
     [SerializeField]
     GameObject MirrorField;
@@ -32,6 +32,24 @@ public class PageSystem : MonoBehaviour
         PageSet(1);
     }
 
+    private void Update()
+    {
+        if (Input.GetAxis("Mouse ScrollWheel") > 0)
+        {
+            firstPage++;
+            if (firstPage < 1) firstPage = 1;
+            else if (firstPage > maxPage) firstPage = maxPage;
+            PageSet(firstPage);
+        }
+        else if (Input.GetAxis("Mouse ScrollWheel") < 0)
+        {
+            firstPage--;
+            if (firstPage < 1) firstPage = 1;
+            else if (firstPage > maxPage) firstPage = maxPage;
+            PageSet(firstPage);
+        }
+    }
+
     public void PageSet(int first)
     {
         if (first > maxPage)
@@ -39,8 +57,8 @@ public class PageSystem : MonoBehaviour
         firstPage = first;
 
         float posy;
-        posy = (firstPage - 1) * 1600 / 3;
-        NoteField.transform.localPosition = new Vector3(0.0f, posy, 0.0f);
+        posy = (firstPage - 1) * 1600;
+        NoteField.transform.localPosition = new Vector3(0.0f, -posy, 0.0f);
 
         for (int i = 0; i < MirrorField.transform.childCount; i++)
         {
@@ -51,7 +69,7 @@ public class PageSystem : MonoBehaviour
         {
             GameObject copy;
             copy = Instantiate(NoteField, MirrorField.transform);
-            copy.transform.localPosition = new Vector3(posX[i], posy - 4800 * (i + 1), 0.0f);
+            copy.transform.localPosition = new Vector3(posX[i], -posy - 4800 * (i + 1), 0.0f);
         }
 
         for (int i = 0; i < 15; i++)

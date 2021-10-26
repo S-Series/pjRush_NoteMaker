@@ -21,9 +21,14 @@ public class InputManager : MonoBehaviour
     [SerializeField]
     GameObject NullObject;
 
+    [SerializeField]
+    GameObject inputCollider;
+
     public GameObject InputObject;
 
     public bool isNoteInputAble;
+
+    public bool isNoteBottom;
 
     // { Field Number (0 ~ 4), Line Number (1 ~ 5), Prefab Number (1 ~ 4) }
     public int[] InputNoteData;
@@ -38,6 +43,7 @@ public class InputManager : MonoBehaviour
     private void Start()
     {
         isNoteInputAble = true;
+        isNoteBottom = false;
         InputNoteData = new int[3]{ 1, 1, 0 };
     }
 
@@ -45,7 +51,10 @@ public class InputManager : MonoBehaviour
     {
         if (isNoteInputAble == true)
         {
+            inputCollider.SetActive(true);
+
             float posX;
+
             switch (InputNoteData[1]) 
             {
                 case 1:
@@ -91,53 +100,61 @@ public class InputManager : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Escape))
             {
                 isNoteInputAble = false;
-            }
-
-            if (Input.GetMouseButtonDown(0))
-            {
-                GameObject copy;
-                copy = Instantiate(NotePrefab[InputNoteData[2]], NoteField.transform);
-
-                float copiedPosX;
-                switch (InputNoteData[1])
+                for (int i = 0; i < 4; i++)
                 {
-                    case 1:
-                        copiedPosX = -300.0f;
-                        break;
-
-                    case 2:
-                        copiedPosX = -100.0f;
-                        break;
-
-                    case 3:
-                        copiedPosX = +100.0f;
-                        break;
-
-                    case 4:
-                        copiedPosX = +300.0f;
-                        break;
-
-                    case 5:
-                        copiedPosX = 0.0f;
-                        break;
-
-                    default:
-                        Debug.LogError("Out of Range");
-                        return;
+                    PreviewNote[i].SetActive(false);
                 }
-
-                float copiedPosY;
-                copiedPosY = (PageSystem.pageSystem.firstPage - 1) * 1600
-                    + InputNoteData[0] * 4800 + posY;
-
-                copy.transform.localPosition = new Vector3(copiedPosX, copiedPosY, 0);
-
-                PageSystem.pageSystem.PageSet(PageSystem.pageSystem.firstPage);
             }
         }
         else
         {
             InputObject = NullObject;
+            inputCollider.SetActive(false);
+        }
+    }
+
+    public void NoteGenerate()
+    {
+        if (isNoteInputAble == true)
+        {
+            GameObject copy;
+            copy = Instantiate(NotePrefab[InputNoteData[2]], NoteField.transform);
+
+            float copiedPosX;
+            switch (InputNoteData[1])
+            {
+                case 1:
+                    copiedPosX = -300.0f;
+                    break;
+
+                case 2:
+                    copiedPosX = -100.0f;
+                    break;
+
+                case 3:
+                    copiedPosX = +100.0f;
+                    break;
+
+                case 4:
+                    copiedPosX = +300.0f;
+                    break;
+
+                case 5:
+                    copiedPosX = 0.0f;
+                    break;
+
+                default:
+                    Debug.LogError("Out of Range");
+                    return;
+            }
+
+            float copiedPosY;
+            copiedPosY = (PageSystem.pageSystem.firstPage - 1) * 1600
+                + InputNoteData[0] * 4800 + posY;
+
+            copy.transform.localPosition = new Vector3(copiedPosX, copiedPosY, 0);
+
+            PageSystem.pageSystem.PageSet(PageSystem.pageSystem.firstPage);
         }
     }
 }
