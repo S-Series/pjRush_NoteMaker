@@ -70,11 +70,7 @@ public class AutoTest : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            HitEffect[0].SetTrigger("Play");
-            Debug.Log("애니메이션 테스트");
-        }
+
     }
 
     private void TestPause()
