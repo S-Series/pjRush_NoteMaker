@@ -6,6 +6,8 @@ using TMPro;
 
 public class AutoTest : MonoBehaviour
 {
+    public static AutoTest autoTest;
+
     private bool isPause;
 
     [SerializeField]
@@ -13,7 +15,7 @@ public class AutoTest : MonoBehaviour
 
     public float bpm;
 
-    private float delay;
+    public float delay;
 
     [SerializeField]
     AudioSource Music;
@@ -22,10 +24,11 @@ public class AutoTest : MonoBehaviour
 
     [SerializeField]
     private int testMs;
-    private int[] index;
+    private int index;
 
     private List<GameObject> note;
     private List<int> noteMs;
+    private List<int> noteLine;
     private List<int> noteLegnth;
 
     [SerializeField]
@@ -43,12 +46,16 @@ public class AutoTest : MonoBehaviour
     [SerializeField]
     TMP_InputField inputStartDelay;
 
+    private void Awake()
+    {
+        autoTest = this;
+    }
+
     private void Start()
     {
         MirrorField.SetActive(true);
         isPause = false;
         HitSound = GetComponent<AudioSource>();
-        index = new int[5];
         ResetTest();
 
         bpm = 120;
@@ -68,23 +75,37 @@ public class AutoTest : MonoBehaviour
         }
     }
 
-    private void LateUpdate()
+    private void Update()
     {
-
+        if (isTest == true)
+        {
+            try
+            {
+                if (noteMs[index] <= testMs)
+                {
+                    HitEffect[noteLine[index] - 1].SetTrigger("Play");
+                    HitSound.Play();
+                    index++;
+                }
+            }
+            catch { }
+        }
     }
 
-    private void TestPause()
+    private void TestStop()
     {
         isTest = false;
         MirrorField.SetActive(true);
         MirrorField.transform.localPosition = new Vector3(0, 0, 0);
         testMs = 0;
+        index = 0;
     }
 
     private void ResetTest()
     {
         note = new List<GameObject>();
         noteMs = new List<int>();
+        noteLine = new List<int>();
         noteLegnth = new List<int>();
     }
 
@@ -93,6 +114,15 @@ public class AutoTest : MonoBehaviour
         try
         {
             bpm = Convert.ToSingle(inputBpm.text);
+        }
+        catch { return; }
+    }
+
+    public void ButtonDelay()
+    {
+        try
+        {
+            delay = Convert.ToSingle(inputStartDelay.text);
         }
         catch { return; }
     }
@@ -109,7 +139,7 @@ public class AutoTest : MonoBehaviour
             isPause = false;
             Music.Stop();
             StopCoroutine(Test());
-            TestPause();
+            TestStop();
         }
     }
 
@@ -118,6 +148,9 @@ public class AutoTest : MonoBehaviour
         ResetTest();
 
         MirrorField.SetActive(false);
+
+        NoteField = PageSystem.pageSystem.NoteField;
+
         for (int i = 0; i < NoteField.transform.childCount; i++)
         {
             GameObject targetNote;
@@ -136,16 +169,40 @@ public class AutoTest : MonoBehaviour
         {
             int targetNoteMs;
             int targetLegnth;
-            targetNoteMs = (int)(note[i].transform.localPosition.y * bpm / 150);
+            targetNoteMs = (int)(note[i].transform.localPosition.y * 150 / bpm);
             targetLegnth = (int)(note[i].transform.localScale.y / 100);
             noteMs.Add(targetNoteMs);
-            noteMs.Add(targetLegnth);
+            noteLegnth.Add(targetLegnth);
+
+            switch (note[i].transform.localPosition.x)
+            {
+                case -300:
+                    noteLine.Add(1);
+                    break;
+
+                case -100:
+                    noteLine.Add(2);
+                    break;
+
+                case +100:
+                    noteLine.Add(3);
+                    break;
+
+                case +300:
+                    noteLine.Add(4);
+                    break;
+
+                case 0:
+                    noteLine.Add(5);
+                    break;
+            }
+
         }
         yield return new WaitForSeconds(.5f);
 
         isTest = true;
 
-        yield return new WaitForSeconds(delay);
+        yield return new WaitForSeconds(delay / 1000);
         Music.Play();
     }
 }

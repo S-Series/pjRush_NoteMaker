@@ -140,7 +140,9 @@ public class SaveLoad : MonoBehaviour
         catch { yield break; }
 
         inputBpm.text = (noteSaved.bpm).ToString();
+        AutoTest.autoTest.bpm = noteSaved.bpm;
         inputStartDelayMs.text = (noteSaved.startDelayMs).ToString();
+        AutoTest.autoTest.delay = noteSaved.startDelayMs;
 
         for (int i = 0; i < noteSaved.Note_ms.Count; i++)
         {
@@ -199,8 +201,7 @@ public class SaveLoad : MonoBehaviour
             // 노트의 Y좌표 해석
             // Ms = 150 * PosY / Bpm |=>| PosY = Bpm * Ms / 150
             copiedObjectPos.y 
-                = noteSaved.bpm * noteSaved.Note_ms[i] / 150
-                + noteSaved.bpm * noteSaved.startDelayMs / 150;
+                = noteSaved.bpm * noteSaved.Note_ms[i] / 150;
 
             copiedObject.transform.localPosition = copiedObjectPos;
         }

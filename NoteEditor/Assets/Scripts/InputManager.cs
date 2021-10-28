@@ -13,7 +13,7 @@ public class InputManager : MonoBehaviour
     GameObject[] PreviewNoteField;
 
     [SerializeField]
-    GameObject[] PreviewNote;
+    public GameObject[] PreviewNote;
 
     [SerializeField]
     GameObject[] NotePrefab;

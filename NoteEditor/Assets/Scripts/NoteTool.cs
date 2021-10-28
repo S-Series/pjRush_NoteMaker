@@ -15,6 +15,7 @@ public class NoteTool : MonoBehaviour
     {
         input.isNoteInputAble = true;
         input.isNoteBottom = false;
+        input.InputObject = input.PreviewNote[0];
         input.InputNoteData[2] = 0;
     }
 
@@ -22,6 +23,7 @@ public class NoteTool : MonoBehaviour
     {
         input.isNoteInputAble = true;
         input.isNoteBottom = false;
+        input.InputObject = input.PreviewNote[1];
         input.InputNoteData[2] = 1;
     }
 
@@ -29,6 +31,7 @@ public class NoteTool : MonoBehaviour
     {
         input.isNoteInputAble = true;
         input.isNoteBottom = true;
+        input.InputObject = input.PreviewNote[2];
         input.InputNoteData[2] = 2;
     }
 
@@ -36,6 +39,7 @@ public class NoteTool : MonoBehaviour
     {
         input.isNoteInputAble = true;
         input.isNoteBottom = true;
+        input.InputObject = input.PreviewNote[3];
         input.InputNoteData[2] = 3;
     }
 }
