@@ -36,6 +36,17 @@ public class SaveLoad : MonoBehaviour
     private void Start()
     {
         ResetSavedData();
+
+        try
+        {
+            inputFileName.text = PlayerPrefs.GetString("NoteFileName");
+            StartCoroutine(LoadDataFromJson());
+        }
+        catch
+        {
+            inputFileName.text = "";
+            PlayerPrefs.SetString("NoteFileName", "");
+        }
     }
 
     [ContextMenu("Save")]
@@ -120,11 +131,15 @@ public class SaveLoad : MonoBehaviour
             File.WriteAllText(path, jsonData);
         }
         catch { return; }
+
+        PlayerPrefs.SetString("NoteFileName", inputFileName.text);
     }
 
     [ContextMenu("Load")]
     IEnumerator LoadDataFromJson()
     {
+        yield return new WaitForSeconds(.1f);
+
         for (int i = 0; i < NoteField.transform.childCount; i++)
         {
             Destroy(NoteField.transform.GetChild(i).gameObject);
@@ -208,6 +223,8 @@ public class SaveLoad : MonoBehaviour
 
         yield return new WaitForSeconds(.1f);
         PageSystem.pageSystem.PageSet(PageSystem.pageSystem.firstPage);
+
+        PlayerPrefs.SetString("NoteFileName", inputFileName.text);
     }
 
     private void ResetSavedData()

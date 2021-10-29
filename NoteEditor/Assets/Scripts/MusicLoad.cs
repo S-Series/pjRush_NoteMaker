@@ -16,10 +16,23 @@ public class MusicLoad : MonoBehaviour
     [SerializeField]
     GameObject loadSuccessCheck;
 
+    string SavedSongName;
+
     private void Start()
     {
         audioSource = GetComponent<AudioSource>();
         loadSuccessCheck.SetActive(false);
+
+        try
+        {
+            SavedSongName = PlayerPrefs.GetString("SongName");
+            songName.text = SavedSongName;
+            StartCoroutine(GetAudioClip());
+        }
+        catch 
+        {
+            ResetSave();
+        }
     }
 
     IEnumerator GetAudioClip()
@@ -34,15 +47,23 @@ public class MusicLoad : MonoBehaviour
 
             if (www.isNetworkError)
             {
+                ResetSave();
                 yield break;
             }
             else
             {
+                PlayerPrefs.SetString("SongName", songName.text);
                 loadSuccessCheck.SetActive(true);
                 MusicClip = DownloadHandlerAudioClip.GetContent(www);
                 audioSource.clip = MusicClip;
             }
         }
+    }
+
+    private void ResetSave()
+    {
+        PlayerPrefs.SetString("SongName", "");
+        songName.text = "";
     }
 
     public void BUttonGetAudio()
