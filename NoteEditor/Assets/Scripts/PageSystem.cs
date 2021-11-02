@@ -59,6 +59,7 @@ public class PageSystem : MonoBehaviour
         float posy;
         posy = (firstPage - 1) * 1600;
         NoteField.transform.localPosition = new Vector3(0.0f, -posy, 0.0f);
+        NoteField.transform.localPosition = new Vector3(0.0f, -posy, 0.0f);
 
         for (int i = 0; i < MirrorField.transform.childCount; i++)
         {

@@ -10,6 +10,9 @@ public class InputManager : MonoBehaviour
     GameObject NoteField;
 
     [SerializeField]
+    GameObject EffectField;
+
+    [SerializeField]
     GameObject[] PreviewNoteField;
 
     [SerializeField]
@@ -27,10 +30,11 @@ public class InputManager : MonoBehaviour
     public GameObject InputObject;
 
     public bool isNoteInputAble;
+    public bool isEffectInputAble;
 
     public bool isNoteBottom;
 
-    // { Field Number (0 ~ 4), Line Number (1 ~ 5), Prefab Number (1 ~ 4) }
+    // InputNoteData [Field Number (0 ~ 4), Line Number (1 ~ 5), Prefab Number (1 ~ 4)]
     public int[] InputNoteData;
 
     public float posY;
@@ -42,7 +46,8 @@ public class InputManager : MonoBehaviour
 
     private void Start()
     {
-        isNoteInputAble = true;
+        isNoteInputAble = false;
+        isEffectInputAble = false;
         isNoteBottom = false;
         InputNoteData = new int[3]{ 1, 1, 0 };
     }
@@ -111,14 +116,19 @@ public class InputManager : MonoBehaviour
             InputObject = NullObject;
             inputCollider.SetActive(false);
         }
+
+        if (isEffectInputAble == true)
+        {
+
+        }
     }
 
     public void NoteGenerate()
     {
         if (isNoteInputAble == true)
         {
-            GameObject copy;
-            copy = Instantiate(NotePrefab[InputNoteData[2]], NoteField.transform);
+            GameObject CopyObject;
+            CopyObject = Instantiate(NotePrefab[InputNoteData[2]], NoteField.transform);
 
             float copiedPosX;
             switch (InputNoteData[1])
@@ -152,7 +162,24 @@ public class InputManager : MonoBehaviour
             copiedPosY = (PageSystem.pageSystem.firstPage - 1) * 1600
                 + InputNoteData[0] * 4800 + posY;
 
-            copy.transform.localPosition = new Vector3(copiedPosX, copiedPosY, 0);
+            CopyObject.transform.localPosition = new Vector3(copiedPosX, copiedPosY, 0);
+
+            PageSystem.pageSystem.PageSet(PageSystem.pageSystem.firstPage);
+        }
+    }
+
+    public void EffectGenerate()
+    {
+        if (isEffectInputAble == true)
+        {
+            GameObject CopyObject;
+            CopyObject = Instantiate(NotePrefab[InputNoteData[2]], EffectField.transform);
+
+            float copiedPosY;
+            copiedPosY = (PageSystem.pageSystem.firstPage - 1) * 1600
+                + InputNoteData[0] * 4800 + posY;
+
+            CopyObject.transform.localPosition = new Vector3(0, copiedPosY, 0);
 
             PageSystem.pageSystem.PageSet(PageSystem.pageSystem.firstPage);
         }

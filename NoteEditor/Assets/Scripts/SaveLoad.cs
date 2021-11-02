@@ -12,6 +12,8 @@ public class SaveLoad : MonoBehaviour
     NoteSavedData noteSaved = new NoteSavedData();
 
     List<GameObject> listObject;
+    List<GameObject> effectObject;
+    List<GameObject> bpmObject;
 
     [SerializeField]
     GameObject[] PrefabObject;
@@ -52,6 +54,9 @@ public class SaveLoad : MonoBehaviour
     [ContextMenu("Save")]
     void SaveDataToJson()
     {
+        float gameBpm;
+        gameBpm = AutoTest.autoTest.bpm;
+
         ResetSavedData();
 
         try
@@ -70,10 +75,29 @@ public class SaveLoad : MonoBehaviour
 
         for (int i = 0; i < NoteField.transform.childCount; i++)
         {
-            listObject.Add(NoteField.transform.GetChild(i).gameObject);
+            GameObject ChildObject;
+            ChildObject = NoteField.transform.GetChild(i).gameObject;
+
+            if (ChildObject.tag == "Effect") effectObject.Add(ChildObject);
+            else if (ChildObject.tag == "BPM") bpmObject.Add(ChildObject);
+            else listObject.Add(ChildObject);
         }
 
         listObject.Sort(delegate (GameObject A, GameObject B)
+        {
+            if (A.transform.localPosition.y > B.transform.localPosition.y) return 1;
+            else if (A.transform.localPosition.y < B.transform.localPosition.y) return -1;
+            return 0;
+        });
+
+        bpmObject.Sort(delegate (GameObject A, GameObject B)
+        {
+            if (A.transform.localPosition.y > B.transform.localPosition.y) return 1;
+            else if (A.transform.localPosition.y < B.transform.localPosition.y) return -1;
+            return 0;
+        });
+
+        effectObject.Sort(delegate (GameObject A, GameObject B)
         {
             if (A.transform.localPosition.y > B.transform.localPosition.y) return 1;
             else if (A.transform.localPosition.y < B.transform.localPosition.y) return -1;
@@ -97,7 +121,7 @@ public class SaveLoad : MonoBehaviour
             }
 
             int ms;
-            ms = (int)(150 * gameObject.transform.localPosition.y / Convert.ToSingle(inputBpm.text));
+            ms = (int)(150 * gameObject.transform.localPosition.y / gameBpm);
             noteSaved.NoteMs.Add(ms);
 
             switch (gameObject.transform.localPosition.x)
@@ -122,6 +146,34 @@ public class SaveLoad : MonoBehaviour
                     noteSaved.NoteLine.Add(5);
                     break;
             }
+        }
+
+        for (int i = 0; i < effectObject.Count; i++)
+        {
+            GameObject gameObject;
+            gameObject = effectObject[i];
+
+            int ms;
+            ms = (int)(150 * gameObject.transform.localPosition.y / gameBpm);
+            noteSaved.EffectMs.Add(ms);
+
+            float force;
+            force = Convert.ToSingle(gameObject.name);
+            noteSaved.EffectForce.Add(force);
+        }
+
+        for (int i = 0; i < bpmObject.Count; i++)
+        {
+            GameObject gameObject;
+            gameObject = bpmObject[i];
+
+            int ms;
+            ms = (int)(150 * gameObject.transform.localPosition.y / gameBpm);
+            noteSaved.SpeedMs.Add(ms);
+
+            float bpm;
+            bpm = Convert.ToSingle(gameObject.name);
+            noteSaved.EffectForce.Add(bpm);
         }
 
         try
@@ -236,6 +288,12 @@ public class SaveLoad : MonoBehaviour
         noteSaved.NoteMs = new List<int>();
         noteSaved.NoteLine = new List<int>();
 
+        noteSaved.EffectMs = new List<int>();
+        noteSaved.EffectForce = new List<float>();
+
+        noteSaved.SpeedMs = new List<int>();
+        noteSaved.SpeedBpm = new List<float>();
+
         listObject = new List<GameObject>();
     }
 
@@ -262,4 +320,7 @@ public class NoteSavedData
 
     public List<int> EffectMs;
     public List<float> EffectForce;
+
+    public List<int> SpeedMs;
+    public List<float> SpeedBpm;
 }
