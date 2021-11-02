@@ -87,39 +87,39 @@ public class SaveLoad : MonoBehaviour
 
             if (gameObject.tag == "chip" || gameObject.tag == "btChip")
             {
-                noteSaved.Note_legnth.Add(0);
+                noteSaved.NoteLegnth.Add(0);
             }
             else
             {
                 int legnth;
                 legnth = (int)(NoteField.transform.GetChild(i).localScale.y / 100);
-                noteSaved.Note_legnth.Add(legnth);
+                noteSaved.NoteLegnth.Add(legnth);
             }
 
             int ms;
             ms = (int)(150 * gameObject.transform.localPosition.y / Convert.ToSingle(inputBpm.text));
-            noteSaved.Note_ms.Add(ms);
+            noteSaved.NoteMs.Add(ms);
 
             switch (gameObject.transform.localPosition.x)
             {
                 case -300:
-                    noteSaved.Note_line.Add(1);
+                    noteSaved.NoteLine.Add(1);
                     break;
 
                 case -100:
-                    noteSaved.Note_line.Add(2);
+                    noteSaved.NoteLine.Add(2);
                     break;
 
                 case +100:
-                    noteSaved.Note_line.Add(3);
+                    noteSaved.NoteLine.Add(3);
                     break;
 
                 case +300:
-                    noteSaved.Note_line.Add(4);
+                    noteSaved.NoteLine.Add(4);
                     break;
 
                 case 0:
-                    noteSaved.Note_line.Add(5);
+                    noteSaved.NoteLine.Add(5);
                     break;
             }
         }
@@ -159,7 +159,7 @@ public class SaveLoad : MonoBehaviour
         inputStartDelayMs.text = (noteSaved.startDelayMs).ToString();
         AutoTest.autoTest.delay = noteSaved.startDelayMs;
 
-        for (int i = 0; i < noteSaved.Note_ms.Count; i++)
+        for (int i = 0; i < noteSaved.NoteMs.Count; i++)
         {
             GameObject copiedObject;
             Vector3 copiedObjectPos;
@@ -167,14 +167,14 @@ public class SaveLoad : MonoBehaviour
 
             // 노트파일 해석 시작
             // 노트 X 위치와 노트의 종류 해석
-            if (noteSaved.Note_line[i] == 5)
+            if (noteSaved.NoteLine[i] == 5)
             {
                 copiedObjectPos.x = 0;
 
-                if (noteSaved.Note_legnth[i] != 0)
+                if (noteSaved.NoteLegnth[i] != 0)
                 {
                     copiedObject = Instantiate(PrefabObject[3], NoteField.transform);
-                    copiedObject.transform.localScale = new Vector3(1, noteSaved.Note_legnth[i] * 100, 1);
+                    copiedObject.transform.localScale = new Vector3(1, noteSaved.NoteLegnth[i] * 100, 1);
                 }
                 else
                 {
@@ -183,17 +183,17 @@ public class SaveLoad : MonoBehaviour
             }
             else
             {
-                if (noteSaved.Note_legnth[i] != 0)
+                if (noteSaved.NoteLegnth[i] != 0)
                 {
                     copiedObject = Instantiate(PrefabObject[1], NoteField.transform);
-                    copiedObject.transform.localScale = new Vector3(1, noteSaved.Note_legnth[i] * 100, 1);
+                    copiedObject.transform.localScale = new Vector3(1, noteSaved.NoteLegnth[i] * 100, 1);
                 }
                 else
                 {
                     copiedObject = Instantiate(PrefabObject[0], NoteField.transform);
                 }
 
-                switch (noteSaved.Note_line[i])
+                switch (noteSaved.NoteLine[i])
                 {
                     case 1:
                         copiedObjectPos.x = -300;
@@ -216,7 +216,7 @@ public class SaveLoad : MonoBehaviour
             // 노트의 Y좌표 해석
             // Ms = 150 * PosY / Bpm |=>| PosY = Bpm * Ms / 150
             copiedObjectPos.y 
-                = noteSaved.bpm * noteSaved.Note_ms[i] / 150;
+                = noteSaved.bpm * noteSaved.NoteMs[i] / 150;
 
             copiedObject.transform.localPosition = copiedObjectPos;
         }
@@ -232,9 +232,9 @@ public class SaveLoad : MonoBehaviour
         noteSaved.bpm = new float();
         noteSaved.startDelayMs = new int();
 
-        noteSaved.Note_legnth = new List<int>();
-        noteSaved.Note_ms = new List<int>();
-        noteSaved.Note_line = new List<int>();
+        noteSaved.NoteLegnth = new List<int>();
+        noteSaved.NoteMs = new List<int>();
+        noteSaved.NoteLine = new List<int>();
 
         listObject = new List<GameObject>();
     }
@@ -256,7 +256,10 @@ public class NoteSavedData
     public float bpm;
     public int startDelayMs;
 
-    public List<int> Note_legnth;
-    public List<int> Note_ms;
-    public List<int> Note_line;
+    public List<int> NoteLegnth;
+    public List<int> NoteMs;
+    public List<int> NoteLine;
+
+    public List<int> EffectMs;
+    public List<float> EffectForce;
 }
