@@ -290,6 +290,7 @@ public class SaveLoad : MonoBehaviour
 
         noteSaved.EffectMs = new List<int>();
         noteSaved.EffectForce = new List<float>();
+        noteSaved.EffectDuration = new List<int>();
 
         noteSaved.SpeedMs = new List<int>();
         noteSaved.SpeedBpm = new List<float>();
@@ -320,6 +321,7 @@ public class NoteSavedData
 
     public List<int> EffectMs;
     public List<float> EffectForce;
+    public List<int> EffectDuration;
 
     public List<int> SpeedMs;
     public List<float> SpeedBpm;

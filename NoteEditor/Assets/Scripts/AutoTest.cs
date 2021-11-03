@@ -21,6 +21,8 @@ public class AutoTest : MonoBehaviour
     AudioSource Music;
 
     AudioSource HitSound;
+    [SerializeField]
+    AudioSource LongHitSound;
 
     [SerializeField]
     private int testMs;
@@ -30,8 +32,24 @@ public class AutoTest : MonoBehaviour
 
     private List<GameObject> note;
     private List<int> noteMs;
+    private List<float> notePos; // *
     private List<int> noteLine;
     private List<int> noteLegnth;
+
+    private List<GameObject> effect;
+    private List<int> EffectMs;
+    private List<float> EffectForce;
+    private List<int> EffectDuration;
+
+    private int EffectIndex;
+
+    private List<GameObject> speed;
+    private List<int> SpeedMs;
+    private List<float> SpeedPos;
+    private List<float> SpeedBpm;
+    private List<int> SpeedRetouch;
+
+    private int SpeedIndex;
 
     [SerializeField]
     Animator[] HitEffect;
@@ -100,6 +118,24 @@ public class AutoTest : MonoBehaviour
                 }
             }
             catch { }
+
+            try
+            {
+                if (EffectMs[EffectIndex] <= testMs)
+                {
+
+                }
+            }
+            catch { }
+
+            try
+            {
+                if (SpeedMs[EffectIndex] <= testMs)
+                {
+
+                }
+            }
+            catch { }
         }
     }
 
@@ -110,7 +146,7 @@ public class AutoTest : MonoBehaviour
         for (int i = 0; i < Legnth; i++)
         {
             HitEffect[Line - 1].SetTrigger("Play");
-            HitSound.Play();
+            LongHitSound.Play();
             yield return delay;
         }
     }
@@ -122,6 +158,8 @@ public class AutoTest : MonoBehaviour
         NoteField.transform.localPosition = new Vector3(0, 0, 0);
         testMs = 0;
         index = 0;
+        EffectIndex = 0;
+        SpeedIndex = 0;
         for (int i = 0; i < NoteField.transform.childCount; i++)
         {
             NoteField.transform.GetChild(i).gameObject.SetActive(true);
@@ -134,6 +172,17 @@ public class AutoTest : MonoBehaviour
         noteMs = new List<int>();
         noteLine = new List<int>();
         noteLegnth = new List<int>();
+
+        effect = new List<GameObject>();
+        EffectMs = new List<int>();
+        EffectForce = new List<float>();
+        EffectDuration = new List<int>();
+
+        speed = new List<GameObject>();
+        SpeedMs = new List<int>();
+        SpeedPos = new List<float>();
+        SpeedBpm = new List<float>();
+        SpeedRetouch = new List<int>();
     }
 
     public void ButtonBpm()
@@ -204,7 +253,10 @@ public class AutoTest : MonoBehaviour
         {
             GameObject targetNote;
             targetNote = NoteField.transform.GetChild(i).gameObject;
-            note.Add(targetNote);
+
+            if (targetNote.tag == "Effect") effect.Add(targetNote);
+            else if (targetNote.tag == "Bpm") speed.Add(targetNote);
+            else note.Add(targetNote);
         }
 
         note.Sort(delegate (GameObject A, GameObject B)
@@ -214,11 +266,79 @@ public class AutoTest : MonoBehaviour
             return 0;
         });
 
+        effect.Sort(delegate (GameObject A, GameObject B)
+        {
+            if (A.transform.localPosition.y > B.transform.localPosition.y) return 1;
+            else if (A.transform.localPosition.y < B.transform.localPosition.y) return -1;
+            return 0;
+        });
+
+        speed.Sort(delegate (GameObject A, GameObject B)
+        {
+            if (A.transform.localPosition.y > B.transform.localPosition.y) return 1;
+            else if (A.transform.localPosition.y < B.transform.localPosition.y) return -1;
+            return 0;
+        });
+
+        // for int i = 0 start
+        int speedRetouchMs;
+
+        SpeedPos.Add(speed[0].transform.localPosition.y);
+
+        int onceMs;
+        onceMs = (int)(speed[0].transform.localPosition.y * 150 / bpm);
+        SpeedMs.Add(onceMs);
+        SpeedRetouch.Add(onceMs);
+        speedRetouchMs = onceMs;
+        // for int i = 0 end
+
+        for (int i = 1; i < speed.Count; i++)
+        {
+            GameObject targetObject;
+            targetObject = speed[i].transform.GetChild(0).gameObject;
+
+            SpeedPos.Add(speed[i].transform.localPosition.y);
+
+            float targetSpeedBpm;
+            targetSpeedBpm = targetObject.transform.localPosition.y;
+            SpeedBpm.Add(targetSpeedBpm);
+            float posY;
+            posY = SpeedPos[i] - SpeedPos[i - 1];
+            int ms;
+            ms = (int)(posY * 150 / targetSpeedBpm) + speedRetouchMs;
+            SpeedMs.Add(ms);
+            SpeedRetouch.Add(ms);
+            speedRetouchMs = ms;
+        }
+
+        yield return new WaitForSeconds(.5f);
+
         for (int i = 0; i < note.Count; i++)
         {
+            notePos.Add(note[i].transform.localPosition.y);
+        }
+
+        for (int i = 0; i < note.Count; i++)
+        {
+            int speedInfoIndex;
+            speedInfoIndex = 0;
+            float notePosY;
+            notePosY = notePos[i];
+            for (int j = 0; j < SpeedMs.Count; j++)
+            {
+                if (SpeedPos[j] <= notePosY)
+                {
+                    speedInfoIndex = j;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
             int targetNoteMs;
             int targetLegnth;
-            targetNoteMs = (int)(note[i].transform.localPosition.y * 150 / bpm);
+            targetNoteMs = (int)((notePosY - SpeedPos[speedInfoIndex]) * 150 / SpeedBpm[speedInfoIndex]);
             targetLegnth = (int)(note[i].transform.localScale.y / 100);
             noteMs.Add(targetNoteMs);
             noteLegnth.Add(targetLegnth);
@@ -247,6 +367,12 @@ public class AutoTest : MonoBehaviour
             }
 
         }
+        for (int i = 0; i < effect.Count; i++)
+        {
+            GameObject targetObject;
+            targetObject = effect[i];
+        }
+
         yield return new WaitForSeconds(.5f);
 
         isTest = true;
