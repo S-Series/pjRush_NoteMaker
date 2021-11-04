@@ -42,4 +42,20 @@ public class NoteTool : MonoBehaviour
         input.InputObject = input.PreviewNote[3];
         input.InputNoteData[2] = 3;
     }
+
+    public void ButtonEffect()
+    {
+        input.isNoteInputAble = true;
+        input.isNoteBottom = true;
+        input.InputObject = input.PreviewNote[4];
+        input.InputNoteData[2] = 4;
+    }
+
+    public void ButtonBpm()
+    {
+        input.isNoteInputAble = true;
+        input.isNoteBottom = true;
+        input.InputObject = input.PreviewNote[5];
+        input.InputNoteData[2] = 5;
+    }
 }

@@ -36,6 +36,17 @@ public class NoteEdit : MonoBehaviour
     [SerializeField]
     List<GameObject> mirror;
 
+    //---------------------------------------------
+
+    [SerializeField]
+    GameObject OriginalSector;
+
+    [SerializeField]
+    GameObject EffectSector;
+
+    [SerializeField]
+    GameObject SpeedSector;
+
     private void Awake()
     {
         noteEdit = this;
@@ -45,6 +56,8 @@ public class NoteEdit : MonoBehaviour
     {
         isNoteEdit = false;
         ResetNoteInfo();
+
+        SectorSetOriginal();
     }
 
     private void Update()
@@ -81,51 +94,62 @@ public class NoteEdit : MonoBehaviour
 
     public void DisplayNoteInfo()
     {
-        switch (Selected.transform.localPosition.x)
+        switch (Selected.tag)
         {
-            case -300:
-                inputLine.text = "1";
+            case "Effect":
                 break;
 
-            case -100:
-                inputLine.text = "2";
-                break;
-
-            case +100:
-                inputLine.text = "3";
-                break;
-
-            case +300:
-                inputLine.text = "4";
-                break;
-
-            case 0:
-                inputLine.text = "5";
+            case "Bpm":
                 break;
 
             default:
-                return;
-        }
+                switch (Selected.transform.localPosition.x)
+                {
+                    case -300:
+                        inputLine.text = "1";
+                        break;
 
-        try
-        {
-            float posY;
-            posY = Selected.transform.localPosition.y;
+                    case -100:
+                        inputLine.text = "2";
+                        break;
 
-            inputPage.text = ((posY - posY % 1600) / 1600).ToString();
-            inputPosY.text = (posY % 1600).ToString();
-        }
-        catch { return; }
+                    case +100:
+                        inputLine.text = "3";
+                        break;
 
-        try
-        {
-            if (Selected.tag == "long" || Selected.tag == "btLong")
-            {
-                inputLegnth.text = ((int)(Selected.transform.localScale.y / 100)).ToString();
-            }
-            else { inputLegnth.text = "--"; }
+                    case +300:
+                        inputLine.text = "4";
+                        break;
+
+                    case 0:
+                        inputLine.text = "5";
+                        break;
+
+                    default:
+                        return;
+                }
+
+                try
+                {
+                    float posY;
+                    posY = Selected.transform.localPosition.y;
+
+                    inputPage.text = ((posY - posY % 1600) / 1600).ToString();
+                    inputPosY.text = (posY % 1600).ToString();
+                }
+                catch { return; }
+
+                try
+                {
+                    if (Selected.tag == "long" || Selected.tag == "btLong")
+                    {
+                        inputLegnth.text = ((int)(Selected.transform.localScale.y / 100)).ToString();
+                    }
+                    else { inputLegnth.text = "--"; }
+                }
+                catch { return; }
+                break;
         }
-        catch { return; }
     }
 
     IEnumerator DeleteNote()
@@ -312,5 +336,29 @@ public class NoteEdit : MonoBehaviour
                 mirror[i].name = "MirrorField" + i.ToString();
             }
         }
+    }
+
+    // this fuction is triggered by button
+    public void SectorSetOriginal()
+    {
+        OriginalSector.SetActive(true);
+        EffectSector.SetActive(false);
+        SpeedSector.SetActive(false);
+    }
+
+    // this fuction is triggered by button
+    public void SectorSetEffect()
+    {
+        OriginalSector.SetActive(false);
+        EffectSector.SetActive(true);
+        SpeedSector.SetActive(false);
+    }
+
+    // this fuction is triggered by button
+    public void SectorSetSpeed()
+    {
+        OriginalSector.SetActive(false);
+        EffectSector.SetActive(false);
+        SpeedSector.SetActive(true);
     }
 }

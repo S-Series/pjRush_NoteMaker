@@ -34,7 +34,8 @@ public class InputManager : MonoBehaviour
 
     public bool isNoteBottom;
 
-    // InputNoteData [Field Number (0 ~ 4), Line Number (1 ~ 5), Prefab Number (1 ~ 4)]
+    // InputNoteData [Field Number (0 ~ 4), Line Number (1 ~ 5), Prefab Number (1 ~ 6)]
+    // Prefab Number 5 == Effect || Prefab Number 6 == Bpm
     public int[] InputNoteData;
 
     public float posY;
@@ -86,7 +87,7 @@ public class InputManager : MonoBehaviour
                     InputObject = NullObject;
                     return;
             }
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < 6; i++)
             {
                 if (i != InputNoteData[2])
                 {
@@ -105,7 +106,7 @@ public class InputManager : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Escape))
             {
                 isNoteInputAble = false;
-                for (int i = 0; i < 4; i++)
+                for (int i = 0; i < 6; i++)
                 {
                     PreviewNote[i].SetActive(false);
                 }

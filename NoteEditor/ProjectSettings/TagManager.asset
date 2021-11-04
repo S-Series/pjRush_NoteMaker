@@ -8,6 +8,8 @@ TagManager:
   - long
   - btChip
   - btLong
+  - Effect
+  - Bpm
   layers:
   - Default
   - TransparentFX
