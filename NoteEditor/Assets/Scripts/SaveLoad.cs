@@ -28,6 +28,9 @@ public class SaveLoad : MonoBehaviour
     TMP_InputField inputFileName;
 
     [SerializeField]
+    TextMeshProUGUI dropdownDifficulty;
+
+    [SerializeField]
     GameObject NoteField;
 
     private void Awake()
@@ -57,6 +60,8 @@ public class SaveLoad : MonoBehaviour
         float gameBpm;
         gameBpm = AutoTest.autoTest.bpm;
 
+        noteSaved.difficulty = Convert.ToInt32(dropdownDifficulty.text);
+
         ResetSavedData();
 
         try
@@ -79,30 +84,39 @@ public class SaveLoad : MonoBehaviour
             ChildObject = NoteField.transform.GetChild(i).gameObject;
 
             if (ChildObject.tag == "Effect") effectObject.Add(ChildObject);
-            else if (ChildObject.tag == "BPM") bpmObject.Add(ChildObject);
+            else if (ChildObject.tag == "Bpm") bpmObject.Add(ChildObject);
             else listObject.Add(ChildObject);
         }
 
-        listObject.Sort(delegate (GameObject A, GameObject B)
+        if (listObject.Count >= 2)
         {
-            if (A.transform.localPosition.y > B.transform.localPosition.y) return 1;
-            else if (A.transform.localPosition.y < B.transform.localPosition.y) return -1;
-            return 0;
-        });
+            listObject.Sort(delegate (GameObject A, GameObject B)
+            {
+                if (A.transform.localPosition.y > B.transform.localPosition.y) return 1;
+                else if (A.transform.localPosition.y < B.transform.localPosition.y) return -1;
+                return 0;
+            });
+        }
 
-        bpmObject.Sort(delegate (GameObject A, GameObject B)
+        if (bpmObject.Count >= 2)
         {
-            if (A.transform.localPosition.y > B.transform.localPosition.y) return 1;
-            else if (A.transform.localPosition.y < B.transform.localPosition.y) return -1;
-            return 0;
-        });
+            bpmObject.Sort(delegate (GameObject A, GameObject B)
+            {
+                if (A.transform.localPosition.y > B.transform.localPosition.y) return 1;
+                else if (A.transform.localPosition.y < B.transform.localPosition.y) return -1;
+                return 0;
+            });
+        }
 
-        effectObject.Sort(delegate (GameObject A, GameObject B)
+        if (effectObject.Count >= 2)
         {
-            if (A.transform.localPosition.y > B.transform.localPosition.y) return 1;
-            else if (A.transform.localPosition.y < B.transform.localPosition.y) return -1;
-            return 0;
-        });
+            effectObject.Sort(delegate (GameObject A, GameObject B)
+            {
+                if (A.transform.localPosition.y > B.transform.localPosition.y) return 1;
+                else if (A.transform.localPosition.y < B.transform.localPosition.y) return -1;
+                return 0;
+            });
+        }
 
         for (int i = 0; i < listObject.Count; i++)
         {
@@ -296,6 +310,8 @@ public class SaveLoad : MonoBehaviour
         noteSaved.SpeedBpm = new List<float>();
 
         listObject = new List<GameObject>();
+        effectObject = new List<GameObject>();
+        bpmObject = new List<GameObject>();
     }
 
     public void ButtonSave()
@@ -313,6 +329,7 @@ public class SaveLoad : MonoBehaviour
 public class NoteSavedData
 {
     public float bpm;
+    public int difficulty;
     public int startDelayMs;
 
     public List<int> NoteLegnth;

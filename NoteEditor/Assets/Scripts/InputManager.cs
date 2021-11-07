@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class InputManager : MonoBehaviour
 {
@@ -30,11 +31,10 @@ public class InputManager : MonoBehaviour
     public GameObject InputObject;
 
     public bool isNoteInputAble;
-    public bool isEffectInputAble;
 
     public bool isNoteBottom;
 
-    // InputNoteData [Field Number (0 ~ 4), Line Number (1 ~ 5), Prefab Number (1 ~ 6)]
+    // 0. InputNoteData [Field Number (0 ~ 4) || 1. Line Number (1 ~ 5) || 2. Prefab Number (1 ~ 6)]
     // Prefab Number 5 == Effect || Prefab Number 6 == Bpm
     public int[] InputNoteData;
 
@@ -48,7 +48,6 @@ public class InputManager : MonoBehaviour
     private void Start()
     {
         isNoteInputAble = false;
-        isEffectInputAble = false;
         isNoteBottom = false;
         InputNoteData = new int[3]{ 1, 1, 0 };
     }
@@ -106,6 +105,7 @@ public class InputManager : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Escape))
             {
                 isNoteInputAble = false;
+                NoteEdit.noteEdit.SectorSetOriginal();
                 for (int i = 0; i < 6; i++)
                 {
                     PreviewNote[i].SetActive(false);
@@ -116,11 +116,6 @@ public class InputManager : MonoBehaviour
         {
             InputObject = NullObject;
             inputCollider.SetActive(false);
-        }
-
-        if (isEffectInputAble == true)
-        {
-
         }
     }
 
@@ -166,23 +161,12 @@ public class InputManager : MonoBehaviour
             CopyObject.transform.localPosition = new Vector3(copiedPosX, copiedPosY, 0);
 
             PageSystem.pageSystem.PageSet(PageSystem.pageSystem.firstPage);
-        }
-    }
 
-    public void EffectGenerate()
-    {
-        if (isEffectInputAble == true)
-        {
-            GameObject CopyObject;
-            CopyObject = Instantiate(NotePrefab[InputNoteData[2]], EffectField.transform);
-
-            float copiedPosY;
-            copiedPosY = (PageSystem.pageSystem.firstPage - 1) * 1600
-                + InputNoteData[0] * 4800 + posY;
-
-            CopyObject.transform.localPosition = new Vector3(0, copiedPosY, 0);
-
-            PageSystem.pageSystem.PageSet(PageSystem.pageSystem.firstPage);
+            if (CopyObject.tag == "Bpm")
+            {
+                CopyObject.transform.GetChild(0).GetChild(0).localPosition = new Vector3(0, AutoTest.autoTest.bpm, 0);
+                CopyObject.transform.GetChild(0).GetComponent<TextMeshPro>().text = (AutoTest.autoTest.bpm).ToString();
+            }
         }
     }
 }

@@ -27,7 +27,7 @@ public class NoteClick : MonoBehaviour
         {
             InputManager.input.isNoteInputAble = false;
             noteEdit.isNoteEdit = true;
-            noteEdit.SectorSetEffect();
+            noteEdit.SectorSetOriginal();
             noteEdit.Selected = this.gameObject;
             noteEdit.DisplayNoteInfo();
         }

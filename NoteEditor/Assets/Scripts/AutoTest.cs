@@ -21,12 +21,10 @@ public class AutoTest : MonoBehaviour
     AudioSource Music;
 
     AudioSource HitSound;
-    [SerializeField]
     AudioSource LongHitSound;
 
     [SerializeField]
     private int testMs;
-    private int index;
     private int bpmIndex;
 
     private float LongDelay;
@@ -37,6 +35,7 @@ public class AutoTest : MonoBehaviour
     private List<int> noteLine;
     private List<int> noteLegnth;
 
+    [SerializeField]
     private int NoteIndex;
 
     private List<GameObject> effect;
@@ -48,8 +47,10 @@ public class AutoTest : MonoBehaviour
     private int EffectIndex;
 
     private List<GameObject> speed;
+    [SerializeField]
     private List<int> SpeedMs;
     private List<float> SpeedPos;
+    [SerializeField]
     private List<float> SpeedBpm;
     private List<int> SpeedRetouch;
 
@@ -70,6 +71,9 @@ public class AutoTest : MonoBehaviour
     [SerializeField]
     TMP_InputField inputStartDelay;
 
+    float TestSpeedPos;
+    float TestSpeedMs;
+
     private void Awake()
     {
         autoTest = this;
@@ -80,6 +84,7 @@ public class AutoTest : MonoBehaviour
         MirrorField.SetActive(true);
         isPause = false;
         HitSound = GetComponent<AudioSource>();
+        LongHitSound = transform.GetChild(0).GetComponent<AudioSource>();
         ResetTest();
 
         bpm = 120;
@@ -92,6 +97,9 @@ public class AutoTest : MonoBehaviour
         SpeedIndex = 0;
 
         LongDelay = 0.125f;
+
+        TestSpeedPos = 0;
+        TestSpeedMs = 0;
     }
 
     private void FixedUpdate()
@@ -106,14 +114,18 @@ public class AutoTest : MonoBehaviour
     {
         if (isTest == true)
         {
-            if (SpeedMs[bpmIndex] <= testMs)
+            try
             {
-                bpm = SpeedBpm[bpmIndex];
-                bpmIndex++;
+                if (SpeedMs[bpmIndex] <= testMs)
+                {
+                    bpm = SpeedBpm[bpmIndex];
+                    bpmIndex++;
+                }
             }
+            catch { }
 
             float posY;
-            posY = SpeedPos[bpmIndex] - ((SpeedMs[bpmIndex] - testMs) * bpm / 150);
+            posY = TestSpeedPos + ((testMs - TestSpeedMs) * bpm / 150);
             NoteField.transform.localPosition = new Vector3(0, -posY, 0);
 
             // ----------------------------------------------------------------------------
@@ -149,6 +161,8 @@ public class AutoTest : MonoBehaviour
                 if (SpeedMs[SpeedIndex] <= testMs)
                 {
                     bpm = SpeedBpm[SpeedIndex];
+                    TestSpeedMs = SpeedMs[SpeedIndex];
+                    TestSpeedPos = SpeedPos[SpeedIndex];
                 }
                 SpeedIndex++;
             }
@@ -165,6 +179,8 @@ public class AutoTest : MonoBehaviour
             HitEffect[Line - 1].SetTrigger("Play");
             LongHitSound.Play();
             yield return delay;
+
+            if (isTest == false) break;
         }
     }
 
@@ -174,7 +190,6 @@ public class AutoTest : MonoBehaviour
         MirrorField.SetActive(true);
         NoteField.transform.localPosition = new Vector3(0, 0, 0);
         testMs = 0;
-        index = 0;
         bpmIndex = 0;
         EffectIndex = 0;
         SpeedIndex = 0;
@@ -190,6 +205,7 @@ public class AutoTest : MonoBehaviour
 
         note = new List<GameObject>();
         noteMs = new List<int>();
+        notePos = new List<float>();
         noteLine = new List<int>();
         noteLegnth = new List<int>();
 
@@ -214,6 +230,11 @@ public class AutoTest : MonoBehaviour
         try
         {
             bpm = Convert.ToSingle(inputBpm.text);
+            if (bpm < 0)
+            {
+                bpm = 120;
+                inputBpm.text = "120";
+            }
         }
         catch { return; }
     }
@@ -305,42 +326,46 @@ public class AutoTest : MonoBehaviour
             return 0;
         });
 
-        // for int i = 0 start
-        int speedRetouchMs;
-
-        // Add to List -----------------
-        SpeedPos.Add(speed[0].transform.localPosition.y);
-
-        int onceMs;
-        onceMs = (int)(speed[0].transform.localPosition.y * 150 / bpm);
-        speedRetouchMs = onceMs;
-
-        // Add to List -----------------
-        SpeedMs.Add(onceMs);
-        SpeedRetouch.Add(onceMs);
-        // for int i = 0 end
-
-        for (int i = 1; i < speed.Count; i++)
+        if (speed.Count >= 1)
         {
-            GameObject targetObject;
-            targetObject = speed[i].transform.GetChild(0).gameObject;
+            // for int i = 0 start
+            int speedRetouchMs;
 
             // Add to List -----------------
-            SpeedPos.Add(speed[i].transform.localPosition.y);
+            SpeedPos.Add(speed[0].transform.localPosition.y);
 
-            float targetSpeedBpm;
-            targetSpeedBpm = targetObject.transform.localPosition.y;
-
-            float posY;
-            posY = SpeedPos[i] - SpeedPos[i - 1];
-            int ms;
-            ms = (int)(posY * 150 / targetSpeedBpm) + speedRetouchMs;
-            speedRetouchMs = ms;
+            int onceMs;
+            onceMs = (int)(speed[0].transform.localPosition.y * 150 / bpm);
+            speedRetouchMs = onceMs;
 
             // Add to List -----------------
-            SpeedMs.Add(ms);
-            SpeedBpm.Add(targetSpeedBpm);
-            SpeedRetouch.Add(ms);
+            SpeedMs.Add(onceMs);
+            SpeedBpm.Add(speed[0].transform.GetChild(0).GetChild(0).transform.localPosition.y);
+            SpeedRetouch.Add(onceMs);
+            // for int i = 0 end
+
+            for (int i = 1; i < speed.Count; i++)
+            {
+                GameObject childObject;
+                childObject = speed[i].transform.GetChild(0).GetChild(0).gameObject;
+
+                // Add to List -----------------
+                SpeedPos.Add(speed[i].transform.localPosition.y);
+
+                float targetSpeedBpm;
+                targetSpeedBpm = childObject.transform.localPosition.y;
+
+                float posY;
+                posY = SpeedPos[i] - SpeedPos[i - 1];
+                int ms;
+                ms = (int)(posY * 150 / targetSpeedBpm) + speedRetouchMs;
+                speedRetouchMs = ms;
+
+                // Add to List -----------------
+                SpeedMs.Add(ms);
+                SpeedBpm.Add(targetSpeedBpm);
+                SpeedRetouch.Add(ms);
+            }
         }
 
         yield return new WaitForSeconds(.5f);
@@ -370,14 +395,21 @@ public class AutoTest : MonoBehaviour
                 else { break; }
             }
 
-            float posDif;
-            posDif = notePosY - SpeedPos[SpeedNoteinfoIndex];
-
             int ms;
-            ms = (int)(posDif * 150 / SpeedBpm[SpeedNoteinfoIndex]) + SpeedMs[SpeedNoteinfoIndex];
+            try
+            {
+                float posDif;
+                posDif = notePosY - SpeedPos[SpeedNoteinfoIndex];
+                ms = (int)(posDif * 150 / SpeedBpm[SpeedNoteinfoIndex]) + SpeedMs[SpeedNoteinfoIndex];
+            }
+            catch
+            {
+                ms = (int)(notePosY * 150 / bpm);
+            }
 
             // Add to List -----------------
             noteMs.Add(ms);
+            noteLegnth.Add((int)(note[i].transform.localScale.y / 100));
 
             // Add to List -----------------
             switch (targetNote.transform.localPosition.x)
@@ -406,7 +438,7 @@ public class AutoTest : MonoBehaviour
 
         yield return new WaitForSeconds(.5f);
 
-        for (int i = 0; i < note.Count; i++)
+        for (int i = 0; i < effect.Count; i++)
         {
             // Add to List -----------------
             EffectPos.Add(effect[i].transform.localPosition.y);
@@ -419,7 +451,7 @@ public class AutoTest : MonoBehaviour
             targetObject = effect[i];
 
             GameObject childObject;
-            childObject = targetObject.transform.GetChild(0).gameObject;
+            childObject = targetObject.transform.GetChild(0).GetChild(0).gameObject;
 
             float EffectPosY;
             EffectPosY = EffectPos[i];

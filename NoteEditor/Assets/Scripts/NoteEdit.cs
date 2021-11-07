@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
@@ -35,6 +36,17 @@ public class NoteEdit : MonoBehaviour
 
     [SerializeField]
     List<GameObject> mirror;
+
+    //---------------------------------------------
+
+    [SerializeField]
+    TMP_InputField inputEffectForce;
+
+    [SerializeField]
+    TMP_InputField inputEffectDuration;
+
+    [SerializeField]
+    TMP_InputField inputSpeedBpm;
 
     //---------------------------------------------
 
@@ -270,18 +282,71 @@ public class NoteEdit : MonoBehaviour
     {
         int legnthInput;
         Vector3 SelectedScale;
+        if (Selected.tag == "long" || Selected.tag == "btLong")
+        {
+            try
+            {
+                legnthInput = int.Parse(inputLegnth.text);
+                SelectedScale = Selected.transform.localScale;
+                if (legnthInput < 2)
+                {
+                    DisplayNoteInfo();
+                    return;
+                }
+                SelectedScale.y = legnthInput * 100;
+
+                Selected.transform.localScale = SelectedScale;
+                MirrorPage();
+            }
+            catch { return; }
+        }
+    }
+
+    // Effect Force =
+    //      EffectNote.child.transform.localposition.x
+    // Effect Duration = 
+    //      EffectNote.child.transform.localposition.y
+    public void ButtonEffect()
+    {
+        Vector3 forcePos;
         try
         {
-            legnthInput = int.Parse(inputLegnth.text);
-            SelectedScale = Selected.transform.localScale;
-            if (legnthInput < 2)
-            {
-                DisplayNoteInfo();
-                return;
-            }
-            SelectedScale.y = legnthInput * 100;
+            forcePos = Selected.transform.localPosition;
+            forcePos.x = Convert.ToSingle(inputEffectForce.text);
+            Selected.transform.GetChild(0).localPosition = forcePos;
+            MirrorPage();
+        }
+        catch { return; }
+    }
 
-            Selected.transform.localScale = SelectedScale;
+    public void ButtonDuration()
+    {
+        Vector3 durationPos;
+        try
+        {
+            durationPos = Selected.transform.localPosition;
+            durationPos.y = Convert.ToSingle(inputEffectForce.text);
+            Selected.transform.GetChild(0).localPosition = durationPos;
+            MirrorPage();
+        }
+        catch { return; }
+    }
+
+    // Speed Bpm = 
+    //      SpeedNote.child.child.transform.localposition.y
+    public void ButtonSpeed()
+    {
+        float speedBpm;
+        try
+        {
+            speedBpm = Convert.ToSingle(inputSpeedBpm.text);
+            if (speedBpm < 0)
+            {
+                speedBpm = 120;
+                inputSpeedBpm.text = "120";
+            }
+            Selected.transform.GetChild(0).GetComponent<TextMeshPro>().text = speedBpm.ToString();
+            Selected.transform.GetChild(0).GetChild(0).localPosition = new Vector3(0, speedBpm, 0);
             MirrorPage();
         }
         catch { return; }

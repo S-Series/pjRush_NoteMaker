@@ -75,6 +75,5 @@ public class NoteFieldMouseOver : MonoBehaviour
     private void OnMouseDown()
     {
         InputManager.input.NoteGenerate();
-        InputManager.input.EffectGenerate();
     }
 }

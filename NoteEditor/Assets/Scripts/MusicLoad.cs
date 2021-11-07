@@ -40,7 +40,7 @@ public class MusicLoad : MonoBehaviour
         loadSuccessCheck.SetActive(false);
         string path;
         path = Application.dataPath + "/" + songName.text + ".mp3";
-        Debug.Log(path);
+        // Debug.Log(path);
         using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(path, AudioType.MPEG))
         {
             yield return www.SendWebRequest();
@@ -52,10 +52,14 @@ public class MusicLoad : MonoBehaviour
             }
             else
             {
-                PlayerPrefs.SetString("SongName", songName.text);
-                loadSuccessCheck.SetActive(true);
-                MusicClip = DownloadHandlerAudioClip.GetContent(www);
-                audioSource.clip = MusicClip;
+                try
+                {
+                    PlayerPrefs.SetString("SongName", songName.text);
+                    loadSuccessCheck.SetActive(true);
+                    MusicClip = DownloadHandlerAudioClip.GetContent(www);
+                    audioSource.clip = MusicClip;
+                }
+                catch { ResetSave(); }
             }
         }
     }
