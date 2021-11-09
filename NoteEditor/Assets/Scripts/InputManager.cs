@@ -169,4 +169,9 @@ public class InputManager : MonoBehaviour
             }
         }
     }
+
+    public void inputNoteFieldSet(GameObject gameObject)
+    {
+        NoteField = gameObject;
+    }
 }

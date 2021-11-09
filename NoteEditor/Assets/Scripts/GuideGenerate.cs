@@ -95,9 +95,10 @@ public class GuideGenerate : MonoBehaviour
             inputField.text = "1";
         }
 
-        if (count >= 1 && count <= 16)
+        if (count >= 1 && count <= 64)
         {
             GuideLineGenerate(count);
+            NoteEdit.noteEdit.guidePosSector = 1600 / count;
         }
         else
         {

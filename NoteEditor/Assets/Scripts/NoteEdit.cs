@@ -17,6 +17,9 @@ public class NoteEdit : MonoBehaviour
     private readonly float[] rdPosX = new float[5] {0.0f, 925.926f, 1851.852f, 2777.778f, 3703.704f };
 
     [SerializeField]
+    public float guidePosSector;
+
+    [SerializeField]
     TMP_InputField inputLine;
 
     [SerializeField]
@@ -87,12 +90,229 @@ public class NoteEdit : MonoBehaviour
             {
                 StartCoroutine(DeleteNote());
             }
+
+            if (Selected != null)
+            {
+                if (Input.GetKeyDown(KeyCode.LeftArrow))
+                {
+                    Vector3 selectPos;
+                    selectPos = Selected.transform.localPosition;
+
+                    switch (Selected.transform.localPosition.x)
+                    {
+                        case -100:
+                            selectPos.x = -300;
+                            Selected.transform.localPosition = selectPos;
+                            DisplayNoteInfo();
+                            MirrorPage();
+                            break;
+
+                        case +100:
+                            selectPos.x = -100;
+                            Selected.transform.localPosition = selectPos;
+                            DisplayNoteInfo();
+                            MirrorPage(); break;
+
+                        case +300:
+                            selectPos.x = +100;
+                            Selected.transform.localPosition = selectPos;
+                            DisplayNoteInfo();
+                            MirrorPage(); break;
+
+                        default:
+                            return;
+                    }
+                }
+
+                if (Input.GetKeyDown(KeyCode.RightArrow))
+                {
+                    Vector3 selectPos;
+                    selectPos = Selected.transform.localPosition;
+
+                    switch (Selected.transform.localPosition.x)
+                    {
+                        case -300:
+                            selectPos.x = -100;
+                            Selected.transform.localPosition = selectPos;
+                            DisplayNoteInfo();
+                            MirrorPage();
+                            break;
+
+                        case -100:
+                            selectPos.x = +100;
+                            Selected.transform.localPosition = selectPos;
+                            DisplayNoteInfo();
+                            MirrorPage();
+                            break;
+
+                        case +100:
+                            selectPos.x = +300;
+                            Selected.transform.localPosition = selectPos;
+                            DisplayNoteInfo();
+                            MirrorPage();
+                            break;
+
+                        default:
+                            return;
+                    }
+                }
+
+                if (Input.GetKeyDown(KeyCode.UpArrow))
+                {
+                    bool isUp;
+                    isUp = true;
+
+                    Vector3 notePos;
+                    notePos = Selected.transform.localPosition;
+
+                    if ((Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
+                        && (Selected.tag == "long" || Selected.tag == "btLong"))
+                    {
+                        int length;
+                        length = (int)(Selected.transform.localScale.y / 100);
+                        StartCoroutine(UpdateLengthNote(length + 1));
+
+                        DisplayNoteInfo();
+                        MirrorPage();
+                    }
+                    else
+                    {
+                        ArrowKeyNoteMove(notePos, isUp);
+                    }
+                }
+
+                if (Input.GetKeyDown(KeyCode.DownArrow))
+                {
+                    bool isUp;
+                    isUp = false;
+
+                    Vector3 notePos;
+                    notePos = Selected.transform.localPosition;
+
+                    if ((Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
+                        && (Selected.tag == "long" || Selected.tag == "btLong"))
+                    {
+                        int length;
+                        length = (int)(Selected.transform.localScale.y / 100);
+                        StartCoroutine(UpdateLengthNote(length - 1));
+
+                        DisplayNoteInfo();
+                        MirrorPage();
+                    }
+                    else
+                    {
+                        ArrowKeyNoteMove(notePos, isUp);
+                    }
+                }
+            }
         }
 
         if (Selected == null)
         {
             isNoteEdit = false;
             ResetNoteInfo();
+        }
+    }
+
+    private IEnumerator UpdateLengthNote(int length)
+    {
+        Vector3 pos;
+        pos = Selected.transform.localPosition;
+
+        GameObject NoteField;
+        NoteField = PageSystem.pageSystem.NoteField;
+
+        GameObject editNote;
+        editNote = null;
+        for (int i = 0; i < NoteField.transform.childCount; i++)
+        {
+            if (NoteField.transform.GetChild(i).localPosition == pos)
+            {
+                editNote = NoteField.transform.GetChild(i).gameObject;
+                break;
+            }
+        }
+        if (editNote != null)
+        {
+            Vector3 SelectedScale;
+            if (Selected.tag == "long" || Selected.tag == "btLong")
+            {
+                try
+                {
+                    SelectedScale = Selected.transform.localScale;
+                    if (length < 2)
+                    {
+                        DisplayNoteInfo();
+                        yield break;
+                    }
+                    SelectedScale.y = length * 100;
+
+                    Selected.transform.localScale = SelectedScale;
+                    MirrorPage();
+                }
+                catch { yield break; }
+            }
+        }
+        else { Debug.LogError("조정 대상을 찾지 못함"); yield break; }
+
+        yield return new WaitForSeconds(.1f);
+
+        PageSystem.pageSystem.PageSet(PageSystem.pageSystem.firstPage);
+    }
+
+    private void ArrowKeyNoteMove(Vector3 pos, bool isUp)
+    {
+        if (isUp == true)
+        {
+            int guideNum;
+
+            if ((pos.y - pos.y % 1600) / 1600 == 0)
+            {
+                guideNum = 0;
+            }
+            else
+            {
+                guideNum = (int)((pos.y - pos.y % 1600) / 1600);
+            }
+
+            if (guideNum == 0)
+            {
+                pos.y = pos.y - pos.y % 1600 + guidePosSector;
+            }
+            else
+            {
+                pos.y = pos.y - pos.y % 1600 + guidePosSector * (guideNum + 1);
+            }
+
+            Selected.transform.localPosition = pos;
+            DisplayNoteInfo();
+            MirrorPage();
+        }
+        else
+        {
+            int guideNum;
+
+            if ((pos.y - pos.y % 1600) / 1600 == 0)
+            {
+                guideNum = 0;
+            }
+            else
+            {
+                guideNum = (int)((pos.y - pos.y % 1600) / 1600);
+            }
+
+            if (guideNum == 0)
+            {
+                pos.y = pos.y - pos.y % 1600 - guidePosSector;
+            }
+            else
+            {
+                pos.y = pos.y - pos.y % 1600 + guidePosSector * (guideNum - 1);
+            }
+
+            Selected.transform.localPosition = pos;
+            DisplayNoteInfo();
+            MirrorPage();
         }
     }
 
@@ -193,6 +413,54 @@ public class NoteEdit : MonoBehaviour
         PageSystem.pageSystem.PageSet(PageSystem.pageSystem.firstPage);
     }
 
+    IEnumerator LengthNote()
+    {
+        Vector3 pos;
+        pos = Selected.transform.localPosition;
+
+        GameObject NoteField;
+        NoteField = PageSystem.pageSystem.NoteField;
+
+        GameObject editNote;
+        editNote = null;
+        for (int i = 0; i < NoteField.transform.childCount; i++)
+        {
+            if (NoteField.transform.GetChild(i).localPosition == pos)
+            {
+                editNote = NoteField.transform.GetChild(i).gameObject;
+                break;
+            }
+        }
+        if (editNote != null)
+        {
+            int legnthInput;
+            Vector3 SelectedScale;
+            if (Selected.tag == "long" || Selected.tag == "btLong")
+            {
+                try
+                {
+                    legnthInput = int.Parse(inputLegnth.text);
+                    SelectedScale = Selected.transform.localScale;
+                    if (legnthInput < 2)
+                    {
+                        DisplayNoteInfo();
+                        yield break;
+                    }
+                    SelectedScale.y = legnthInput * 100;
+
+                    Selected.transform.localScale = SelectedScale;
+                    MirrorPage();
+                }
+                catch { yield break; }
+            }
+        }
+        else { Debug.LogError("조정 대상을 찾지 못함"); yield break; }
+
+        yield return new WaitForSeconds(.1f);
+
+        PageSystem.pageSystem.PageSet(PageSystem.pageSystem.firstPage);
+    }
+
     // ------------------------------------------------------------
 
     public void ButtonLine()
@@ -280,26 +548,7 @@ public class NoteEdit : MonoBehaviour
 
     public void ButtonLegnth()
     {
-        int legnthInput;
-        Vector3 SelectedScale;
-        if (Selected.tag == "long" || Selected.tag == "btLong")
-        {
-            try
-            {
-                legnthInput = int.Parse(inputLegnth.text);
-                SelectedScale = Selected.transform.localScale;
-                if (legnthInput < 2)
-                {
-                    DisplayNoteInfo();
-                    return;
-                }
-                SelectedScale.y = legnthInput * 100;
-
-                Selected.transform.localScale = SelectedScale;
-                MirrorPage();
-            }
-            catch { return; }
-        }
+        StartCoroutine(LengthNote());
     }
 
     // Effect Force =
@@ -357,7 +606,6 @@ public class NoteEdit : MonoBehaviour
         float posX;
         posX = Selected.transform.parent.localPosition.x;
 
-        
         mirror = new List<GameObject>(5);
 
         mirror.Add(PageSystem.pageSystem.NoteField);
@@ -386,6 +634,7 @@ public class NoteEdit : MonoBehaviour
             mirror[0] = PageSystem.pageSystem.NoteField;
             mirror[0].transform.localPosition = pos;
             mirror[0].name = "NoteField";
+            InputManager.input.inputNoteFieldSet(mirror[0]);
         }
 
         for (int i = 1; i < 5; i++)
