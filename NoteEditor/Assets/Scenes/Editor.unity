@@ -4376,6 +4376,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Selected: {fileID: 0}
   isNoteEdit: 0
+  guidePosSector: 0
   inputLine: {fileID: 2120116200}
   inputPage: {fileID: 137263464}
   inputPosY: {fileID: 520782566}
@@ -26098,7 +26099,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2061325712
 Transform:
   m_ObjectHideFlags: 0

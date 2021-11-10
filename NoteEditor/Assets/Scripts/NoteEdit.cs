@@ -17,7 +17,7 @@ public class NoteEdit : MonoBehaviour
     private readonly float[] rdPosX = new float[5] {0.0f, 925.926f, 1851.852f, 2777.778f, 3703.704f };
 
     [SerializeField]
-    public float guidePosSector;
+    public int guidePosSector;
 
     [SerializeField]
     TMP_InputField inputLine;
@@ -70,6 +70,7 @@ public class NoteEdit : MonoBehaviour
     private void Start()
     {
         isNoteEdit = false;
+        guidePosSector = 1;
         ResetNoteInfo();
 
         SectorSetOriginal();
@@ -173,11 +174,10 @@ public class NoteEdit : MonoBehaviour
                         StartCoroutine(UpdateLengthNote(length + 1));
 
                         DisplayNoteInfo();
-                        MirrorPage();
                     }
                     else
                     {
-                        ArrowKeyNoteMove(notePos, isUp);
+                        StartCoroutine(ArrowKeyNoteMove(notePos, isUp));
                     }
                 }
 
@@ -197,11 +197,10 @@ public class NoteEdit : MonoBehaviour
                         StartCoroutine(UpdateLengthNote(length - 1));
 
                         DisplayNoteInfo();
-                        MirrorPage();
                     }
                     else
                     {
-                        ArrowKeyNoteMove(notePos, isUp);
+                        StartCoroutine(ArrowKeyNoteMove(notePos, isUp));
                     }
                 }
             }
@@ -211,6 +210,11 @@ public class NoteEdit : MonoBehaviour
         {
             isNoteEdit = false;
             ResetNoteInfo();
+        }
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            MirrorPage();
         }
     }
 
@@ -256,63 +260,97 @@ public class NoteEdit : MonoBehaviour
         else { Debug.LogError("조정 대상을 찾지 못함"); yield break; }
 
         yield return new WaitForSeconds(.1f);
-
-        PageSystem.pageSystem.PageSet(PageSystem.pageSystem.firstPage);
     }
 
-    private void ArrowKeyNoteMove(Vector3 pos, bool isUp)
+    private IEnumerator ArrowKeyNoteMove(Vector3 pos, bool isUp)
     {
+        yield return new WaitForSeconds(.1f);
+
         if (isUp == true)
         {
-            int guideNum;
-
-            if ((pos.y - pos.y % 1600) / 1600 == 0)
+            if (guidePosSector == 1)
             {
-                guideNum = 0;
+                pos.y = pos.y - pos.y % 1600 + 1600;
+
+                if (pos.y < 0) pos.y = 0;
+                Selected.transform.localPosition = pos;
+                DisplayNoteInfo();
+                MirrorPage();
             }
             else
             {
-                guideNum = (int)((pos.y - pos.y % 1600) / 1600);
-            }
+                int guideNum;
 
-            if (guideNum == 0)
-            {
-                pos.y = pos.y - pos.y % 1600 + guidePosSector;
-            }
-            else
-            {
-                pos.y = pos.y - pos.y % 1600 + guidePosSector * (guideNum + 1);
-            }
+                if (pos.y % 1600 == 0)
+                {
+                    guideNum = 0;
+                }
+                else
+                {
+                    guideNum = (int)((pos.y % 1600) / (1600 / guidePosSector));
+                }
 
-            Selected.transform.localPosition = pos;
-            DisplayNoteInfo();
-            MirrorPage();
+                if (guideNum == 0)
+                {
+                    pos.y = pos.y - pos.y % 1600 + (1600 / guidePosSector);
+                }
+                else if (guideNum + 1 == guidePosSector)
+                {
+                    pos.y = pos.y - pos.y % 1600 + 1600;
+                }
+                else
+                {
+                    pos.y = pos.y - pos.y % 1600 + (1600 / guidePosSector) * (guideNum + 1);
+                }
+
+                if (pos.y < 0) pos.y = 0;
+                Selected.transform.localPosition = pos;
+                DisplayNoteInfo();
+                MirrorPage();
+            }
         }
         else
         {
-            int guideNum;
-
-            if ((pos.y - pos.y % 1600) / 1600 == 0)
+            if (guidePosSector == 1)
             {
-                guideNum = 0;
+                pos.y = pos.y - pos.y % 1600 - 1600;
+
+                if (pos.y < 0) pos.y = 0;
+                Selected.transform.localPosition = pos;
+                DisplayNoteInfo();
+                MirrorPage();
             }
             else
             {
-                guideNum = (int)((pos.y - pos.y % 1600) / 1600);
-            }
+                int guideNum;
 
-            if (guideNum == 0)
-            {
-                pos.y = pos.y - pos.y % 1600 - guidePosSector;
-            }
-            else
-            {
-                pos.y = pos.y - pos.y % 1600 + guidePosSector * (guideNum - 1);
-            }
+                if (pos.y / 1600 == 0)
+                {
+                    guideNum = 0;
+                }
+                else
+                {
+                    guideNum = (int)((pos.y % 1600) / (1600 / guidePosSector));
+                }
 
-            Selected.transform.localPosition = pos;
-            DisplayNoteInfo();
-            MirrorPage();
+                if (guideNum == 0)
+                {
+                    pos.y = pos.y - pos.y % 1600 - (1600 / guidePosSector);
+                }
+                else if (guideNum - 1 == 0)
+                {
+                    pos.y -= pos.y % 1600;
+                }
+                else
+                {
+                    pos.y = pos.y - pos.y % 1600 + (1600 / guidePosSector) * (guideNum - 1);
+                }
+
+                if (pos.y < 0) pos.y = 0;
+                Selected.transform.localPosition = pos;
+                DisplayNoteInfo();
+                MirrorPage();
+            }
         }
     }
 
@@ -409,8 +447,6 @@ public class NoteEdit : MonoBehaviour
         else { Debug.LogError("삭제 대상을 찾지 못함"); yield break; }
 
         yield return new WaitForSeconds(.1f);
-
-        PageSystem.pageSystem.PageSet(PageSystem.pageSystem.firstPage);
     }
 
     IEnumerator LengthNote()
@@ -457,8 +493,6 @@ public class NoteEdit : MonoBehaviour
         else { Debug.LogError("조정 대상을 찾지 못함"); yield break; }
 
         yield return new WaitForSeconds(.1f);
-
-        PageSystem.pageSystem.PageSet(PageSystem.pageSystem.firstPage);
     }
 
     // ------------------------------------------------------------
@@ -528,18 +562,19 @@ public class NoteEdit : MonoBehaviour
 
     public void ButtonPos()
     {
-        int posInput;
+        float posInput;
         Vector3 SelectedPos;
         try
         {
-            posInput = int.Parse(inputPage.text);
+            posInput = Convert.ToSingle(inputPosY.text);
+            Debug.Log(posInput);
             SelectedPos = Selected.transform.localPosition;
             if (posInput < 0 || posInput >= 1600)
             {
                 DisplayNoteInfo();
                 return;
             }
-            SelectedPos.y -= SelectedPos.y % 1600 + posInput;
+            SelectedPos.y = SelectedPos.y - SelectedPos.y % 1600 + posInput;
 
             Selected.transform.localPosition = SelectedPos;
         }
@@ -610,7 +645,7 @@ public class NoteEdit : MonoBehaviour
 
         mirror.Add(PageSystem.pageSystem.NoteField);
 
-        for (int i = 0; i < MirrorField.transform.childCount; i++)
+        for (int i = 0; i < 4; i++)
         {
             mirror.Add(MirrorField.transform.GetChild(i).gameObject);
         }
@@ -648,6 +683,7 @@ public class NoteEdit : MonoBehaviour
                 , MirrorField.transform);
                 mirror[i].transform.localPosition = pos;
                 mirror[i].name = "MirrorField" + i.ToString();
+                Debug.Log("mirror" + i + "생성");
             }
         }
     }
