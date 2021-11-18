@@ -55,8 +55,8 @@ public class MusicLoad : MonoBehaviour
                 try
                 {
                     PlayerPrefs.SetString("SongName", songName.text);
-                    loadSuccessCheck.SetActive(true);
                     MusicClip = DownloadHandlerAudioClip.GetContent(www);
+                    loadSuccessCheck.SetActive(true);
                     audioSource.clip = MusicClip;
                 }
                 catch { ResetSave(); }

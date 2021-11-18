@@ -427,26 +427,66 @@ public class NoteEdit : MonoBehaviour
         Vector3 pos;
         pos = Selected.transform.localPosition;
 
+        float posX;
+        posX = Selected.transform.parent.localPosition.x;
+
         GameObject NoteField;
         NoteField = PageSystem.pageSystem.NoteField;
 
-        GameObject deleteNote;
-        deleteNote = null;
-        for (int i = 0; i < NoteField.transform.childCount; i++)
+        GameObject Parent;
+        Parent = Selected.transform.parent.gameObject;
+
+        if (Selected != null)
         {
-            if (NoteField.transform.GetChild(i).localPosition == pos)
-            {
-                deleteNote = NoteField.transform.GetChild(i).gameObject;
-                break;
-            }
-        }
-        if (deleteNote != null)
-        {
-            Destroy(deleteNote);
+            Destroy(Selected);
         }
         else { Debug.LogError("삭제 대상을 찾지 못함"); yield break; }
 
         yield return new WaitForSeconds(.1f);
+
+        mirror = new List<GameObject>(5);
+
+        mirror.Add(PageSystem.pageSystem.NoteField);
+
+        for (int i = 0; i < 4; i++)
+        {
+            mirror.Add(MirrorField.transform.GetChild(i).gameObject);
+        }
+
+        mirror.Sort(delegate (GameObject A, GameObject B)
+        {
+            if (A.transform.localPosition.x > B.transform.localPosition.x) return 1;
+            else if (A.transform.localPosition.x < B.transform.localPosition.x) return -1;
+            return 0;
+        });
+
+        if (posX != 0)
+        {
+            Vector3 pagePos;
+            pagePos = PageSystem.pageSystem.NoteField.transform.localPosition;
+
+            Destroy(PageSystem.pageSystem.NoteField);
+            PageSystem.pageSystem.NoteField =
+                Instantiate(Parent, NoteFieldParent.transform);
+            mirror[0] = PageSystem.pageSystem.NoteField;
+            mirror[0].transform.localPosition = pagePos;
+            mirror[0].name = "NoteField";
+            InputManager.input.inputNoteFieldSet(mirror[0]);
+        }
+
+        for (int i = 1; i < 5; i++)
+        {
+            if (posX != rdPosX[i])
+            {
+                Vector3 pagePos;
+                pagePos = mirror[i].transform.localPosition;
+                Destroy(mirror[i]);
+                mirror[i] = Instantiate(Parent, MirrorField.transform);
+                mirror[i].transform.localPosition = pagePos;
+                mirror[i].name = "MirrorField" + i.ToString();
+                Debug.Log("mirror" + i + "생성");
+            }
+        }
     }
 
     IEnumerator LengthNote()

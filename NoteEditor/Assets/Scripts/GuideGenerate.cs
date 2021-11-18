@@ -102,6 +102,7 @@ public class GuideGenerate : MonoBehaviour
         }
         else
         {
+            GuideLineGenerate(1);
             inputField.text = "1";
             return;
         }
