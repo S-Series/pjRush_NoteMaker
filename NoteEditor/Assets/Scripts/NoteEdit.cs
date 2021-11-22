@@ -670,6 +670,7 @@ public class NoteEdit : MonoBehaviour
             mirror[0].transform.localPosition = pos;
             mirror[0].name = "NoteField";
             InputManager.input.inputNoteFieldSet(mirror[0]);
+            AutoTest.autoTest.autoNoteFieldSet(mirror[0]);
         }
 
         for (int i = 1; i < 5; i++)

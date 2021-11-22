@@ -10,8 +10,7 @@ public class AutoTest : MonoBehaviour
 
     private bool isPause;
 
-    [SerializeField]
-    private bool isTest;
+    public bool isTest;
 
     public float bpm;
 
@@ -168,6 +167,11 @@ public class AutoTest : MonoBehaviour
             }
             catch { }
         }
+    }
+
+    public void autoNoteFieldSet(GameObject gameObject)
+    {
+        NoteField = gameObject;
     }
 
     private IEnumerator LongStart(int Line, int Legnth)
