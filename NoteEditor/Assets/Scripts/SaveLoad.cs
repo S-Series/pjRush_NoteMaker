@@ -130,7 +130,8 @@ public class SaveLoad : MonoBehaviour
             else
             {
                 int legnth;
-                legnth = (int)(NoteField.transform.GetChild(i).localScale.y / 100);
+                legnth = (int)(listObject[i].transform.localScale.y / 100);
+                Debug.Log(legnth);
                 noteSaved.NoteLegnth.Add(legnth);
             }
 
@@ -240,10 +241,12 @@ public class SaveLoad : MonoBehaviour
                 if (noteSaved.NoteLegnth[i] != 0)
                 {
                     copiedObject = Instantiate(PrefabObject[3], NoteField.transform);
+                    copiedObjectPos.z = 0.003f;
                     copiedObject.transform.localScale = new Vector3(1, noteSaved.NoteLegnth[i] * 100, 1);
                 }
                 else
                 {
+                    copiedObjectPos.z = 0.001f;
                     copiedObject = Instantiate(PrefabObject[2], NoteField.transform);
                 }
             }
@@ -252,6 +255,7 @@ public class SaveLoad : MonoBehaviour
                 if (noteSaved.NoteLegnth[i] != 0)
                 {
                     copiedObject = Instantiate(PrefabObject[1], NoteField.transform);
+                    copiedObjectPos.z = 0.002f;
                     copiedObject.transform.localScale = new Vector3(1, noteSaved.NoteLegnth[i] * 100, 1);
                 }
                 else
@@ -276,6 +280,10 @@ public class SaveLoad : MonoBehaviour
                     case 4:
                         copiedObjectPos.x = +300;
                         break;
+
+                    case 5:
+                        copiedObjectPos.x = 0;
+                        break;
                 }
             }
 
@@ -295,6 +303,8 @@ public class SaveLoad : MonoBehaviour
 
     private void ResetSavedData()
     {
+        NoteField = PageSystem.pageSystem.NoteField;
+
         noteSaved.bpm = new float();
         noteSaved.startDelayMs = new int();
 

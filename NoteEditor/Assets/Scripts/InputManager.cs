@@ -35,6 +35,8 @@ public class InputManager : MonoBehaviour
     public bool isNoteBottom;
 
     // 0. InputNoteData [Field Number (0 ~ 4) || 1. Line Number (1 ~ 5) || 2. Prefab Number (1 ~ 6)]
+    // Prefab Number 1 == Chip || Prefab Number 2 == Long
+    // Prefab Number 3 == BtChip || Prefab Number 4 == BtLong
     // Prefab Number 5 == Effect || Prefab Number 6 == Bpm
     public int[] InputNoteData;
 
@@ -127,26 +129,137 @@ public class InputManager : MonoBehaviour
             CopyObject = Instantiate(NotePrefab[InputNoteData[2]], NoteField.transform);
 
             float copiedPosX;
+            float copiedPosZ;
             switch (InputNoteData[1])
             {
                 case 1:
                     copiedPosX = -300.0f;
+                    switch (InputNoteData[2])
+                    {
+                        case 1:
+                            copiedPosZ = +0.000f;
+                            break;
+
+                        case 2:
+                            copiedPosZ = +0.001f;
+                            break;
+
+                        case 3:
+                            copiedPosZ = +0.002f;
+                            break;
+
+                        case 4:
+                            copiedPosZ = +0.003f;
+                            break;
+
+                        default:
+                            copiedPosZ = +0.000f;
+                            break;
+                    }
                     break;
 
                 case 2:
                     copiedPosX = -100.0f;
+                    switch (InputNoteData[2])
+                    {
+                        case 1:
+                            copiedPosZ = +0.000f;
+                            break;
+
+                        case 2:
+                            copiedPosZ = +0.001f;
+                            break;
+
+                        case 3:
+                            copiedPosZ = +0.002f;
+                            break;
+
+                        case 4:
+                            copiedPosZ = +0.003f;
+                            break;
+
+                        default:
+                            copiedPosZ = +0.000f;
+                            break;
+                    }
                     break;
 
                 case 3:
                     copiedPosX = +100.0f;
+                    switch (InputNoteData[2])
+                    {
+                        case 1:
+                            copiedPosZ = +0.000f;
+                            break;
+
+                        case 2:
+                            copiedPosZ = +0.001f;
+                            break;
+
+                        case 3:
+                            copiedPosZ = +0.002f;
+                            break;
+
+                        case 4:
+                            copiedPosZ = +0.003f;
+                            break;
+
+                        default:
+                            copiedPosZ = +0.000f;
+                            break;
+                    }
                     break;
 
                 case 4:
                     copiedPosX = +300.0f;
+                    switch (InputNoteData[2])
+                    {
+                        case 1:
+                            copiedPosZ = +0.000f;
+                            break;
+
+                        case 2:
+                            copiedPosZ = +0.001f;
+                            break;
+
+                        case 3:
+                            copiedPosZ = +0.002f;
+                            break;
+
+                        case 4:
+                            copiedPosZ = +0.003f;
+                            break;
+
+                        default:
+                            copiedPosZ = +0.000f;
+                            break;
+                    }
                     break;
 
                 case 5:
                     copiedPosX = 0.0f;
+                    switch (InputNoteData[2])
+                    {
+                        case 1:
+                            copiedPosZ = +0.000f;
+                            break;
+
+                        case 2:
+                            copiedPosZ = +0.001f;
+                            break;
+
+                        case 3:
+                            copiedPosZ = +0.002f;
+                            break;
+
+                        case 4:
+                            copiedPosZ = +0.003f;
+                            break;
+
+                        default:
+                            copiedPosZ = +0.000f;
+                            break;
+                    }
                     break;
 
                 default:
@@ -158,7 +271,7 @@ public class InputManager : MonoBehaviour
             copiedPosY = (PageSystem.pageSystem.firstPage - 1) * 1600
                 + InputNoteData[0] * 4800 + posY;
 
-            CopyObject.transform.localPosition = new Vector3(copiedPosX, copiedPosY, 0);
+            CopyObject.transform.localPosition = new Vector3(copiedPosX, copiedPosY, copiedPosZ);
 
             PageSystem.pageSystem.PageSet(PageSystem.pageSystem.firstPage);
 
