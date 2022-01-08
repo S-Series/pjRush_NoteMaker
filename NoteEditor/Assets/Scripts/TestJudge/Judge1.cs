@@ -20,9 +20,25 @@ public class Judge1 : MonoBehaviour
     [SerializeField]
     Animator HitEffect;
 
+    [SerializeField]
+    AudioSource[] HitSound;
+
     AutoTest auto;
 
-    private void Awake()
+    [SerializeField]
+    private GameObject LongBlind;
+
+    private void Start()
+    {
+        auto = AutoTest.autoTest;
+        TestPlay1 = new List<GameObject>();
+        TestPlayMs1 = new List<int>();
+        index = 0;
+        ms = 0;
+        isLongJudge = false;
+    }
+
+    private void OnEnable()
     {
         auto = AutoTest.autoTest;
         TestPlay1 = new List<GameObject>();
@@ -50,42 +66,42 @@ public class Judge1 : MonoBehaviour
         }
         else if (Input.GetKeyUp(KeyCode.Z) || Input.GetKeyUp(KeyCode.M))
         {
-            isLongJudge = false;
-        }
-        else if (TestPlayLegnth1[index] != 0)
-        {
-            int num;
-            num = judgeMs - longNoteJudgeMs;
-
-            if (isLongJudge == true)
-            {
-                if (num <= 30 && num >= -85)
-                {
-                    TestPlay.testPlay.Rush[0]++;
-                    longNoteJudgeMs += 50;
-                }
-            }
-            else if (num < -85)
-            {
-                TestPlay.testPlay.Lost[1]++;
-                //ComboManager.comboManager.resetCombo();
-                longNoteJudgeMs += 50;
-            }
-
-            if (longNoteJudgeMs >= TestPlayLegnth1[index])
-            {
-                longNoteJudgeMs = 0;
-                TestPlay1[index].SetActive(false);
-                index++;
-            }
+            StartCoroutine(longKeep());
         }
         else if (judgeMs < -85)
         {
             isLongJudge = false;
             TestPlay.testPlay.Lost[1]++;
             //ComboManager.comboManager.resetCombo();
-            TestPlay1[index].SetActive(false);
+            CheckLong();
             index++;
+        }
+
+        if (!isLongJudge)
+        {
+            LongBlind.transform.localPosition -= new Vector3(0, TestPlay.testPlay.BlindMovingPos, 0);
+        }
+        else
+        {
+            LongBlind.transform.localPosition = new Vector3(-1.62f, 0, 0);
+        }
+    }
+
+    private IEnumerator longKeep()
+    {
+        yield return new WaitForSeconds(.5f);
+        if (!Input.GetKey(KeyCode.Z) && !Input.GetKey(KeyCode.M)) isLongJudge = false;
+    }
+
+    private void CheckLong()
+    {
+        if (TestPlayLegnth1[index] != 0)
+        {
+            StartCoroutine(LongStart(TestPlayLegnth1[index]));
+        }
+        else
+        {
+            TestPlay1[index].SetActive(false);
         }
     }
 
@@ -95,6 +111,8 @@ public class Judge1 : MonoBehaviour
         {
             TestPlay.testPlay.Rush[1]++;
             HitEffect.SetTrigger("Play");
+            HitSound[0].Play();
+            CheckLong();
         }
         else if (judgeMs >= -55 && judgeMs <= 55)
         {
@@ -107,6 +125,8 @@ public class Judge1 : MonoBehaviour
                 TestPlay.testPlay.Rush[2]++;
             }
             HitEffect.SetTrigger("Play");
+            HitSound[0].Play();
+            CheckLong();
         }
         else if (judgeMs >= -85 && judgeMs <= 85)
         {
@@ -118,16 +138,49 @@ public class Judge1 : MonoBehaviour
             {
                 TestPlay.testPlay.Step[1]++;
             }
+            HitEffect.SetTrigger("Play");
+            HitSound[0].Play();
+            CheckLong();
         }
         else if (judgeMs > 85 && judgeMs <= 100)
         {
             isLongJudge = false;
             TestPlay.testPlay.Lost[0]++;
             //ComboManager.comboManager.resetCombo();
+            CheckLong();
         }
         else { return; }
 
-        TestPlay1[index].SetActive(false);
         index++;
+    }
+
+    private IEnumerator LongStart(int Legnth)
+    {
+        var delay = new WaitForSeconds(15/AutoTest.autoTest.bpm);
+
+        for (int i = 0; i < Legnth; i++)
+        {
+            if (isLongJudge)
+            {
+                HitEffect.SetTrigger("Play");
+                TestPlay.testPlay.Rush[1]++;
+                HitSound[1].Play();
+            }
+            else
+            {
+                TestPlay.testPlay.Lost[1]++;
+                //ComboManager.comboManager.resetCombo();
+            }
+
+            yield return delay;
+
+            if (!AutoTest.autoTest.isPlay) break;
+        }
+            TestPlay1[index - 1].SetActive(false);
+    }
+
+    public void resetMs1()
+    {
+        ms = 0;
     }
 }

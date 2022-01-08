@@ -21,7 +21,38 @@ public class GuideGenerate : MonoBehaviour
     [SerializeField]
     TMP_InputField inputField;
 
+    [SerializeField]
+    GameObject StaticGuide;
+    GameObject StaticGuideParent;
+
     readonly float[] posX = new float[5]{0.0f, 925.926f, 1851.852f, 2777.778f, 3703.704f };
+
+    private void Awake()
+    {
+        StaticGuideParent = StaticGuide.transform.parent.gameObject;
+        for (int i = 1; i < 9; i++)
+        {
+            GameObject copy;
+            copy = Instantiate(StaticGuide, StaticGuideParent.transform);
+            copy.transform.localPosition = new Vector3(0, 1600 * i, 0);
+            copy.transform.GetChild(0).GetComponent<TextMeshPro>().text = "00" + (i + 1).ToString();
+        }
+        for (int i = 9; i < 99; i++)
+        {
+            GameObject copy;
+            copy = Instantiate(StaticGuide, StaticGuideParent.transform);
+            copy.transform.localPosition = new Vector3(0, 1600 * i, 0);
+            copy.transform.GetChild(0).GetComponent<TextMeshPro>().text = "0" + (i + 1).ToString();
+        }
+        for (int i = 99; i < 999; i++)
+        {
+            GameObject copy;
+            copy = Instantiate(StaticGuide, StaticGuideParent.transform);
+            copy.transform.localPosition = new Vector3(0, 1600 * i, 0);
+            copy.transform.GetChild(0).GetComponent<TextMeshPro>().text = (i + 1).ToString();
+        }
+        StaticGuideParent.SetActive(false);
+    }
 
     private void Start()
     {
@@ -69,14 +100,17 @@ public class GuideGenerate : MonoBehaviour
                 }
             }
 
-            float div;
-            div = 1600 / count;
-
             for (int j = 0; j < 4; j++)
             {
+                float posY;
+                posY = (1600 * i) / count + 1600 * j;
                 GameObject copy;
                 copy = Instantiate(GuideLinePrefab, GuideLineBox.transform);
-                copy.transform.localPosition = new Vector3(0.0f, div * i + 1600 * j, 0.0f);
+                copy.transform.localPosition = new Vector3(0.0f, posY, 0.0f);
+                if ((int)(posY % 400) == 0)
+                {
+                    copy.GetComponent<SpriteRenderer>().color = new Color32(255, 0, 0, 150);
+                }
             }
         }
     }

@@ -11,27 +11,36 @@ public class NoteClick : MonoBehaviour
             NoteEdit noteEdit;
             noteEdit = NoteEdit.noteEdit;
 
-            if (this.gameObject.tag == "Effect")
+            if (noteEdit.Selected != null) 
             {
-                InputManager.input.isNoteInputAble = false;
-                noteEdit.isNoteEdit = true;
-                noteEdit.SectorSetEffect();
-                noteEdit.Selected = this.gameObject;
+
             }
-            else if (this.gameObject.tag == "Bpm")
+
+            switch (this.gameObject.tag)
             {
-                InputManager.input.isNoteInputAble = false;
-                noteEdit.isNoteEdit = true;
-                noteEdit.SectorSetSpeed();
-                noteEdit.Selected = this.gameObject;
-            }
-            else
-            {
-                InputManager.input.isNoteInputAble = false;
-                noteEdit.isNoteEdit = true;
-                noteEdit.SectorSetOriginal();
-                noteEdit.Selected = this.gameObject;
-                noteEdit.DisplayNoteInfo();
+                case "Effect":
+                    InputManager.input.isNoteInputAble = false;
+                    noteEdit.isNoteEdit = true;
+                    noteEdit.SectorSetEffect();
+                    noteEdit.Selected = this.gameObject;
+                    break;
+
+                case "Bpm":
+                    InputManager.input.isNoteInputAble = false;
+                    noteEdit.isNoteEdit = true;
+                    noteEdit.SectorSetSpeed();
+                    noteEdit.Selected = this.gameObject;
+                    noteEdit.inputSpeedBpm.text
+                        = this.transform.GetChild(0).GetChild(0).localPosition.y.ToString();
+                    break;
+
+                default:
+                    InputManager.input.isNoteInputAble = false;
+                    noteEdit.isNoteEdit = true;
+                    noteEdit.SectorSetOriginal();
+                    noteEdit.Selected = this.gameObject;
+                    noteEdit.DisplayNoteInfo();
+                    break;
             }
         }
     }
