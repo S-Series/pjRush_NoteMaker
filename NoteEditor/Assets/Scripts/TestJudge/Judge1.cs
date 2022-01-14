@@ -17,6 +17,8 @@ public class Judge1 : MonoBehaviour
     private int longNoteJudgeMs;
     private int index;
 
+    float wait;
+
     [SerializeField]
     Animator HitEffect;
 
@@ -89,7 +91,8 @@ public class Judge1 : MonoBehaviour
 
     private IEnumerator longKeep()
     {
-        yield return new WaitForSeconds(.5f);
+        wait = 15 / AutoTest.autoTest.bpm;
+        yield return new WaitForSeconds(2 * wait);
         if (!Input.GetKey(KeyCode.Z) && !Input.GetKey(KeyCode.M)) isLongJudge = false;
     }
 
@@ -110,7 +113,7 @@ public class Judge1 : MonoBehaviour
         if (judgeMs >= -30 && judgeMs <= 30)
         {
             TestPlay.testPlay.Rush[1]++;
-            HitEffect.SetTrigger("Play");
+            HitEffect.SetTrigger("Rush");
             HitSound[0].Play();
             CheckLong();
         }
@@ -124,7 +127,7 @@ public class Judge1 : MonoBehaviour
             {
                 TestPlay.testPlay.Rush[2]++;
             }
-            HitEffect.SetTrigger("Play");
+            HitEffect.SetTrigger("Rush");
             HitSound[0].Play();
             CheckLong();
         }
@@ -138,7 +141,7 @@ public class Judge1 : MonoBehaviour
             {
                 TestPlay.testPlay.Step[1]++;
             }
-            HitEffect.SetTrigger("Play");
+            HitEffect.SetTrigger("Step");
             HitSound[0].Play();
             CheckLong();
         }
@@ -149,25 +152,41 @@ public class Judge1 : MonoBehaviour
             //ComboManager.comboManager.resetCombo();
             CheckLong();
         }
-        else { return; }
+        else 
+        {
+            HitEffect.SetTrigger("None");
+            return; 
+        }
 
         index++;
     }
 
     private IEnumerator LongStart(int Legnth)
     {
-        var delay = new WaitForSeconds(15/AutoTest.autoTest.bpm);
+        SpriteRenderer sprite;
+        sprite = TestPlay1[index].GetComponentInChildren<SpriteRenderer>();
+
+        wait = 15 / AutoTest.autoTest.bpm;
+        var delay = new WaitForSeconds(wait);
+        var white = new Color32(255, 255, 255, 255);
+        var middleGray = new Color32(240, 240, 240, 255);
+        var gray = new Color32(225, 225, 225, 255);
+        var dark = new Color32(150, 150, 150, 255);
 
         for (int i = 0; i < Legnth; i++)
         {
             if (isLongJudge)
             {
-                HitEffect.SetTrigger("Play");
+                HitEffect.SetTrigger("Rush");
                 TestPlay.testPlay.Rush[1]++;
+                sprite.color = white;
+                StartCoroutine(color(sprite, wait / 4, middleGray, gray));
                 HitSound[1].Play();
             }
             else
             {
+                isLongJudge = false;
+                sprite.color = dark;
                 TestPlay.testPlay.Lost[1]++;
                 //ComboManager.comboManager.resetCombo();
             }
@@ -176,7 +195,17 @@ public class Judge1 : MonoBehaviour
 
             if (!AutoTest.autoTest.isPlay) break;
         }
-            TestPlay1[index - 1].SetActive(false);
+        TestPlay1[index - 1].SetActive(false);
+    }
+
+    private IEnumerator color(SpriteRenderer sprite, float duration, Color32 color1, Color32 color2)
+    {
+        yield return new WaitForSeconds(duration);
+        sprite.color = color1;
+        yield return new WaitForSeconds(duration);
+        sprite.color = color2;
+        yield return new WaitForSeconds(duration);
+        sprite.color = color1;
     }
 
     public void resetMs1()

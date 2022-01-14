@@ -14,7 +14,8 @@ public class NoteEdit : MonoBehaviour
 
     private const int maxPage = 984;
 
-    private readonly float[] rdPosX = new float[5] {0.0f, 925.926f, 1851.852f, 2777.778f, 3703.704f };
+    private readonly float[] rdPosX 
+        = new float[5] {0.0f, 925.926f, 1851.852f, 2777.778f, 3703.704f };
 
     [SerializeField]
     public int guidePosSector;
@@ -83,6 +84,24 @@ public class NoteEdit : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Escape))
             {
                 isNoteEdit = false;
+                switch (Selected.gameObject.tag)
+                {
+                    case "chip":
+                    case "long":
+                        noteEdit.Selected.GetComponentInChildren<SpriteRenderer>()
+                            .color = new Color32(230, 230, 230, 255);
+                        break;
+
+                    case "btChip":
+                        noteEdit.Selected.GetComponentInChildren<SpriteRenderer>()
+                            .color = new Color32(255, 255, 255, 255);
+                        break;
+
+                    case "btLong":
+                        noteEdit.Selected.GetComponentInChildren<SpriteRenderer>()
+                            .color = new Color32(255, 255, 255, 150);
+                        break;
+                }
                 Selected = null;
                 ResetNoteInfo();
                 SectorSetOriginal();
@@ -100,29 +119,45 @@ public class NoteEdit : MonoBehaviour
                     Vector3 selectPos;
                     selectPos = Selected.transform.localPosition;
 
-                    switch (Selected.transform.localPosition.x)
+                    if (Selected.tag == "chip" || Selected.tag == "long")
                     {
-                        case -100:
-                            selectPos.x = -300;
-                            Selected.transform.localPosition = selectPos;
-                            DisplayNoteInfo();
-                            MirrorPage();
-                            break;
+                        switch (Selected.transform.localPosition.x)
+                        {
+                            case -100:
+                                selectPos.x = -300;
+                                Selected.transform.localPosition = selectPos;
+                                DisplayNoteInfo();
+                                MirrorPage();
+                                break;
 
-                        case +100:
-                            selectPos.x = -100;
-                            Selected.transform.localPosition = selectPos;
-                            DisplayNoteInfo();
-                            MirrorPage(); break;
+                            case +100:
+                                selectPos.x = -100;
+                                Selected.transform.localPosition = selectPos;
+                                DisplayNoteInfo();
+                                MirrorPage(); break;
 
-                        case +300:
-                            selectPos.x = +100;
-                            Selected.transform.localPosition = selectPos;
-                            DisplayNoteInfo();
-                            MirrorPage(); break;
+                            case +300:
+                                selectPos.x = +100;
+                                Selected.transform.localPosition = selectPos;
+                                DisplayNoteInfo();
+                                MirrorPage(); break;
 
-                        default:
-                            return;
+                            default:
+                                return;
+                        }
+                    }
+                    else if (Selected.tag == "btChip" || Selected.tag == "btLong")
+                    {
+                        Vector3 selectScale;
+                        selectScale = Selected.transform.localScale;
+                        selectScale.x = 0.75f;
+
+                        selectPos.x = -100;
+                        Selected.transform.localPosition = selectPos;
+                        Selected.transform.localScale = selectScale;
+
+                        DisplayNoteInfo();
+                        MirrorPage();
                     }
                 }
 
@@ -131,31 +166,47 @@ public class NoteEdit : MonoBehaviour
                     Vector3 selectPos;
                     selectPos = Selected.transform.localPosition;
 
-                    switch (Selected.transform.localPosition.x)
+                    if (Selected.tag == "chip" || Selected.tag == "long")
                     {
-                        case -300:
-                            selectPos.x = -100;
-                            Selected.transform.localPosition = selectPos;
-                            DisplayNoteInfo();
-                            MirrorPage();
-                            break;
+                        switch (Selected.transform.localPosition.x)
+                        {
+                            case -300:
+                                selectPos.x = -100;
+                                Selected.transform.localPosition = selectPos;
+                                DisplayNoteInfo();
+                                MirrorPage();
+                                break;
 
-                        case -100:
-                            selectPos.x = +100;
-                            Selected.transform.localPosition = selectPos;
-                            DisplayNoteInfo();
-                            MirrorPage();
-                            break;
+                            case -100:
+                                selectPos.x = +100;
+                                Selected.transform.localPosition = selectPos;
+                                DisplayNoteInfo();
+                                MirrorPage();
+                                break;
 
-                        case +100:
-                            selectPos.x = +300;
-                            Selected.transform.localPosition = selectPos;
-                            DisplayNoteInfo();
-                            MirrorPage();
-                            break;
+                            case +100:
+                                selectPos.x = +300;
+                                Selected.transform.localPosition = selectPos;
+                                DisplayNoteInfo();
+                                MirrorPage();
+                                break;
 
-                        default:
-                            return;
+                            default:
+                                return;
+                        }
+                    }
+                    else if (Selected.CompareTag("btChip") || Selected.CompareTag("btLong"))
+                    {
+                        Vector3 selectScale;
+                        selectScale = Selected.transform.localScale;
+                        selectScale.x = 0.75f;
+
+                        selectPos.x = 100;
+                        Selected.transform.localPosition = selectPos;
+                        Selected.transform.localScale = selectScale;
+
+                        DisplayNoteInfo();
+                        MirrorPage();
                     }
                 }
 
@@ -168,7 +219,7 @@ public class NoteEdit : MonoBehaviour
                     notePos = Selected.transform.localPosition;
 
                     if ((Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
-                        && (Selected.tag == "long" || Selected.tag == "btLong"))
+                        && (Selected.CompareTag("long") || Selected.CompareTag("btLong")))
                     {
                         int length;
                         length = (int)(Selected.transform.localScale.y / 100);
@@ -191,7 +242,7 @@ public class NoteEdit : MonoBehaviour
                     notePos = Selected.transform.localPosition;
 
                     if ((Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
-                        && (Selected.tag == "long" || Selected.tag == "btLong"))
+                        && (Selected.CompareTag("long") || Selected.CompareTag("btLong")))
                     {
                         int length;
                         length = (int)(Selected.transform.localScale.y / 100);
@@ -744,6 +795,32 @@ public class NoteEdit : MonoBehaviour
 
     private void MirrorPage()
     {
+        switch (Selected.gameObject.tag)
+        {
+            case "chip":
+                noteEdit.Selected.GetComponentInChildren<SpriteRenderer>()
+                    .color = new Color32(255, 255, 255, 255);
+                break;
+
+            case "long":
+                noteEdit.Selected.GetComponentInChildren<SpriteRenderer>()
+                    .color = new Color32(255, 255, 255, 230);
+                break;
+
+            case "btChip":
+                noteEdit.Selected.GetComponentInChildren<SpriteRenderer>()
+                    .color = new Color32(255, 255, 255, 255);
+                break;
+
+            case "btLong":
+                noteEdit.Selected.GetComponentInChildren<SpriteRenderer>()
+                    .color = new Color32(255, 255, 255, 150);
+                break;
+
+            default:
+                break;
+        }
+
         float posX;
         posX = Selected.transform.parent.localPosition.x;
 
@@ -792,6 +869,29 @@ public class NoteEdit : MonoBehaviour
                 mirror[i].name = "MirrorField" + i.ToString();
                 Debug.Log("mirror" + i + "생성");
             }
+        }
+
+        switch (Selected.gameObject.tag)
+        {
+            case "chip":
+                noteEdit.Selected.GetComponentInChildren<SpriteRenderer>()
+                    .color = new Color32(0, 255, 128, 255);
+                break;
+
+            case "long":
+                noteEdit.Selected.GetComponentInChildren<SpriteRenderer>()
+                    .color = new Color32(0, 255, 128, 230);
+                break;
+
+            case "btChip":
+                noteEdit.Selected.GetComponentInChildren<SpriteRenderer>()
+                    .color = new Color32(0, 255, 255, 255);
+                break;
+
+            case "btLong":
+                noteEdit.Selected.GetComponentInChildren<SpriteRenderer>()
+                    .color = new Color32(0, 255, 255, 150);
+                break;
         }
     }
 

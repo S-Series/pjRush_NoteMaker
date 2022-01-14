@@ -34,7 +34,9 @@ public class TestPlay : MonoBehaviour
     public float BlindMovingPos;
 
     public GameObject PlayNoteField;
-    public GameObject MovingNoteField;
+    public GameObject NoteField;
+    [SerializeField]
+    private GameObject MovingNoteField;
 
     [SerializeField]
     TextMeshPro[] TextNum;
@@ -42,6 +44,7 @@ public class TestPlay : MonoBehaviour
     private void Awake()
     {
         testPlay = this;
+        MovingNoteField = NoteField.transform.parent.gameObject;
         ResetJudge();
     }
 

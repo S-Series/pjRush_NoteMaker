@@ -133,6 +133,11 @@ public class SaveLoad : MonoBehaviour
                 {
                     if (A.transform.localPosition.y > B.transform.localPosition.y) return 1;
                     else if (A.transform.localPosition.y < B.transform.localPosition.y) return -1;
+                    else if (A.transform.localPosition.y == B.transform.localPosition.y)
+                    {
+                        if (A.transform.localPosition.x > B.transform.localPosition.x) return 1;
+                        else if (A.transform.localPosition.x < B.transform.localPosition.x) return -1;
+                    }
                     return 0;
                 });
             }
@@ -143,6 +148,11 @@ public class SaveLoad : MonoBehaviour
                 {
                     if (A.transform.localPosition.y > B.transform.localPosition.y) return 1;
                     else if (A.transform.localPosition.y < B.transform.localPosition.y) return -1;
+                    else if (A.transform.localPosition.y == B.transform.localPosition.y)
+                    {
+                        if (A.transform.localPosition.x > B.transform.localPosition.x) return 1;
+                        else if (A.transform.localPosition.x < B.transform.localPosition.x) return -1;
+                    }
                     return 0;
                 });
             }
@@ -153,6 +163,11 @@ public class SaveLoad : MonoBehaviour
                 {
                     if (A.transform.localPosition.y > B.transform.localPosition.y) return 1;
                     else if (A.transform.localPosition.y < B.transform.localPosition.y) return -1;
+                    else if (A.transform.localPosition.y == B.transform.localPosition.y)
+                    {
+                        if (A.transform.localPosition.x > B.transform.localPosition.x) return 1;
+                        else if (A.transform.localPosition.x < B.transform.localPosition.x) return -1;
+                    }
                     return 0;
                 });
             }
@@ -174,31 +189,43 @@ public class SaveLoad : MonoBehaviour
                     noteSaved.NoteLegnth.Add(legnth);
                 }
 
-                int ms;
-                ms = (int)(150 * gameObject.transform.localPosition.y / gameBpm);
+                float ms;
+                ms = (150 * gameObject.transform.localPosition.y / gameBpm);
                 noteSaved.NoteMs.Add(ms);
 
-                switch (gameObject.transform.localPosition.x)
+                if (gameObject.tag == "chip" || gameObject.tag == "long")
                 {
-                    case -300:
-                        noteSaved.NoteLine.Add(1);
-                        break;
+                    switch (gameObject.transform.localPosition.x)
+                    {
+                        case -300:
+                            noteSaved.NoteLine.Add(1);
+                            break;
 
-                    case -100:
-                        noteSaved.NoteLine.Add(2);
-                        break;
+                        case -100:
+                            noteSaved.NoteLine.Add(2);
+                            break;
 
-                    case +100:
-                        noteSaved.NoteLine.Add(3);
-                        break;
+                        case +100:
+                            noteSaved.NoteLine.Add(3);
+                            break;
 
-                    case +300:
-                        noteSaved.NoteLine.Add(4);
-                        break;
+                        case +300:
+                            noteSaved.NoteLine.Add(4);
+                            break;
+                    }
+                }
+                else if (gameObject.tag == "btChip" || gameObject.tag == "btLong")
+                {
+                    switch (gameObject.transform.localPosition.x)
+                    {
+                        case -100:
+                            noteSaved.NoteLine.Add(5);
+                            break;
 
-                    case 0:
-                        noteSaved.NoteLine.Add(5);
-                        break;
+                        case +100:
+                            noteSaved.NoteLine.Add(6);
+                            break;
+                    }
                 }
             }
 
@@ -225,10 +252,14 @@ public class SaveLoad : MonoBehaviour
                 ms = (int)(150 * gameObject.transform.localPosition.y / gameBpm);
                 noteSaved.SpeedMs.Add(ms);
 
-                noteSaved.SpeedPos.Add(gameObject.transform.localPosition.y);
+                float pos;
+                pos = gameObject.transform.localPosition.y;
+                if (pos % 10 >= 5) pos = pos - pos % 10 + 10;
+                else pos = pos - pos % 10;
+                noteSaved.SpeedPos.Add(pos);
 
                 float bpm;
-                bpm = Convert.ToSingle(gameObject.transform.GetChild(0).GetChild(0).transform.localPosition.y);
+                bpm = Convert.ToSingle(gameObject.transform.GetChild(0).GetChild(0).localPosition.y);
                 noteSaved.SpeedBpm.Add(bpm);
             }
 
@@ -285,7 +316,7 @@ public class SaveLoad : MonoBehaviour
             copy = Instantiate(PrefabObject[5], NoteField.transform);
             copy.transform.localPosition = new Vector3(0, noteSaved.SpeedPos[i], 0);
             copy.transform.GetChild(0).GetComponent<TextMeshPro>().text = noteSaved.SpeedBpm[i].ToString();
-            copy.transform.GetChild(0).GetChild(0).transform.localPosition 
+            copy.transform.GetChild(0).GetChild(0).localPosition 
                 = new Vector3(0, noteSaved.SpeedBpm[i], 0);
         }
 
@@ -297,20 +328,22 @@ public class SaveLoad : MonoBehaviour
 
             // 노트파일 해석 시작
             // 노트 X 위치와 노트의 종류 해석
-            if (noteSaved.NoteLine[i] == 5)
+            if (noteSaved.NoteLine[i] == 5 || noteSaved.NoteLine[i] == 6)
             {
-                copiedObjectPos.x = 0;
+                if (noteSaved.NoteLine[i] == 5) { copiedObjectPos.x = -100; }
+                else { copiedObjectPos.x = 100; }
 
                 if (noteSaved.NoteLegnth[i] != 0)
                 {
                     copiedObject = Instantiate(PrefabObject[3], NoteField.transform);
                     copiedObjectPos.z = 0.003f;
-                    copiedObject.transform.localScale = new Vector3(1, noteSaved.NoteLegnth[i] * 100, 1);
+                    copiedObject.transform.localScale = new Vector3(0.75f, noteSaved.NoteLegnth[i] * 100, 1);
                 }
                 else
                 {
                     copiedObjectPos.z = 0.001f;
                     copiedObject = Instantiate(PrefabObject[2], NoteField.transform);
+                    copiedObject.transform.localScale = new Vector3(0.75f, 1, 1);
                 }
             }
             else
@@ -345,15 +378,22 @@ public class SaveLoad : MonoBehaviour
                         break;
 
                     case 5:
-                        copiedObjectPos.x = 0;
+                        copiedObjectPos.x = -100;
+                        break;
+
+                    case 6:
+                        copiedObjectPos.x = +100;
                         break;
                 }
             }
 
             // 노트의 Y좌표 해석
             // Ms = 150 * PosY / Bpm |=>| PosY = Bpm * Ms / 150
-            copiedObjectPos.y 
-                = noteSaved.bpm * noteSaved.NoteMs[i] / 150;
+            float pos;
+            pos = noteSaved.bpm * noteSaved.NoteMs[i] / 150;
+            if (pos % 1 >= .5f) pos = pos - pos % 1 + 1;
+            else pos = pos - pos % 1;
+            copiedObjectPos.y = pos;
 
             copiedObject.transform.localPosition = copiedObjectPos;
         }
@@ -372,7 +412,7 @@ public class SaveLoad : MonoBehaviour
         noteSaved.startDelayMs = new int();
 
         noteSaved.NoteLegnth = new List<int>();
-        noteSaved.NoteMs = new List<int>();
+        noteSaved.NoteMs = new List<float>();
         noteSaved.NoteLine = new List<int>();
 
         noteSaved.EffectMs = new List<int>();
@@ -427,7 +467,7 @@ public class NoteSavedData
     public int startDelayMs;
 
     public List<int> NoteLegnth;
-    public List<int> NoteMs;
+    public List<float> NoteMs;
     public List<int> NoteLine;
 
     public List<int> EffectMs;

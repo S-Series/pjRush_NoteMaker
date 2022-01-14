@@ -13,7 +13,27 @@ public class NoteClick : MonoBehaviour
 
             if (noteEdit.Selected != null) 
             {
+                switch (noteEdit.Selected.gameObject.tag)
+                {
+                    case "chip":
+                    case "long":
+                        noteEdit.Selected.GetComponentInChildren<SpriteRenderer>()
+                            .color = new Color32(230, 230, 230, 255);
+                        break;
 
+                    case "btChip":
+                        noteEdit.Selected.GetComponentInChildren<SpriteRenderer>()
+                            .color = new Color32(255, 255, 255, 255);
+                        break;
+
+                    case "btLong":
+                        noteEdit.Selected.GetComponentInChildren<SpriteRenderer>()
+                            .color = new Color32(255, 255, 255, 150);
+                        break;
+
+                    default:
+                        break;
+                }
             }
 
             switch (this.gameObject.tag)
@@ -40,6 +60,30 @@ public class NoteClick : MonoBehaviour
                     noteEdit.SectorSetOriginal();
                     noteEdit.Selected = this.gameObject;
                     noteEdit.DisplayNoteInfo();
+                    switch (noteEdit.Selected.tag)
+                    {
+                        case "chip":
+                            noteEdit.Selected.GetComponentInChildren<SpriteRenderer>()
+                                .color = new Color32(0, 255, 128, 255);
+                            break;
+
+                        case "long":
+                            noteEdit.Selected.GetComponentInChildren<SpriteRenderer>()
+                                .color = new Color32(0, 255, 128, 230);
+                            break;
+
+                        case "btChip":
+                            noteEdit.Selected.GetComponentInChildren<SpriteRenderer>()
+                                .color = new Color32(0, 255, 255, 255);
+                            break;
+
+                        case "btLong":
+                            noteEdit.Selected.GetComponentInChildren<SpriteRenderer>()
+                                .color = new Color32(0, 255, 255, 150);
+                            break;
+                        default:
+                            break;
+                    }
                     break;
             }
         }

@@ -12,9 +12,9 @@ public class NoteFieldMouseOver : MonoBehaviour
     {
         InputManager input = InputManager.input;
 
-        input.posY = this.transform.parent.parent.localPosition.y;
+        input.posY = transform.parent.parent.localPosition.y;
 
-        switch (this.transform.parent.parent.localPosition.x)
+        switch (transform.parent.parent.localPosition.x)
         {
             case 0.0f:
                 input.InputNoteData[0] = 0;

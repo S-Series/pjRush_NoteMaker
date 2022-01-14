@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
@@ -21,6 +22,9 @@ public class PageSystem : MonoBehaviour
 
     [SerializeField]
     TextMeshPro[] LineNum;
+
+    [SerializeField]
+    TMP_InputField PageInput;
 
     private void Awake()
     {
@@ -88,5 +92,21 @@ public class PageSystem : MonoBehaviour
                 LineNum[i].text = (firstPage + i).ToString();
             }
         }
+    }
+
+    public void ButtonPage()
+    {
+        //var auto = AutoTest.autoTest;       // 1번
+        AutoTest auto = AutoTest.autoTest;  // 2번
+        if (auto.isTest || auto.isPlay) return;
+
+        int input;
+        try
+        {
+            input = Convert.ToInt32(PageInput.text);
+        }
+        catch { return; }
+        PageInput.text = "";
+        PageSet(input - 1);
     }
 }

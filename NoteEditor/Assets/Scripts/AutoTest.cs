@@ -6,9 +6,11 @@ using TMPro;
 
 public class AutoTest : MonoBehaviour
 {
+    #region properties
     public static AutoTest autoTest;
 
     private bool isPause;
+    private int testResetPage;
 
     public bool isTest;
     public bool isPlay;
@@ -29,7 +31,6 @@ public class AutoTest : MonoBehaviour
     private float LongDelay;
 
     private List<GameObject> note;
-    [SerializeField]
     private List<int> noteMs;
     private List<float> notePos;
     private List<int> noteLine;
@@ -47,11 +48,8 @@ public class AutoTest : MonoBehaviour
     private int EffectIndex;
 
     private List<GameObject> speed;
-    [SerializeField]
     private List<int> SpeedMs;
-    [SerializeField]
     private List<float> SpeedPos;
-    [SerializeField]
     private List<float> SpeedBpm;
 
     private int SpeedIndex;
@@ -85,6 +83,7 @@ public class AutoTest : MonoBehaviour
     GameObject[] ActiveObject;
 
     private TestPlay test;
+    #endregion
 
     private void Awake()
     {
@@ -99,6 +98,8 @@ public class AutoTest : MonoBehaviour
         HitSound = GetComponent<AudioSource>();
         LongHitSound = transform.GetChild(0).GetComponent<AudioSource>();
         ResetTest();
+
+        testResetPage = 1;
 
         bpm = 120;
         inputBpm.text = "120";
@@ -155,7 +156,7 @@ public class AutoTest : MonoBehaviour
                 {
                     if (noteLegnth[NoteIndex] < 2)
                     {
-                        HitEffect[noteLine[NoteIndex] - 1].SetTrigger("Play");
+                        HitEffect[noteLine[NoteIndex] - 1].SetTrigger("Rush");
                         HitSound.Play();
                     }
                     else
@@ -189,7 +190,7 @@ public class AutoTest : MonoBehaviour
 
         for (int i = 0; i < Legnth; i++)
         {
-            HitEffect[Line - 1].SetTrigger("Play");
+            HitEffect[Line - 1].SetTrigger("Rush");
             LongHitSound.Play();
             yield return delay;
 
@@ -203,6 +204,7 @@ public class AutoTest : MonoBehaviour
         MirrorField.SetActive(true);
         ActiveObject[0].SetActive(true);
         ActiveObject[1].SetActive(false);
+        NoteField.transform.localPosition = new Vector3(0, (testResetPage - 1) * -1600, 0);
         NoteFieldParent.transform.localPosition = new Vector3(0, 0, 0);
         testMs = 0;
         EffectIndex = 0;
@@ -358,6 +360,8 @@ public class AutoTest : MonoBehaviour
 
     public IEnumerator Test()
     {
+        testResetPage = PageSystem.pageSystem.firstPage;
+
         testBpm = bpm;
 
         ResetTest();
@@ -367,6 +371,7 @@ public class AutoTest : MonoBehaviour
         MirrorField.SetActive(false);
 
         NoteField = PageSystem.pageSystem.NoteField;
+        NoteField.transform.localPosition = new Vector3(0, 0, 0);
 
         ActiveObject[0].SetActive(false);
         ActiveObject[1].SetActive(true);
@@ -484,27 +489,39 @@ public class AutoTest : MonoBehaviour
             noteLegnth.Add((int)(note[i].transform.localScale.y / 100));
 
             // Add to List -----------------
-            switch (targetNote.transform.localPosition.x)
+            if (targetNote.tag == "chip" || targetNote.tag == "long")
             {
-                case -300:
-                    noteLine.Add(1);
-                    break;
+                switch (targetNote.transform.localPosition.x)
+                {
+                    case -300:
+                        noteLine.Add(1);
+                        break;
 
-                case -100:
-                    noteLine.Add(2);
-                    break;
+                    case -100:
+                        noteLine.Add(2);
+                        break;
 
-                case +100:
-                    noteLine.Add(3);
-                    break;
+                    case +100:
+                        noteLine.Add(3);
+                        break;
 
-                case +300:
-                    noteLine.Add(4);
-                    break;
+                    case +300:
+                        noteLine.Add(4);
+                        break;
+                }
+            }
+            else
+            {
+                switch (targetNote.transform.localPosition.x)
+                {
+                    case -100:
+                        noteLine.Add(5);
+                        break;
 
-                case 0:
-                    noteLine.Add(5);
-                    break;
+                    case +100:
+                        noteLine.Add(5);
+                        break;
+                }
             }
         }
 
@@ -560,9 +577,9 @@ public class AutoTest : MonoBehaviour
     public IEnumerator TestPlay()
     {
 
-        for (int i = 0; i < test.MovingNoteField.transform.childCount; i++)
+        for (int i = 0; i < test.NoteField.transform.childCount; i++)
         {
-            Destroy(test.MovingNoteField.transform.GetChild(i).gameObject);
+            Destroy(test.NoteField.transform.GetChild(i).gameObject);
         }
 
         SaveLoad.saveLoad.ButtonSave();
@@ -578,6 +595,7 @@ public class AutoTest : MonoBehaviour
         MirrorField.SetActive(false);
 
         NoteField = PageSystem.pageSystem.NoteField;
+        NoteField.transform.localPosition = new Vector3(0, 0, 0);
 
         for (int i = 0; i < NoteField.transform.childCount; i++)
         {
@@ -695,27 +713,39 @@ public class AutoTest : MonoBehaviour
             noteLegnth.Add((int)(note[i].transform.localScale.y / 100));
 
             // Add to List -----------------
-            switch (targetNote.transform.localPosition.x)
+            if (targetNote.tag == "chip" || targetNote.tag == "long")
             {
-                case -300:
-                    noteLine.Add(1);
-                    break;
+                switch (targetNote.transform.localPosition.x)
+                {
+                    case -300:
+                        noteLine.Add(1);
+                        break;
 
-                case -100:
-                    noteLine.Add(2);
-                    break;
+                    case -100:
+                        noteLine.Add(2);
+                        break;
 
-                case +100:
-                    noteLine.Add(3);
-                    break;
+                    case +100:
+                        noteLine.Add(3);
+                        break;
 
-                case +300:
-                    noteLine.Add(4);
-                    break;
+                    case +300:
+                        noteLine.Add(4);
+                        break;
+                }
+            }
+            else
+            {
+                switch (targetNote.transform.localPosition.x)
+                {
+                    case -100:
+                        noteLine.Add(5);
+                        break;
 
-                case 0:
-                    noteLine.Add(5);
-                    break;
+                    case +100:
+                        noteLine.Add(5);
+                        break;
+                }
             }
         }
 
@@ -765,7 +795,7 @@ public class AutoTest : MonoBehaviour
         for (int i = 0; i < noteMs.Count; i++)
         {
             GameObject clone;
-            clone = Instantiate(note[i], test.MovingNoteField.transform);
+            clone = Instantiate(note[i], test.NoteField.transform);
             Vector3 pos;
             pos = note[i].transform.localPosition;
             clone.transform.localPosition = new Vector3(pos.x, pos.y, 0);
@@ -803,6 +833,7 @@ public class AutoTest : MonoBehaviour
                     break;
 
                 case 5:
+                case 6:
                     var play5 = test.judgeBottom;
                     play5.TestPlay5.Add(clone);
                     play5.TestPlayMs5.Add(noteMs[i]);
@@ -832,18 +863,30 @@ public class AutoTest : MonoBehaviour
 
     public IEnumerator DelayTest()
     {
+        testResetPage = PageSystem.pageSystem.firstPage;
+
+        float nowPos;
+        nowPos = NoteField.transform.localPosition.y + 1600;
+        print(nowPos);
+
         List<GameObject> DelayEffect = new List<GameObject>();
         List<GameObject> DelayNote = new List<GameObject>();
+        List<float> DelayNotePos = new List<float>();
+        List<int> DelayNoteMs = new List<int>();
+        List<int> DelayNoteLegnth = new List<int>();
+        List<int> DelayNoteLine = new List<int>();
 
         testBpm = bpm;
 
         ResetTest();
 
         MirrorField.SetActive(false);
-        ActiveObject[0].SetActive(false);
-        ActiveObject[1].SetActive(true);
 
         NoteField = PageSystem.pageSystem.NoteField;
+        NoteField.transform.localPosition = new Vector3(0, 0, 0); 
+
+        ActiveObject[0].SetActive(false);
+        ActiveObject[1].SetActive(true);
 
         for (int i = 0; i < NoteField.transform.childCount; i++)
         {
@@ -855,6 +898,20 @@ public class AutoTest : MonoBehaviour
             else if (targetNote.tag == "Bpm") speed.Add(targetNote);
             else DelayNote.Add(targetNote);
         }
+
+        DelayNote.Sort(delegate (GameObject A, GameObject B)
+        {
+            if (A.transform.localPosition.y > B.transform.localPosition.y) return 1;
+            else if (A.transform.localPosition.y < B.transform.localPosition.y) return -1;
+            return 0;
+        });
+
+        DelayEffect.Sort(delegate (GameObject A, GameObject B)
+        {
+            if (A.transform.localPosition.y > B.transform.localPosition.y) return 1;
+            else if (A.transform.localPosition.y < B.transform.localPosition.y) return -1;
+            return 0;
+        });
 
         speed.Sort(delegate (GameObject A, GameObject B)
         {
@@ -899,140 +956,107 @@ public class AutoTest : MonoBehaviour
             }
         }
 
-        int startPage = PageSystem.pageSystem.firstPage;
-        float delayStartPos = startPage * 1600;
-
         yield return new WaitForSeconds(.5f);
+        // 시작 변수 설정하는곳
+        #region Start Setting
 
-        int startMs = 0;
-        float startPos = 0.0f;
-        float startBpm = bpm;
-
-        if (speed.Count >= 1)
+        if (SpeedPos.Count >= 1)
         {
-            for (int i = 0; i < SpeedMs.Count; i++)
+            for (int i = 0; i < SpeedPos.Count; i++)
             {
-                if (SpeedPos[i] < delayStartPos)
+                if (-nowPos >= SpeedMs[i])
                 {
-                    startMs = SpeedMs[i];
-                    startPos = SpeedPos[i];
-                    startBpm = SpeedBpm[i];
+                    testBpm = SpeedBpm[i];
                 }
                 else { break; }
             }
         }
+        else { testBpm = bpm; }
 
-        print(startMs);
-        print(startBpm);
-        print(((startPage - 1) * 1600 - startPos) * 150 / startBpm);
-        startMs += (int)(((startPage - 1) * 1600 - startPos) * 150 / startBpm);
-        testMs = startMs;
-        print(testMs);
-        testBpm = startBpm;
-        if (testMs - delay <= 1000)
-        {
-            StartCoroutine(Test());
-            yield break;
-        }
-        Music.time = (testMs - delay) / 1000;
+        int delayMs;
+        delayMs = (int)(-nowPos * 150 / testBpm);
+
+        if (delayMs <= 0) { StartCoroutine(Test()); yield break; }
+        #endregion
 
         yield return new WaitForSeconds(.5f);
 
         for (int i = 0; i < DelayNote.Count; i++)
         {
-            if (DelayNote[i].transform.localPosition.y >= delayStartPos) 
-            { 
-                note.Add(DelayNote[i]); 
-            }
-        }
-
-        for (int i = 0; i < DelayEffect.Count; i++)
-        {
-            if (DelayEffect[i].transform.localPosition.y >= delayStartPos) 
-            { 
-                effect.Add(DelayEffect[i]); 
-            }
-        }
-
-        note.Sort(delegate (GameObject A, GameObject B)
-        {
-            if (A.transform.localPosition.y > B.transform.localPosition.y) return 1;
-            else if (A.transform.localPosition.y < B.transform.localPosition.y) return -1;
-            return 0;
-        });
-
-        yield return new WaitForSeconds(.5f);
-
-        effect.Sort(delegate (GameObject A, GameObject B)
-        {
-            if (A.transform.localPosition.y > B.transform.localPosition.y) return 1;
-            else if (A.transform.localPosition.y < B.transform.localPosition.y) return -1;
-            return 0;
-        });
-
-        yield return new WaitForSeconds(.5f);
-
-        for (int i = 0; i < note.Count; i++)
-        {
             // Add to List -----------------
-            notePos.Add(note[i].transform.localPosition.y);
+            DelayNotePos.Add(DelayNote[i].transform.localPosition.y);
         }
 
         int SpeedNoteinfoIndex;
         SpeedNoteinfoIndex = 0;
 
-        for (int i = 0; i < note.Count; i++)
+        for (int i = 0; i < DelayNote.Count; i++)
         {
             GameObject targetNote;
-            targetNote = note[i];
+            targetNote = DelayNote[i];
 
             for (int j = SpeedNoteinfoIndex; j < SpeedMs.Count; j++)
             {
-                if (SpeedPos[j] < notePos[i])
+                if (SpeedPos[j] < DelayNotePos[i])
                 {
                     SpeedNoteinfoIndex = j;
                 }
-                else{ break; }
+                else
+                {
+                    break;
+                }
             }
 
             int ms;
             try
             {
                 float posDif;
-                posDif = notePos[i] - SpeedPos[SpeedNoteinfoIndex];
+                posDif = DelayNotePos[i] - SpeedPos[SpeedNoteinfoIndex];
                 ms = (int)(posDif * 150 / SpeedBpm[SpeedNoteinfoIndex]) + SpeedMs[SpeedNoteinfoIndex];
             }
             catch
             {
-                ms = (int)(notePos[i] * 150 / bpm);
+                ms = (int)(DelayNotePos[i] * 150 / bpm);
             }
 
             // Add to List -----------------
-            noteMs.Add(ms);
-            noteLegnth.Add((int)(note[i].transform.localScale.y / 100));
+            DelayNoteMs.Add(ms);
+            DelayNoteLegnth.Add((int)(DelayNote[i].transform.localScale.y / 100));
 
             // Add to List -----------------
-            switch (targetNote.transform.localPosition.x)
+            if (targetNote.tag == "chip" || targetNote.tag == "long")
             {
-                case -300:
-                    noteLine.Add(1);
-                    break;
+                switch (targetNote.transform.localPosition.x)
+                {
+                    case -300:
+                        DelayNoteLine.Add(1);
+                        break;
 
-                case -100:
-                    noteLine.Add(2);
-                    break;
+                    case -100:
+                        DelayNoteLine.Add(2);
+                        break;
 
-                case +100:
-                    noteLine.Add(3);
-                    break;
+                    case +100:
+                        DelayNoteLine.Add(3);
+                        break;
 
-                case +300:
-                    noteLine.Add(4);
-                    break;
+                    case +300:
+                        DelayNoteLine.Add(4);
+                        break;
+                }
+            }
+            else
+            {
+                switch (targetNote.transform.localPosition.x)
+                {
+                    case -100:
+                        DelayNoteLine.Add(5);
+                        break;
 
-                case 0:
-                    noteLine.Add(5);
-                    break;
+                    case +100:
+                        DelayNoteLine.Add(5);
+                        break;
+                }
             }
         }
 
@@ -1076,6 +1100,24 @@ public class AutoTest : MonoBehaviour
             EffectForce.Add(childObject.transform.localPosition.x);
             EffectDuration.Add((int)(childObject.transform.localScale.y));
         }
+
+        yield return new WaitForSeconds(.5f);
+
+        for (int i = 0; i < DelayNoteMs.Count; i++)
+        {
+            if (DelayNoteMs[i] >= delayMs)
+            {
+                note.Add(DelayNote[i]);
+                noteMs.Add(DelayNoteMs[i]);
+                notePos.Add(DelayNotePos[i]);
+                noteLine.Add(DelayNoteLine[i]);
+                noteLegnth.Add(DelayNoteLegnth[i]);
+            }
+        }
+
+        Music.time = (delayMs - delay) / 1000;
+        testMs = delayMs;
+        NoteFieldParent.transform.localPosition = new Vector3(0, delayMs * testBpm / 150, 0);
 
         yield return new WaitForSeconds(.5f);
 
