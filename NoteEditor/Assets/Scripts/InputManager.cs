@@ -277,8 +277,10 @@ public class InputManager : MonoBehaviour
 
             if (CopyObject.tag == "Bpm")
             {
-                CopyObject.transform.GetChild(0).GetChild(0).localPosition = new Vector3(0, AutoTest.autoTest.bpm, 0);
+                CopyObject.transform.GetChild(0).GetChild(0).localPosition = new Vector3(1, AutoTest.autoTest.bpm, 0);
                 CopyObject.transform.GetChild(0).GetComponent<TextMeshPro>().text = (AutoTest.autoTest.bpm).ToString();
+                NoteEdit.noteEdit.Selected = CopyObject;
+                NoteEdit.noteEdit.MirrorPage();
             }
         }
     }

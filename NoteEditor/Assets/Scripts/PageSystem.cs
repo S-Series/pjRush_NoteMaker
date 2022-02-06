@@ -38,19 +38,22 @@ public class PageSystem : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetAxis("Mouse ScrollWheel") > 0)
+        if (!AutoTest.autoTest.isTest && !AutoTest.autoTest.isPlay)
         {
-            firstPage++;
-            if (firstPage < 1) firstPage = 1;
-            else if (firstPage > maxPage) firstPage = maxPage;
-            PageSet(firstPage);
-        }
-        else if (Input.GetAxis("Mouse ScrollWheel") < 0)
-        {
-            firstPage--;
-            if (firstPage < 1) firstPage = 1;
-            else if (firstPage > maxPage) firstPage = maxPage;
-            PageSet(firstPage);
+            if (Input.GetAxis("Mouse ScrollWheel") > 0)
+            {
+                firstPage++;
+                if (firstPage < 1) firstPage = 1;
+                else if (firstPage > maxPage) firstPage = maxPage;
+                PageSet(firstPage);
+            }
+            else if (Input.GetAxis("Mouse ScrollWheel") < 0)
+            {
+                firstPage--;
+                if (firstPage < 1) firstPage = 1;
+                else if (firstPage > maxPage) firstPage = maxPage;
+                PageSet(firstPage);
+            }
         }
     }
 

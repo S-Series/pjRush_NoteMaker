@@ -50,8 +50,10 @@ public class NoteClick : MonoBehaviour
                     noteEdit.isNoteEdit = true;
                     noteEdit.SectorSetSpeed();
                     noteEdit.Selected = this.gameObject;
-                    noteEdit.inputSpeedBpm.text
+                    noteEdit.inputSpeedBpm[0].text
                         = this.transform.GetChild(0).GetChild(0).localPosition.y.ToString();
+                    noteEdit.inputSpeedBpm[1].text
+                        = this.transform.GetChild(0).GetChild(0).localPosition.x.ToString();
                     break;
 
                 default:

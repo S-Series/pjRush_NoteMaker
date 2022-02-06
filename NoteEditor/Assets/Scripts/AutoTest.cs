@@ -47,9 +47,13 @@ public class AutoTest : MonoBehaviour
 
     private int EffectIndex;
 
+    [SerializeField]
     private List<GameObject> speed;
+    [SerializeField]
     private List<int> SpeedMs;
+    [SerializeField]
     private List<float> SpeedPos;
+    [SerializeField]
     private List<float> SpeedBpm;
 
     private int SpeedIndex;
@@ -138,6 +142,7 @@ public class AutoTest : MonoBehaviour
                 if (SpeedMs[SpeedIndex] <= testMs)
                 {
                     testBpm = SpeedBpm[SpeedIndex];
+                    LongDelay = 15 / SpeedBpm[SpeedIndex];
                     TestSpeedMs = SpeedMs[SpeedIndex];
                     TestSpeedPos = SpeedPos[SpeedIndex];
                     SpeedIndex++;
@@ -428,8 +433,11 @@ public class AutoTest : MonoBehaviour
             SpeedBpm.Add(bpm);
             for (int i = 0; i < speed.Count; i++)
             {
+                float speedNum;
+                speedNum = speed[i].transform.GetChild(0).GetChild(0).localPosition.x
+                    * speed[i].transform.GetChild(0).GetChild(0).localPosition.y;
                 SpeedPos.Add(speed[i].transform.localPosition.y);
-                SpeedBpm.Add(speed[i].transform.GetChild(0).GetChild(0).transform.localPosition.y);
+                SpeedBpm.Add(speedNum);
             }
 
             // Add to List -----------------
@@ -439,8 +447,29 @@ public class AutoTest : MonoBehaviour
             SpeedMs.Add(newMs);
             for (int i = 1; i < speed.Count; i++)
             {
-                newMs += (int)((SpeedPos[i + 1] - SpeedPos[i]) * 150 / SpeedBpm[i]);
+                newMs += (int)(Mathf.Abs(SpeedPos[i + 1] - SpeedPos[i]) * 150 / Mathf.Abs(SpeedBpm[i]));
                 SpeedMs.Add(newMs);
+            }
+
+            for (int i = 0; i < speed.Count; i++)
+            {
+                float speedNum;
+                speedNum = SpeedBpm[i];
+                if (speedNum < 0)
+                {
+                    try
+                    {
+                        SpeedPos[i] = (SpeedPos[i] + (SpeedPos[i + 1] - SpeedPos[i]) * 2);
+                    }
+                    catch
+                    {
+                        Debug.LogError("속도값이 잘못된 SpeedNote가 존재합니다");
+                    }
+                }
+                else if (speedNum == 0)
+                {
+                    Debug.LogError("속도값이 0인 SpeedNote가 존재합니다.");
+                }
             }
         }
 
@@ -643,7 +672,8 @@ public class AutoTest : MonoBehaviour
 
             // Add to List -----------------
             SpeedMs.Add(onceMs);
-            SpeedBpm.Add(speed[0].transform.GetChild(0).GetChild(0).transform.localPosition.y);
+            SpeedBpm.Add(speed[0].transform.GetChild(0).GetChild(0).transform.localPosition.x
+                * speed[0].transform.GetChild(0).GetChild(0).transform.localPosition.y);
             // for int i = 0 end
 
             for (int i = 1; i < speed.Count; i++)
@@ -655,7 +685,8 @@ public class AutoTest : MonoBehaviour
                 SpeedPos.Add(speed[i].transform.localPosition.y);
 
                 float targetSpeedBpm;
-                targetSpeedBpm = childObject.transform.localPosition.y;
+                targetSpeedBpm = childObject.transform.localPosition.x 
+                                * childObject.transform.localPosition.y;
 
                 float posY;
                 posY = SpeedPos[i] - SpeedPos[i - 1];
@@ -864,10 +895,15 @@ public class AutoTest : MonoBehaviour
     public IEnumerator DelayTest()
     {
         testResetPage = PageSystem.pageSystem.firstPage;
-
         float nowPos;
-        nowPos = NoteField.transform.localPosition.y + 1600;
-        print(nowPos);
+        int delayMs = 0;
+
+        try
+        {
+            nowPos = NoteField.transform.localPosition.y + 1600;
+            print(-nowPos);
+        }
+        catch { yield break; }
 
         List<GameObject> DelayEffect = new List<GameObject>();
         List<GameObject> DelayNote = new List<GameObject>();
@@ -940,44 +976,82 @@ public class AutoTest : MonoBehaviour
             SpeedBpm.Add(bpm);
             for (int i = 0; i < speed.Count; i++)
             {
+                float speedNum;
+                speedNum = speed[i].transform.GetChild(0).GetChild(0).localPosition.x
+                    * speed[i].transform.GetChild(0).GetChild(0).localPosition.y;
                 SpeedPos.Add(speed[i].transform.localPosition.y);
-                SpeedBpm.Add(speed[i].transform.GetChild(0).GetChild(0).transform.localPosition.y);
+                SpeedBpm.Add(speedNum);
             }
 
-            // Add to List -----------------
+// Add to List -----------------
             int newMs;
             SpeedMs.Add(0);
             newMs = (int)(speed[0].transform.localPosition.y * 150 / bpm);
             SpeedMs.Add(newMs);
             for (int i = 1; i < speed.Count; i++)
             {
-                newMs += (int)((SpeedPos[i + 1] - SpeedPos[i]) * 150 / SpeedBpm[i]);
+                newMs += (int)(Mathf.Abs(SpeedPos[i + 1] - SpeedPos[i]) * 150 / Mathf.Abs(SpeedBpm[i]));
                 SpeedMs.Add(newMs);
+            }
+
+// 시작 변수 설정하는곳
+            #region Start Setting
+
+            if (SpeedPos.Count >= 1)
+            {
+                if (-nowPos < SpeedPos[0])
+                {
+                    testBpm = bpm;
+                    delayMs = (int)(-nowPos * 150 / testBpm);
+                }
+                else
+                {
+                    for (int i = 1; i < SpeedPos.Count; i++)
+                    {
+                        if (-nowPos <= SpeedPos[i])
+                        {
+                            testBpm = SpeedBpm[i - 1];
+                            delayMs = (int)(SpeedMs[i - 1] + (-nowPos - SpeedPos[i - 1]) * 150 / testBpm);
+                            print(delayMs);
+                            break;
+                        }
+                        else {  }
+                    }
+                }
+            }
+            else 
+            { 
+                delayMs = (int)(-nowPos * 150 / testBpm);
+                testBpm = bpm; 
+            }
+
+            if (delayMs <= 0) { StartCoroutine(Test()); yield break; }
+            #endregion
+
+            for (int i = 0; i < speed.Count; i++)
+            {
+                float speedNum;
+                speedNum = SpeedBpm[i];
+                if (speedNum < 0)
+                {
+                    try
+                    {
+                        SpeedPos[i] = (SpeedPos[i] + (SpeedPos[i + 1] - SpeedPos[i]) * 2);
+                    }
+                    catch
+                    {
+                        Debug.LogError("속도값이 잘못된 SpeedNote가 존재합니다");
+                    }
+                }
+                else if (speedNum == 0)
+                {
+                    Debug.LogError("속도값이 0인 SpeedNote가 존재합니다.");
+                }
             }
         }
 
         yield return new WaitForSeconds(.5f);
-        // 시작 변수 설정하는곳
-        #region Start Setting
 
-        if (SpeedPos.Count >= 1)
-        {
-            for (int i = 0; i < SpeedPos.Count; i++)
-            {
-                if (-nowPos >= SpeedMs[i])
-                {
-                    testBpm = SpeedBpm[i];
-                }
-                else { break; }
-            }
-        }
-        else { testBpm = bpm; }
-
-        int delayMs;
-        delayMs = (int)(-nowPos * 150 / testBpm);
-
-        if (delayMs <= 0) { StartCoroutine(Test()); yield break; }
-        #endregion
 
         yield return new WaitForSeconds(.5f);
 

@@ -50,7 +50,7 @@ public class NoteEdit : MonoBehaviour
     TMP_InputField inputEffectDuration;
 
     [SerializeField]
-    public TMP_InputField inputSpeedBpm;
+    public TMP_InputField[] inputSpeedBpm;
 
     //---------------------------------------------
 
@@ -584,17 +584,21 @@ public class NoteEdit : MonoBehaviour
 
     IEnumerator SpeedNote()
     {
-        float speedBpm;
+        float speed;
         try
         {
-            speedBpm = Convert.ToSingle(inputSpeedBpm.text);
-            if (speedBpm < 0)
+            speed = Convert.ToSingle(inputSpeedBpm[1].text);
+            if (speed == 0)
             {
-                speedBpm = 120;
-                inputSpeedBpm.text = "120";
+                speed = AutoTest.autoTest.bpm;
+                inputSpeedBpm[1].text = AutoTest.autoTest.bpm.ToString();
             }
-            Selected.transform.GetChild(0).GetComponent<TextMeshPro>().text = speedBpm.ToString();
-            Selected.transform.GetChild(0).GetChild(0).localPosition = new Vector3(0, speedBpm, 0);
+            Vector3 posChild;
+            posChild = Selected.transform.GetChild(0).GetChild(0).localPosition;
+            posChild.x = speed;
+            Selected.transform.GetChild(0).GetChild(0).localPosition = posChild;
+            Selected.transform.GetComponentInChildren<TextMeshPro>().text =
+                posChild.y.ToString() + "\nx " + posChild.x.ToString(); 
             MirrorPage();
         }
         catch { yield break; }
@@ -610,12 +614,99 @@ public class NoteEdit : MonoBehaviour
 
         GameObject Parent;
         Parent = Selected.transform.parent.gameObject;
-
+        /*
         if (Selected != null)
         {
             Destroy(Selected);
         }
-        else { Debug.LogError("삭제 대상을 찾지 못함"); yield break; }
+        else { Debug.LogError("삭제 대상을 찾지 못함"); yield break; }*/
+
+        yield return new WaitForSeconds(.1f);
+
+        mirror = new List<GameObject>(5);
+
+        mirror.Add(PageSystem.pageSystem.NoteField);
+
+        for (int i = 0; i < 4; i++)
+        {
+            mirror.Add(MirrorField.transform.GetChild(i).gameObject);
+        }
+
+        mirror.Sort(delegate (GameObject A, GameObject B)
+        {
+            if (A.transform.localPosition.x > B.transform.localPosition.x) return 1;
+            else if (A.transform.localPosition.x < B.transform.localPosition.x) return -1;
+            return 0;
+        });
+
+        if (posX != 0)
+        {
+            Vector3 pagePos;
+            pagePos = PageSystem.pageSystem.NoteField.transform.localPosition;
+
+            Destroy(PageSystem.pageSystem.NoteField);
+            PageSystem.pageSystem.NoteField =
+                Instantiate(Parent, NoteFieldParent.transform);
+            mirror[0] = PageSystem.pageSystem.NoteField;
+            mirror[0].transform.localPosition = pagePos;
+            mirror[0].name = "NoteField";
+            InputManager.input.inputNoteFieldSet(mirror[0]);
+        }
+
+        for (int i = 1; i < 5; i++)
+        {
+            if (posX != rdPosX[i])
+            {
+                Vector3 pagePos;
+                pagePos = mirror[i].transform.localPosition;
+                Destroy(mirror[i]);
+                mirror[i] = Instantiate(Parent, MirrorField.transform);
+                mirror[i].transform.localPosition = pagePos;
+                mirror[i].name = "MirrorField" + i.ToString();
+                Debug.Log("mirror" + i + "생성");
+            }
+        }
+    }
+
+    IEnumerator SpeedNoteBpm()
+    {
+        float speedBpm;
+        try
+        {
+            speedBpm = Convert.ToSingle(inputSpeedBpm[0].text);
+            if (speedBpm < 0)
+            {
+                speedBpm = AutoTest.autoTest.bpm;
+                inputSpeedBpm[0].text = AutoTest.autoTest.bpm.ToString();
+            }
+
+            Vector3 posChild;
+            posChild = Selected.transform.GetChild(0).GetChild(0).localPosition;
+            posChild.y = speedBpm;
+            Selected.transform.GetChild(0).GetChild(0).localPosition = posChild;
+            Selected.transform.GetComponentInChildren<TextMeshPro>().text =
+                posChild.y.ToString() + "\nx " + posChild.x.ToString(); 
+            MirrorPage();
+        }
+        catch { yield break; }
+
+        Vector3 pos;
+        pos = Selected.transform.localPosition;
+
+        float posX;
+        posX = Selected.transform.parent.localPosition.x;
+
+        GameObject NoteField;
+        NoteField = PageSystem.pageSystem.NoteField;
+
+        GameObject Parent;
+        Parent = Selected.transform.parent.gameObject;
+        /*
+        if (Selected != null)
+        {
+            Destroy(Selected);
+        }
+        else { Debug.LogError("삭제 대상을 찾지 못함"); yield break; }*/
 
         yield return new WaitForSeconds(.1f);
 
@@ -793,7 +884,12 @@ public class NoteEdit : MonoBehaviour
         StartCoroutine(SpeedNote());
     }
 
-    private void MirrorPage()
+    public void ButtonSpeedBpm()
+    {
+        StartCoroutine(SpeedNoteBpm());
+    }
+
+    public void MirrorPage()
     {
         switch (Selected.gameObject.tag)
         {
