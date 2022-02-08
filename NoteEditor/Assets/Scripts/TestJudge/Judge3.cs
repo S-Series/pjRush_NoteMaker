@@ -5,7 +5,7 @@ using UnityEngine;
 public class Judge3 : MonoBehaviour
 {
     public List<GameObject> TestPlay3;
-    public List<int> TestPlayMs3;
+    public List<float> TestPlayMs3;
     public List<int> TestPlayLegnth3;
 
     private GameObject TargetObject;
@@ -13,7 +13,7 @@ public class Judge3 : MonoBehaviour
     private bool isLongJudge;
 
     private int ms;
-    private int judgeMs;
+    private float judgeMs;
     private int longNoteJudgeMs;
     private int index;
 
@@ -34,7 +34,7 @@ public class Judge3 : MonoBehaviour
     {
         auto = AutoTest.autoTest;
         TestPlay3 = new List<GameObject>();
-        TestPlayMs3 = new List<int>();
+        TestPlayMs3 = new List<float>();
         index = 0;
         ms = 0;
         isLongJudge = false;
@@ -44,7 +44,7 @@ public class Judge3 : MonoBehaviour
     {
         auto = AutoTest.autoTest;
         TestPlay3 = new List<GameObject>();
-        TestPlayMs3 = new List<int>();
+        TestPlayMs3 = new List<float>();
         index = 0;
         ms = 0;
         isLongJudge = false;
@@ -59,7 +59,7 @@ public class Judge3 : MonoBehaviour
         }
         catch { return; }
 
-        ms = auto.testMs;
+        ms = TestPlay.testPlay.playMs;
 
         if (Input.GetKeyDown(KeyCode.C) || Input.GetKeyDown(KeyCode.Period))
         {
@@ -108,7 +108,7 @@ public class Judge3 : MonoBehaviour
         }
     }
 
-    private void JudgeResult(int judgeMs)
+    private void JudgeResult(float judgeMs)
     {
         if (judgeMs >= -30 && judgeMs <= 30)
         {

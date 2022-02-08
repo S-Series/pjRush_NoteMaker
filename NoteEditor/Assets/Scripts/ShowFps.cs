@@ -14,7 +14,7 @@ public class ShowFps : MonoBehaviour
 
     void Awake()
     {
-        Application.targetFrameRate = 60;
+        Application.targetFrameRate = 120;
 
         int w = Screen.width, h = Screen.height;
 

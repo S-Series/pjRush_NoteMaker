@@ -13,6 +13,7 @@ public class AutoTest : MonoBehaviour
     private int testResetPage;
 
     public bool isTest;
+    public bool isPlayReady;
     public bool isPlay;
 
     public float bpm;
@@ -47,7 +48,6 @@ public class AutoTest : MonoBehaviour
 
     private int EffectIndex;
 
-    [SerializeField]
     private List<GameObject> speed;
     [SerializeField]
     private List<int> SpeedMs;
@@ -225,6 +225,7 @@ public class AutoTest : MonoBehaviour
         TestPlayObject[0].SetActive(true);
         TestPlayObject[1].SetActive(false);
         isPlay = false;
+        isPlayReady = false;
         MirrorField.SetActive(true);
         NoteFieldParent.transform.localPosition = new Vector3(0, 0, 0);
         testMs = 0;
@@ -354,8 +355,11 @@ public class AutoTest : MonoBehaviour
 
     public void ButtonPlayTest()
     {
+        isPlayReady = true;
         LongDelay = 15 / bpm;
-        StartCoroutine(TestPlay());
+        TestPlayObject[0].SetActive(false);
+        TestPlayObject[1].SetActive(true);
+        StartCoroutine(TestPlay.testPlay.TestLoad());
     }
 
     public void ButtonPlayStop()
@@ -511,7 +515,7 @@ public class AutoTest : MonoBehaviour
             catch
             {
                 ms = (int)(notePos[i] * 150 / bpm);
-            }
+            }       
 
             // Add to List -----------------
             noteMs.Add(ms);
@@ -598,295 +602,6 @@ public class AutoTest : MonoBehaviour
         yield return new WaitForSeconds(.5f);
 
         isTest = true;
-
-        yield return new WaitForSeconds(delay / 1000);
-        Music.Play();
-    }
-
-    public IEnumerator TestPlay()
-    {
-
-        for (int i = 0; i < test.NoteField.transform.childCount; i++)
-        {
-            Destroy(test.NoteField.transform.GetChild(i).gameObject);
-        }
-
-        SaveLoad.saveLoad.ButtonSave();
-
-        TestPlayObject[0].SetActive(false);
-        TestPlayObject[1].SetActive(true);
-
-        test.ResetList();
-        test.ResetJudge();
-
-        Music.time = 0.0f;
-
-        MirrorField.SetActive(false);
-
-        NoteField = PageSystem.pageSystem.NoteField;
-        NoteField.transform.localPosition = new Vector3(0, 0, 0);
-
-        for (int i = 0; i < NoteField.transform.childCount; i++)
-        {
-            GameObject targetNote;
-            targetNote = NoteField.transform.GetChild(i).gameObject;
-
-            // Add to List -----------------
-            if (targetNote.tag == "Effect") effect.Add(targetNote);
-            else if (targetNote.tag == "Bpm") speed.Add(targetNote);
-            else note.Add(targetNote);
-        }
-
-        note.Sort(delegate (GameObject A, GameObject B)
-        {
-            if (A.transform.localPosition.y > B.transform.localPosition.y) return 1;
-            else if (A.transform.localPosition.y < B.transform.localPosition.y) return -1;
-            return 0;
-        });
-
-        effect.Sort(delegate (GameObject A, GameObject B)
-        {
-            if (A.transform.localPosition.y > B.transform.localPosition.y) return 1;
-            else if (A.transform.localPosition.y < B.transform.localPosition.y) return -1;
-            return 0;
-        });
-
-        speed.Sort(delegate (GameObject A, GameObject B)
-        {
-            if (A.transform.localPosition.y > B.transform.localPosition.y) return 1;
-            else if (A.transform.localPosition.y < B.transform.localPosition.y) return -1;
-            return 0;
-        });
-        
-        if (speed.Count >= 1)
-        {
-            // for int i = 0 start
-            int speedRetouchMs;
-
-            // Add to List -----------------
-            SpeedPos.Add(speed[0].transform.localPosition.y);
-
-            int onceMs;
-            onceMs = (int)(speed[0].transform.localPosition.y * 150 / bpm);
-            speedRetouchMs = onceMs;
-
-            // Add to List -----------------
-            SpeedMs.Add(onceMs);
-            SpeedBpm.Add(speed[0].transform.GetChild(0).GetChild(0).transform.localPosition.x
-                * speed[0].transform.GetChild(0).GetChild(0).transform.localPosition.y);
-            // for int i = 0 end
-
-            for (int i = 1; i < speed.Count; i++)
-            {
-                GameObject childObject;
-                childObject = speed[i].transform.GetChild(0).GetChild(0).gameObject;
-
-                // Add to List -----------------
-                SpeedPos.Add(speed[i].transform.localPosition.y);
-
-                float targetSpeedBpm;
-                targetSpeedBpm = childObject.transform.localPosition.x 
-                                * childObject.transform.localPosition.y;
-
-                float posY;
-                posY = SpeedPos[i] - SpeedPos[i - 1];
-                int ms;
-                ms = (int)(posY * 150 / targetSpeedBpm) + speedRetouchMs;
-                speedRetouchMs = ms;
-
-                // Add to List -----------------
-                SpeedMs.Add(ms);
-                SpeedBpm.Add(targetSpeedBpm);
-            }
-        }
-
-        yield return new WaitForSeconds(.5f);
-
-        for (int i = 0; i < note.Count; i++)
-        {
-            // Add to List -----------------
-            notePos.Add(note[i].transform.localPosition.y);
-        }
-
-        int SpeedNoteinfoIndex;
-        SpeedNoteinfoIndex = 0;
-        for (int i = 0; i < note.Count; i++)
-        {
-            GameObject targetNote;
-            targetNote = note[i];
-
-            float notePosY;
-            notePosY = notePos[i];
-
-            for (int j = SpeedNoteinfoIndex; j < SpeedMs.Count; j++)
-            {
-                if (SpeedPos[j] < notePosY)
-                {
-                    SpeedNoteinfoIndex = j;
-                }
-                else { break; }
-            }
-
-            int ms;
-            try
-            {
-                float posDif;
-                posDif = notePosY - SpeedPos[SpeedNoteinfoIndex];
-                ms = (int)(posDif * 150 / SpeedBpm[SpeedNoteinfoIndex]) + SpeedMs[SpeedNoteinfoIndex];
-            }
-            catch
-            {
-                ms = (int)(notePosY * 150 / bpm);
-            }
-
-            // Add to List -----------------
-            noteMs.Add(ms);
-            noteLegnth.Add((int)(note[i].transform.localScale.y / 100));
-
-            // Add to List -----------------
-            if (targetNote.tag == "chip" || targetNote.tag == "long")
-            {
-                switch (targetNote.transform.localPosition.x)
-                {
-                    case -300:
-                        noteLine.Add(1);
-                        break;
-
-                    case -100:
-                        noteLine.Add(2);
-                        break;
-
-                    case +100:
-                        noteLine.Add(3);
-                        break;
-
-                    case +300:
-                        noteLine.Add(4);
-                        break;
-                }
-            }
-            else
-            {
-                switch (targetNote.transform.localPosition.x)
-                {
-                    case -100:
-                        noteLine.Add(5);
-                        break;
-
-                    case +100:
-                        noteLine.Add(5);
-                        break;
-                }
-            }
-        }
-
-        yield return new WaitForSeconds(.5f);
-
-        for (int i = 0; i < effect.Count; i++)
-        {
-            // Add to List -----------------
-            EffectPos.Add(effect[i].transform.localPosition.y);
-        }
-
-        SpeedNoteinfoIndex = 0;
-        for (int i = 0; i < effect.Count; i++)
-        {
-            GameObject targetObject;
-            targetObject = effect[i];
-
-            GameObject childObject;
-            childObject = targetObject.transform.GetChild(0).GetChild(0).gameObject;
-
-            float EffectPosY;
-            EffectPosY = EffectPos[i];
-
-            for (int j = SpeedNoteinfoIndex; j < SpeedMs.Count; j++)
-            {
-                if (SpeedPos[j] < EffectPosY)
-                {
-                    SpeedNoteinfoIndex = j;
-                }
-                else { break; }
-            }
-
-            float posDif;
-            posDif = EffectPosY - SpeedPos[SpeedNoteinfoIndex];
-
-            int ms;
-            ms = (int)(posDif * 150 / SpeedBpm[SpeedNoteinfoIndex]) + SpeedMs[SpeedNoteinfoIndex];
-
-            // Add to List -----------------
-            EffectMs.Add(ms);
-            EffectForce.Add(childObject.transform.localPosition.x);
-            EffectDuration.Add((int)(childObject.transform.localScale.y));
-        }
-
-        yield return new WaitForSeconds(.5f);
-
-        for (int i = 0; i < noteMs.Count; i++)
-        {
-            GameObject clone;
-            clone = Instantiate(note[i], test.NoteField.transform);
-            Vector3 pos;
-            pos = note[i].transform.localPosition;
-            clone.transform.localPosition = new Vector3(pos.x, pos.y, 0);
-            clone.transform.localScale = note[i].transform.localScale;
-            clone.transform.localRotation = Quaternion.Euler(0, 0, 0);
-
-            switch (noteLine[i])
-            {
-                case 1:
-                    var play1 = test.judge1;
-                    play1.TestPlay1.Add(clone);
-                    play1.TestPlayMs1.Add(noteMs[i]);
-                    play1.TestPlayLegnth1.Add(noteLegnth[i]);
-                    break;
-
-                case 2:
-                    var play2 = test.judge2;
-                    play2.TestPlay2.Add(clone);
-                    play2.TestPlayMs2.Add(noteMs[i]);
-                    play2.TestPlayLegnth2.Add(noteLegnth[i]);
-                    break;
-
-                case 3:
-                    var play3 = test.judge3;
-                    play3.TestPlay3.Add(clone);
-                    play3.TestPlayMs3.Add(noteMs[i]);
-                    play3.TestPlayLegnth3.Add(noteLegnth[i]);
-                    break;
-
-                case 4:
-                    var play4 = test.judge4;
-                    play4.TestPlay4.Add(clone);
-                    play4.TestPlayMs4.Add(noteMs[i]);
-                    play4.TestPlayLegnth4.Add(noteLegnth[i]);
-                    break;
-
-                case 5:
-                case 6:
-                    var play5 = test.judgeBottom;
-                    play5.TestPlay5.Add(clone);
-                    play5.TestPlayMs5.Add(noteMs[i]);
-                    play5.TestPlayLegnth5.Add(noteLegnth[i]);
-                    break;
-            }
-        }
-
-        test.testEffectMs = EffectMs;
-        test.testEffectForce = EffectForce;
-        test.testEffectDuration = EffectDuration;
-
-        test.testSpeedMs = SpeedMs;
-        test.testSpeedBpm = SpeedBpm;
-
-        yield return new WaitForSeconds(.5f);
-
-        test.getInfo();
-
-        yield return new WaitForSeconds(.5f);
-        
-        isPlay = true;
 
         yield return new WaitForSeconds(delay / 1000);
         Music.Play();

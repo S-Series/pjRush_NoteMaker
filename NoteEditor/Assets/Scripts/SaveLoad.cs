@@ -11,9 +11,35 @@ public class SaveLoad : MonoBehaviour
 
     NoteSavedData noteSaved = new NoteSavedData();
 
-    List<GameObject> listObject;
-    List<GameObject> effectObject;
-    List<GameObject> bpmObject;
+    private float bpm;
+
+    private List<GameObject> note;
+    private List<float> noteMs;
+    private List<float> notePos;
+    private List<int> noteLine;
+    private List<int> noteLegnth;
+
+    [SerializeField]
+    private int NoteIndex;
+
+    private List<GameObject> effect;
+    private List<float> EffectMs;
+    private List<float> EffectPos;
+    private List<float> EffectForce;
+    private List<int> EffectDuration;
+
+    private int EffectIndex;
+
+    [SerializeField]
+    private List<GameObject> speed;
+    [SerializeField]
+    private List<float> SpeedMs;
+    [SerializeField]
+    private List<float> SpeedPos;
+    [SerializeField]
+    private List<float> SpeedBpm;
+
+    private int SpeedIndex;
 
     [SerializeField]
     GameObject[] PrefabObject;
@@ -84,233 +110,269 @@ public class SaveLoad : MonoBehaviour
     IEnumerator SaveDataToJson()
     {
         SaveBlock.SetActive(true);
-        float gameBpm;
-        gameBpm = AutoTest.autoTest.bpm;
-
-        noteSaved.difficulty = Convert.ToInt32(dropdownDifficulty.text);
 
         ResetSavedData();
 
-        try
-        {
-            noteSaved.bpm = Convert.ToSingle(inputBpm.text);
-        }
-        catch
-        {
-            PlayerPrefs.SetString("NoteFileName", null);
-            StartCoroutine(DisplaySaveCompleteMessage(false));
-            SaveBlock.SetActive(false);
-            yield break;
-        }
-
-        try
-        {
-            noteSaved.startDelayMs = Convert.ToInt32(inputStartDelayMs.text);
-        }
-        catch
-        {
-            PlayerPrefs.SetString("NoteFileName", null);
-            StartCoroutine(DisplaySaveCompleteMessage(false));
-            SaveBlock.SetActive(false);
-            yield break;
-        }
-
-        if (noteSaved.bpm == 0)
-        {
-            PlayerPrefs.SetString("NoteFileName", null);
-            StartCoroutine(DisplaySaveCompleteMessage(false));
-            SaveBlock.SetActive(false);
-            yield break;
-        }
+        bpm = AutoTest.autoTest.bpm;
 
         for (int i = 0; i < NoteField.transform.childCount; i++)
         {
-            GameObject ChildObject;
-            ChildObject = NoteField.transform.GetChild(i).gameObject;
+            GameObject targetNote;
+            targetNote = NoteField.transform.GetChild(i).gameObject;
 
-            if (ChildObject.CompareTag("Effect")) effectObject.Add(ChildObject);
-            else if (ChildObject.CompareTag("Bpm")) bpmObject.Add(ChildObject);
-            else listObject.Add(ChildObject);
+            // Add to List -----------------
+            if (targetNote.tag == "Effect") effect.Add(targetNote);
+            else if (targetNote.tag == "Bpm") speed.Add(targetNote);
+            else note.Add(targetNote);
         }
 
-        yield return new WaitForSeconds(1.0f);
-
-        if (listObject.Count >= 1)
+        note.Sort(delegate (GameObject A, GameObject B)
         {
-            listObject.Sort(delegate (GameObject A, GameObject B)
-            {
-                if (A.transform.localPosition.y > B.transform.localPosition.y) return 1;
-                else if (A.transform.localPosition.y < B.transform.localPosition.y) return -1;
-                else if (A.transform.localPosition.y == B.transform.localPosition.y)
-                {
-                    if (A.transform.localPosition.x > B.transform.localPosition.x) return 1;
-                    else if (A.transform.localPosition.x < B.transform.localPosition.x) return -1;
-                }
-                return 0;
-            });
-        }
+            if (A.transform.localPosition.y > B.transform.localPosition.y) return 1;
+            else if (A.transform.localPosition.y < B.transform.localPosition.y) return -1;
+            return 0;
+        });
 
-        if (bpmObject.Count >= 1)
+        effect.Sort(delegate (GameObject A, GameObject B)
         {
-            bpmObject.Sort(delegate (GameObject A, GameObject B)
-            {
-                if (A.transform.localPosition.y > B.transform.localPosition.y) return 1;
-                else if (A.transform.localPosition.y < B.transform.localPosition.y) return -1;
-                else if (A.transform.localPosition.y == B.transform.localPosition.y)
-                {
-                    if (A.transform.localPosition.x > B.transform.localPosition.x) return 1;
-                    else if (A.transform.localPosition.x < B.transform.localPosition.x) return -1;
-                }
-                return 0;
-            });
-        }
+            if (A.transform.localPosition.y > B.transform.localPosition.y) return 1;
+            else if (A.transform.localPosition.y < B.transform.localPosition.y) return -1;
+            return 0;
+        });
 
-        if (effectObject.Count >= 1)
+        speed.Sort(delegate (GameObject A, GameObject B)
         {
-            effectObject.Sort(delegate (GameObject A, GameObject B)
-            {
-                if (A.transform.localPosition.y > B.transform.localPosition.y) return 1;
-                else if (A.transform.localPosition.y < B.transform.localPosition.y) return -1;
-                else if (A.transform.localPosition.y == B.transform.localPosition.y)
-                {
-                    if (A.transform.localPosition.x > B.transform.localPosition.x) return 1;
-                    else if (A.transform.localPosition.x < B.transform.localPosition.x) return -1;
-                }
-                return 0;
-            });
-        }
+            if (A.transform.localPosition.y > B.transform.localPosition.y) return 1;
+            else if (A.transform.localPosition.y < B.transform.localPosition.y) return -1;
+            return 0;
+        });
 
-        yield return new WaitForSeconds(1.0f);
-
-        for (int i = 0; i < listObject.Count; i++)
+        if (speed.Count >= 1)
         {
-            GameObject gameObject;
-            gameObject = listObject[i];
+            /// <summary>
+            /// 
+            /// 인자값은 var로 선언은 되지만, 적용은 되지 않는다
+            /// GameObject test = new GameObject();
+            ///
+            /// var GetPos = transform.localPosition;
+            ///
+            /// float testPosA;
+            /// testPosA = test.GetPos.y;
+            /// testPosA = test.transform.localPosition.y;
+            /// 
+            /// </summary>
 
-            if (gameObject.CompareTag("chip") || gameObject.CompareTag("btChip"))
+            // Add to List -----------------
+            SpeedPos.Add(0);
+            SpeedBpm.Add(bpm);
+            for (int i = 0; i < speed.Count; i++)
             {
-                noteSaved.NoteLegnth.Add(0);
+                float speedNum;
+                speedNum = speed[i].transform.GetChild(0).GetChild(0).localPosition.x
+                    * speed[i].transform.GetChild(0).GetChild(0).localPosition.y;
+
+                SpeedPos.Add(speed[i].transform.localPosition.y);
+                noteSaved.SpeedPos.Add(speed[i].transform.localPosition.y);
+                SpeedBpm.Add(speedNum);
+
+                noteSaved.SpeedNum.Add(speed[i].transform.GetChild(0).GetChild(0).localPosition.x);
+                noteSaved.SpeedBpm.Add(speed[i].transform.GetChild(0).GetChild(0).localPosition.y);
             }
-            else
+
+            // Add to List -----------------
+            int newMs;
+            SpeedMs.Add(0);
+            newMs = (int)(speed[0].transform.localPosition.y * 150 / bpm);
+            SpeedMs.Add(newMs);
+            for (int i = 1; i < speed.Count; i++)
             {
-                int legnth;
-                legnth = (int)(listObject[i].transform.localScale.y / 100);
-                Debug.Log(legnth);
-                noteSaved.NoteLegnth.Add(legnth);
+                newMs += (int)(Mathf.Abs(SpeedPos[i + 1] - SpeedPos[i]) * 150 / Mathf.Abs(SpeedBpm[i]));
+                SpeedMs.Add(newMs);
+            }
+
+            for (int i = 0; i < speed.Count; i++)
+            {
+                float speedNum;
+                speedNum = SpeedBpm[i];
+                if (speedNum < 0)
+                {
+                    try
+                    {
+                        SpeedPos[i] = (SpeedPos[i] + (SpeedPos[i + 1] - SpeedPos[i]) * 2);
+                    }
+                    catch
+                    {
+                        Debug.LogError("속도값이 잘못된 SpeedNote가 존재합니다");
+                    }
+                }
+                else if (speedNum == 0)
+                {
+                    Debug.LogError("속도값이 0인 SpeedNote가 존재합니다.");
+                }
+            }
+        }
+
+        yield return new WaitForSeconds(.5f);
+
+        for (int i = 0; i < note.Count; i++)
+        {
+            // Add to List -----------------
+            notePos.Add(note[i].transform.localPosition.y);
+        }
+
+        int SpeedNoteinfoIndex;
+        SpeedNoteinfoIndex = 0;
+
+        for (int i = 0; i < note.Count; i++)
+        {
+            GameObject targetNote;
+            targetNote = note[i];
+
+            for (int j = SpeedNoteinfoIndex; j < SpeedMs.Count; j++)
+            {
+                if (SpeedPos[j] < notePos[i])
+                {
+                    SpeedNoteinfoIndex = j;
+                }
+                else
+                {
+                    break;
+                }
             }
 
             float ms;
-            ms = (150 * gameObject.transform.localPosition.y / gameBpm);
-            noteSaved.NoteMs.Add(ms);
-
-            if (gameObject.CompareTag("chip") || gameObject.CompareTag("long"))
+            try
             {
-                switch (gameObject.transform.localPosition.x)
+                float posDif;
+                posDif = notePos[i] - SpeedPos[SpeedNoteinfoIndex];
+                ms = (int)(posDif * 150 / SpeedBpm[SpeedNoteinfoIndex]) + SpeedMs[SpeedNoteinfoIndex];
+            }
+            catch
+            {
+                ms = (int)(notePos[i] * 150 / bpm);
+            }
+
+            // Add to List -----------------
+            noteMs.Add(ms);
+            noteLegnth.Add((int)(note[i].transform.localScale.y / 100));
+
+            // Add to List -----------------
+            if (targetNote.tag == "chip" || targetNote.tag == "long")
+            {
+                switch (targetNote.transform.localPosition.x)
                 {
                     case -300:
-                        noteSaved.NoteLine.Add(1);
+                        noteLine.Add(1);
                         break;
 
                     case -100:
-                        noteSaved.NoteLine.Add(2);
+                        noteLine.Add(2);
                         break;
 
                     case +100:
-                        noteSaved.NoteLine.Add(3);
+                        noteLine.Add(3);
                         break;
 
                     case +300:
-                        noteSaved.NoteLine.Add(4);
-                        break;
-                    default:
-                        noteSaved.NoteLine.Add(1);
+                        noteLine.Add(4);
                         break;
                 }
             }
-            else if (gameObject.CompareTag("btChip") || gameObject.CompareTag("btLong"))
+            else
             {
-                switch (gameObject.transform.localPosition.x)
+                switch (targetNote.transform.localPosition.x)
                 {
                     case -100:
-                        noteSaved.NoteLine.Add(5);
+                        noteLine.Add(5);
                         break;
 
                     case +100:
-                        noteSaved.NoteLine.Add(6);
-                        break;
-                    default:
-                        noteSaved.NoteLine.Add(5);
+                        noteLine.Add(6);
                         break;
                 }
             }
         }
 
-        yield return new WaitForSeconds(1.0f);
+        yield return new WaitForSeconds(.5f);
 
-
-        for (int i = 0; i < effectObject.Count; i++)
+        for (int i = 0; i < effect.Count; i++)
         {
-            GameObject gameObject;
-            gameObject = effectObject[i];
-
-            int ms;
-            ms = (int)(150 * gameObject.transform.localPosition.y / gameBpm);
-            noteSaved.EffectMs.Add(ms);
-
-            float force;
-            force = Convert.ToSingle(gameObject.name);
-            noteSaved.EffectForce.Add(force);
+            // Add to List -----------------
+            EffectPos.Add(effect[i].transform.localPosition.y);
         }
 
-        for (int i = 0; i < bpmObject.Count; i++)
+        SpeedNoteinfoIndex = 0;
+        for (int i = 0; i < effect.Count; i++)
         {
-            GameObject gameObject;
-            gameObject = bpmObject[i];
+            GameObject targetObject;
+            targetObject = effect[i];
 
-            int ms;
-            ms = (int)(150 * gameObject.transform.localPosition.y / gameBpm);
-            noteSaved.SpeedMs.Add(ms);
+            GameObject childObject;
+            childObject = targetObject.transform.GetChild(0).GetChild(0).gameObject;
 
-            float pos;
-            pos = gameObject.transform.localPosition.y;
-            if (pos % 1 >= .5f) pos = pos - pos % 1 + 1;
-            else pos = pos - pos % 1;
-            noteSaved.SpeedPos.Add(pos);
+            float EffectPosY;
+            EffectPosY = EffectPos[i];
 
-            float bpm;
-            bpm = Convert.ToSingle(gameObject.transform.GetChild(0).GetChild(0).localPosition.y);
-            noteSaved.SpeedBpm.Add(bpm);
+            for (int j = SpeedNoteinfoIndex; j < SpeedMs.Count - 1; j++)
+            {
+                if (SpeedPos[j] < EffectPosY)
+                {
+                    SpeedNoteinfoIndex = j;
+                }
+                else { break; }
+            }
 
-            float speed;
-            speed = Convert.ToSingle(gameObject.transform.GetChild(0).GetChild(0).localPosition.x);
-            noteSaved.SpeedNum.Add(speed);
+            float posDif;
+            posDif = EffectPosY - SpeedPos[SpeedNoteinfoIndex];
+
+            float ms;
+            ms = (int)(posDif * 150 / SpeedBpm[SpeedNoteinfoIndex]) + SpeedMs[SpeedNoteinfoIndex];
+
+            // Add to List -----------------
+            EffectMs.Add(ms);
+            EffectForce.Add(childObject.transform.localPosition.x);
+            EffectDuration.Add((int)(childObject.transform.localScale.y));
         }
 
-        yield return new WaitForSeconds(1.0f);
+        SpeedMs.RemoveAt(0);
+
+        noteSaved.bpm = bpm;
+        noteSaved.startDelayMs = AutoTest.autoTest.delay;
+
+        noteSaved.NoteMs = noteMs;
+        noteSaved.NotePos = notePos;
+        noteSaved.NoteLine = noteLine;
+        noteSaved.NoteLegnth = noteLegnth;
+
+        noteSaved.SpeedMs = SpeedMs;
+
+        noteSaved.EffectMs = EffectMs;
+
+        SaveBlock.SetActive(false);
+
+        yield return new WaitForSeconds(0.5f);
 
         try
         {
             string jsonData = JsonUtility.ToJson(noteSaved, true);
             string path = Path.Combine(Application.dataPath, inputFileName.text + ".json");
             File.WriteAllText(path, jsonData);
+            PlayerPrefs.SetString("NoteFileName", inputFileName.text);
+            StartCoroutine(DisplaySaveCompleteMessage(true));
         }
         catch
         {
-            PlayerPrefs.SetString("NoteFileName", null);
             StartCoroutine(DisplaySaveCompleteMessage(false));
-            SaveBlock.SetActive(false);
-            yield break;
         }
-        
-        SaveBlock.SetActive(false);
-        PlayerPrefs.SetString("NoteFileName", inputFileName.text);
-        StartCoroutine(DisplaySaveCompleteMessage(true));
     }
 
     [ContextMenu("Load")]
     IEnumerator LoadDataFromJson()
     {
         yield return new WaitForSeconds(.1f);
+
+        AutoTest.autoTest.bpm = noteSaved.bpm;
+        AutoTest.autoTest.delay = noteSaved.startDelayMs;
 
         for (int i = 0; i < NoteField.transform.childCount; i++)
         {
@@ -334,12 +396,12 @@ public class SaveLoad : MonoBehaviour
         inputStartDelayMs.text = (noteSaved.startDelayMs).ToString();
         AutoTest.autoTest.delay = noteSaved.startDelayMs;
 
-        for (int i = 0; i < noteSaved.SpeedMs.Count; i++)
+        for (int i = 0; i < noteSaved.SpeedMs.Count; i++) 
         {
             GameObject copy;
             copy = Instantiate(PrefabObject[5], NoteField.transform);
             copy.transform.localPosition = new Vector3(0, noteSaved.SpeedPos[i], 0);
-            copy.transform.GetChild(0).GetComponent<TextMeshPro>().text = 
+            copy.transform.GetComponentInChildren<TextMeshPro>().text = 
                 noteSaved.SpeedBpm[i].ToString() + "\nx " + noteSaved.SpeedNum[i].ToString();
             copy.transform.GetChild(0).GetChild(0).localPosition 
                 = new Vector3(noteSaved.SpeedNum[i], noteSaved.SpeedBpm[i], 0);
@@ -416,11 +478,18 @@ public class SaveLoad : MonoBehaviour
 
                 // 노트의 Y좌표 해석
                 // Ms = 150 * PosY / Bpm |=>| PosY = Bpm * Ms / 150
-                float pos;
-                pos = noteSaved.bpm * noteSaved.NoteMs[i] / 150;
-                if (pos % 1 >= .5f) pos = pos - pos % 1 + 1;
-                else pos = pos - pos % 1;
-                copiedObjectPos.y = pos;
+                if (noteSaved.NotePos.Count == 0)
+                {
+                    float pos;
+                    pos = noteSaved.bpm * noteSaved.NoteMs[i] / 150;
+                    if (pos % 1 >= .5f) pos = pos - pos % 1 + 1;
+                    else pos = pos - pos % 1;
+                    copiedObjectPos.y = pos;
+                }
+                else
+                {
+                    copiedObjectPos.y = noteSaved.NotePos[i];
+                }
 
                 copiedObject.transform.localPosition = copiedObjectPos;
             }
@@ -434,11 +503,16 @@ public class SaveLoad : MonoBehaviour
         PageSystem.pageSystem.PageSet(PageSystem.pageSystem.firstPage);
 
         PlayerPrefs.SetString("NoteFileName", inputFileName.text);
+        TestPlay.testPlay.FileName = inputFileName.text;
     }
 
     private void ResetSavedData()
     {
         NoteField = PageSystem.pageSystem.NoteField;
+
+        note = new List<GameObject>();
+        effect = new List<GameObject>();
+        speed = new List<GameObject>();
 
         noteSaved.bpm = new float();
         noteSaved.startDelayMs = new int();
@@ -447,19 +521,38 @@ public class SaveLoad : MonoBehaviour
         noteSaved.NoteMs = new List<float>();
         noteSaved.NoteLine = new List<int>();
 
-        noteSaved.EffectMs = new List<int>();
+        noteSaved.EffectMs = new List<float>();
         noteSaved.EffectForce = new List<float>();
         noteSaved.EffectDuration = new List<int>();
 
-        noteSaved.SpeedMs = new List<int>();
+        noteSaved.SpeedMs = new List<float>();
         noteSaved.SpeedPos = new List<float>();
         noteSaved.SpeedBpm = new List<float>();
         noteSaved.SpeedNum = new List<float>();
 
-        listObject = new List<GameObject>();
-        effectObject = new List<GameObject>();
-        bpmObject = new List<GameObject>();
-    }
+        noteMs = new List<float>();
+        notePos = new List<float>();
+        noteLine = new List<int>();
+        noteLegnth = new List<int>();
+
+        effect = new List<GameObject>();
+        EffectMs = new List<float>();
+        EffectForce = new List<float>();
+        EffectDuration = new List<int>();
+
+        speed = new List<GameObject>();
+        SpeedMs = new List<float>();
+        SpeedPos = new List<float>();
+        SpeedBpm = new List<float>();
+
+        NoteIndex = 0;
+        EffectIndex = 0;
+        SpeedIndex = 0;
+
+        SpeedMs = new List<float>();
+        SpeedBpm = new List<float>();
+        SpeedPos = new List<float>();
+}
 
     public void ButtonSave()
     {
@@ -497,18 +590,18 @@ public class SaveLoad : MonoBehaviour
 public class NoteSavedData
 {
     public float bpm;
-    public int difficulty;
-    public int startDelayMs;
+    public float startDelayMs;
 
     public List<int> NoteLegnth;
     public List<float> NoteMs;
+    public List<float> NotePos;
     public List<int> NoteLine;
 
-    public List<int> EffectMs;
+    public List<float> EffectMs;
     public List<float> EffectForce;
     public List<int> EffectDuration;
 
-    public List<int> SpeedMs;
+    public List<float> SpeedMs;
     public List<float> SpeedPos;
     public List<float> SpeedBpm;
     public List<float> SpeedNum;
