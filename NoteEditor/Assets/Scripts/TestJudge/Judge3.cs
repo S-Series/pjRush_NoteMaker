@@ -100,7 +100,7 @@ public class Judge3 : MonoBehaviour
     {
         if (TestPlayLegnth3[index] != 0)
         {
-            StartCoroutine(LongStart(TestPlayLegnth3[index]));
+            StartCoroutine(LongStart(TestPlayLegnth3[index], TestPlay3[index]));
         }
         else
         {
@@ -161,12 +161,12 @@ public class Judge3 : MonoBehaviour
         index++;
     }
 
-    private IEnumerator LongStart(int Legnth)
+    private IEnumerator LongStart(int Legnth, GameObject longObject)
     {
         SpriteRenderer sprite;
         sprite = TestPlay3[index].GetComponentInChildren<SpriteRenderer>();
 
-        wait = 15 / AutoTest.autoTest.bpm;
+        wait = 15 / TestPlay.testBpm;
         var delay = new WaitForSeconds(wait);
         var white = new Color32(255, 255, 255, 255);
         var middleGray = new Color32(240, 240, 240, 255);
@@ -193,9 +193,10 @@ public class Judge3 : MonoBehaviour
 
             yield return delay;
 
-            if (!AutoTest.autoTest.isPlay) break;
+            if (!TestPlay.isPlay) break;
         }
-        TestPlay3[index - 1].SetActive(false);
+        sprite.color = white;
+        longObject.SetActive(false);
     }
 
     private IEnumerator color(SpriteRenderer sprite, float duration, Color32 color1, Color32 color2)
@@ -210,6 +211,14 @@ public class Judge3 : MonoBehaviour
 
     public void resetMs3()
     {
+        index = 0;
         ms = 0;
+    }
+
+    public void NoteDataAddTo3(GameObject noteObject, float ms, int legnth)
+    {
+        TestPlay3.Add(noteObject);
+        TestPlayMs3.Add(ms);
+        TestPlayLegnth3.Add(legnth);
     }
 }

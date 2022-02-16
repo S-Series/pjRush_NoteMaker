@@ -38,7 +38,7 @@ public class PageSystem : MonoBehaviour
 
     private void Update()
     {
-        if (!AutoTest.autoTest.isTest && !AutoTest.autoTest.isPlay)
+        if (!AutoTest.autoTest.isTest && !TestPlay.isPlay)
         {
             if (Input.GetAxis("Mouse ScrollWheel") > 0)
             {
@@ -101,7 +101,7 @@ public class PageSystem : MonoBehaviour
     {
         //var auto = AutoTest.autoTest;       // 1번
         AutoTest auto = AutoTest.autoTest;  // 2번
-        if (auto.isTest || auto.isPlay) return;
+        if (auto.isTest || TestPlay.isPlay) return;
 
         int input;
         try

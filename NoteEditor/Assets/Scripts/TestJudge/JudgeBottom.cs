@@ -91,7 +91,7 @@ public class JudgeBottom : MonoBehaviour
 
     private IEnumerator longKeep()
     {
-        wait = 15 / AutoTest.autoTest.bpm;
+        wait = 15 / TestPlay.testBpm;
         yield return new WaitForSeconds(2 * wait);
         if (!Input.GetKey(KeyCode.LeftShift) && !Input.GetKey(KeyCode.RightShift)) isLongJudge = false;
     }
@@ -100,7 +100,7 @@ public class JudgeBottom : MonoBehaviour
     {
         if (TestPlayLegnth5[index] != 0)
         {
-            StartCoroutine(LongStart(TestPlayLegnth5[index]));
+            StartCoroutine(LongStart(TestPlayLegnth5[index], TestPlay5[index]));
         }
         else
         {
@@ -161,12 +161,12 @@ public class JudgeBottom : MonoBehaviour
         index++;
     }
 
-    private IEnumerator LongStart(int Legnth)
+    private IEnumerator LongStart(int Legnth, GameObject longObject)
     {
         SpriteRenderer sprite;
         sprite = TestPlay5[index].GetComponentInChildren<SpriteRenderer>();
 
-        wait = 15 / AutoTest.autoTest.bpm;
+        wait = 15 / TestPlay.testBpm;
         var delay = new WaitForSeconds(wait);
         var white = new Color32(255, 255, 255, 255);
         var middleGray = new Color32(240, 240, 240, 255);
@@ -193,9 +193,10 @@ public class JudgeBottom : MonoBehaviour
 
             yield return delay;
 
-            if (!AutoTest.autoTest.isPlay) break;
+            if (!TestPlay.isPlay) break;
         }
-                TestPlay5[index - 1].SetActive(false);
+        sprite.color = new Color32(255, 255, 255, 150);
+        longObject.SetActive(false);
     }
 
     private IEnumerator color(SpriteRenderer sprite, float duration, Color32 color1, Color32 color2)
@@ -210,6 +211,14 @@ public class JudgeBottom : MonoBehaviour
 
     public void resetMs5()
     {
+        index = 0;
         ms = 0;
+    }
+
+    public void NoteDataAddTo5(GameObject noteObject, float ms, int legnth)
+    {
+        TestPlay5.Add(noteObject);
+        TestPlayMs5.Add(ms);
+        TestPlayLegnth5.Add(legnth);
     }
 }

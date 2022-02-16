@@ -19,27 +19,16 @@ public class SaveLoad : MonoBehaviour
     private List<int> noteLine;
     private List<int> noteLegnth;
 
-    [SerializeField]
-    private int NoteIndex;
-
     private List<GameObject> effect;
     private List<float> EffectMs;
     private List<float> EffectPos;
     private List<float> EffectForce;
     private List<int> EffectDuration;
 
-    private int EffectIndex;
-
-    [SerializeField]
     private List<GameObject> speed;
-    [SerializeField]
     private List<float> SpeedMs;
-    [SerializeField]
     private List<float> SpeedPos;
-    [SerializeField]
     private List<float> SpeedBpm;
-
-    private int SpeedIndex;
 
     [SerializeField]
     GameObject[] PrefabObject;
@@ -384,6 +373,7 @@ public class SaveLoad : MonoBehaviour
         {
             string path = Path.Combine(Application.dataPath, inputFileName.text + ".json");
             string jsonData = File.ReadAllText(path);
+            print(path);
             noteSaved = JsonUtility.FromJson<NoteSavedData>(jsonData);
         }
         catch 
@@ -545,14 +535,10 @@ public class SaveLoad : MonoBehaviour
         SpeedPos = new List<float>();
         SpeedBpm = new List<float>();
 
-        NoteIndex = 0;
-        EffectIndex = 0;
-        SpeedIndex = 0;
-
         SpeedMs = new List<float>();
         SpeedBpm = new List<float>();
         SpeedPos = new List<float>();
-}
+    }
 
     public void ButtonSave()
     {

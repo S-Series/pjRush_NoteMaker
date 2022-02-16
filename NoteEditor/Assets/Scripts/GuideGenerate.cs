@@ -25,65 +25,21 @@ public class GuideGenerate : MonoBehaviour
     GameObject StaticGuide;
     GameObject StaticGuideParent;
 
-    [SerializeField]
-    GameObject PlayGuide;
-    GameObject PlayGuideParent;
-
     readonly float[] posX = new float[5]{0.0f, 925.926f, 1851.852f, 2777.778f, 3703.704f };
 
     private void Awake()
     {
         StaticGuideParent = StaticGuide.transform.parent.gameObject;
-        PlayGuideParent = PlayGuide.transform.parent.gameObject;
 
-        #region Generate Build Test GuideLines
-        for (int i = 1; i < 9; i++)
+        for (int i = 1; i < 999; i++)
         {
             GameObject copy;
             copy = Instantiate(StaticGuide, StaticGuideParent.transform);
             copy.transform.localPosition = new Vector3(0, 1600 * i, 0);
-            copy.transform.GetChild(0).GetComponent<TextMeshPro>().text = "00" + (i + 1).ToString();
-        }
-        for (int i = 9; i < 99; i++)
-        {
-            GameObject copy;
-            copy = Instantiate(StaticGuide, StaticGuideParent.transform);
-            copy.transform.localPosition = new Vector3(0, 1600 * i, 0);
-            copy.transform.GetChild(0).GetComponent<TextMeshPro>().text = "0" + (i + 1).ToString();
-        }
-        for (int i = 99; i < 999; i++)
-        {
-            GameObject copy;
-            copy = Instantiate(StaticGuide, StaticGuideParent.transform);
-            copy.transform.localPosition = new Vector3(0, 1600 * i, 0);
-            copy.transform.GetChild(0).GetComponent<TextMeshPro>().text = (i + 1).ToString();
+            copy.transform.GetChild(0).GetComponent<TextMeshPro>().text
+                = string.Format("{0:D3}", i + 1);
         }
         StaticGuideParent.SetActive(false);
-        #endregion
-
-        #region Generate Play Test GuideLines
-        for (int i = 1; i < 9; i++)
-        {
-            GameObject copy;
-            copy = Instantiate(PlayGuide, PlayGuideParent.transform);
-            copy.transform.localPosition = new Vector3(0, 1600 * i, 0);
-            copy.transform.GetChild(0).GetComponent<TextMeshPro>().text = "00" + (i + 1).ToString();
-        }
-        for (int i = 9; i < 99; i++)
-        {
-            GameObject copy;
-            copy = Instantiate(PlayGuide, PlayGuideParent.transform);
-            copy.transform.localPosition = new Vector3(0, 1600 * i, 0);
-            copy.transform.GetChild(0).GetComponent<TextMeshPro>().text = "0" + (i + 1).ToString();
-        }
-        for (int i = 99; i < 999; i++)
-        {
-            GameObject copy;
-            copy = Instantiate(PlayGuide, PlayGuideParent.transform);
-            copy.transform.localPosition = new Vector3(0, 1600 * i, 0);
-            copy.transform.GetChild(0).GetComponent<TextMeshPro>().text = (i + 1).ToString();
-        }
-        #endregion
     }
 
     private void Start()

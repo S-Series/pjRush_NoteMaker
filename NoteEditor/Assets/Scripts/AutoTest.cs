@@ -6,6 +6,8 @@ using TMPro;
 
 public class AutoTest : MonoBehaviour
 {
+    NoteSavedData noteSaved = new NoteSavedData();
+
     #region properties
     public static AutoTest autoTest;
 
@@ -13,16 +15,13 @@ public class AutoTest : MonoBehaviour
     private int testResetPage;
 
     public bool isTest;
-    public bool isPlayReady;
-    public bool isPlay;
 
     public float bpm;
     public float testBpm;
 
     public float delay;
 
-    [SerializeField]
-    AudioSource Music;
+    public AudioSource Music;
 
     AudioSource HitSound;
     AudioSource LongHitSound;
@@ -32,7 +31,7 @@ public class AutoTest : MonoBehaviour
     private float LongDelay;
 
     private List<GameObject> note;
-    private List<int> noteMs;
+    private List<float> noteMs;
     private List<float> notePos;
     private List<int> noteLine;
     private List<int> noteLegnth;
@@ -41,7 +40,7 @@ public class AutoTest : MonoBehaviour
     private int NoteIndex;
 
     private List<GameObject> effect;
-    private List<int> EffectMs;
+    private List<float> EffectMs;
     private List<float> EffectPos;
     private List<float> EffectForce;
     private List<int> EffectDuration;
@@ -50,7 +49,7 @@ public class AutoTest : MonoBehaviour
 
     private List<GameObject> speed;
     [SerializeField]
-    private List<int> SpeedMs;
+    private List<float> SpeedMs;
     [SerializeField]
     private List<float> SpeedPos;
     [SerializeField]
@@ -127,7 +126,7 @@ public class AutoTest : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (isTest == true || isPlay == true)
+        if (isTest == true || TestPlay.isPlay == true)
         {
             testMs++;
         }
@@ -212,6 +211,7 @@ public class AutoTest : MonoBehaviour
         NoteField.transform.localPosition = new Vector3(0, (testResetPage - 1) * -1600, 0);
         NoteFieldParent.transform.localPosition = new Vector3(0, 0, 0);
         testMs = 0;
+        TestPlay.testPlay.playMs = 0;
         EffectIndex = 0;
         SpeedIndex = 0;
         for (int i = 0; i < NoteField.transform.childCount; i++)
@@ -224,8 +224,8 @@ public class AutoTest : MonoBehaviour
     {
         TestPlayObject[0].SetActive(true);
         TestPlayObject[1].SetActive(false);
-        isPlay = false;
-        isPlayReady = false;
+        TestPlay.isPlay = false;
+        TestPlay.isPlayReady = false;
         MirrorField.SetActive(true);
         NoteFieldParent.transform.localPosition = new Vector3(0, 0, 0);
         testMs = 0;
@@ -236,7 +236,6 @@ public class AutoTest : MonoBehaviour
         {
             NoteField.transform.GetChild(i).gameObject.SetActive(true);
         }
-        test.ResetList();
         test.ResetJudge();
     }
 
@@ -247,18 +246,18 @@ public class AutoTest : MonoBehaviour
         TestStop();
 
         note = new List<GameObject>();
-        noteMs = new List<int>();
+        noteMs = new List<float>();
         notePos = new List<float>();
         noteLine = new List<int>();
         noteLegnth = new List<int>();
 
         effect = new List<GameObject>();
-        EffectMs = new List<int>();
+        EffectMs = new List<float>();
         EffectForce = new List<float>();
         EffectDuration = new List<int>();
 
         speed = new List<GameObject>();
-        SpeedMs = new List<int>();
+        SpeedMs = new List<float>();
         SpeedPos = new List<float>();
         SpeedBpm = new List<float>();
 
@@ -274,18 +273,18 @@ public class AutoTest : MonoBehaviour
         PlayStop();
 
         note = new List<GameObject>();
-        noteMs = new List<int>();
+        noteMs = new List<float>();
         notePos = new List<float>();
         noteLine = new List<int>();
         noteLegnth = new List<int>();
 
         effect = new List<GameObject>();
-        EffectMs = new List<int>();
+        EffectMs = new List<float>();
         EffectForce = new List<float>();
         EffectDuration = new List<int>();
 
         speed = new List<GameObject>();
-        SpeedMs = new List<int>();
+        SpeedMs = new List<float>();
         SpeedPos = new List<float>();
         SpeedBpm = new List<float>();
 
@@ -355,7 +354,6 @@ public class AutoTest : MonoBehaviour
 
     public void ButtonPlayTest()
     {
-        isPlayReady = true;
         LongDelay = 15 / bpm;
         TestPlayObject[0].SetActive(false);
         TestPlayObject[1].SetActive(true);
@@ -505,7 +503,7 @@ public class AutoTest : MonoBehaviour
                 }
             }
 
-            int ms;
+            float ms;
             try
             {
                 float posDif;
@@ -590,7 +588,7 @@ public class AutoTest : MonoBehaviour
             float posDif;
             posDif = EffectPosY - SpeedPos[SpeedNoteinfoIndex];
 
-            int ms;
+            float ms;
             ms = (int)(posDif * 150 / SpeedBpm[SpeedNoteinfoIndex]) + SpeedMs[SpeedNoteinfoIndex];
 
             // Add to List -----------------
@@ -623,7 +621,7 @@ public class AutoTest : MonoBehaviour
         List<GameObject> DelayEffect = new List<GameObject>();
         List<GameObject> DelayNote = new List<GameObject>();
         List<float> DelayNotePos = new List<float>();
-        List<int> DelayNoteMs = new List<int>();
+        List<float> DelayNoteMs = new List<float>();
         List<int> DelayNoteLegnth = new List<int>();
         List<int> DelayNoteLine = new List<int>();
 
@@ -767,7 +765,6 @@ public class AutoTest : MonoBehaviour
 
         yield return new WaitForSeconds(.5f);
 
-
         yield return new WaitForSeconds(.5f);
 
         for (int i = 0; i < DelayNote.Count; i++)
@@ -796,7 +793,7 @@ public class AutoTest : MonoBehaviour
                 }
             }
 
-            int ms;
+            float ms;
             try
             {
                 float posDif;
@@ -881,7 +878,7 @@ public class AutoTest : MonoBehaviour
             float posDif;
             posDif = EffectPosY - SpeedPos[SpeedNoteinfoIndex];
 
-            int ms;
+            float ms;
             ms = (int)(posDif * 150 / SpeedBpm[SpeedNoteinfoIndex]) + SpeedMs[SpeedNoteinfoIndex];
 
             // Add to List -----------------
