@@ -83,6 +83,8 @@ public class NoteEdit : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Escape))
             {
+                if (Selected == null) return;
+
                 isNoteEdit = false;
                 switch (Selected.gameObject.tag)
                 {

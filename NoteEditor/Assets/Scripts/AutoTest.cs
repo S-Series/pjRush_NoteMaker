@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 
 public class AutoTest : MonoBehaviour
@@ -48,11 +49,8 @@ public class AutoTest : MonoBehaviour
     private int EffectIndex;
 
     private List<GameObject> speed;
-    [SerializeField]
     private List<float> SpeedMs;
-    [SerializeField]
     private List<float> SpeedPos;
-    [SerializeField]
     private List<float> SpeedBpm;
 
     private int SpeedIndex;
@@ -84,6 +82,9 @@ public class AutoTest : MonoBehaviour
 
     [SerializeField]
     GameObject[] ActiveObject;
+
+    [SerializeField]
+    Button[] TestButton;
 
     private TestPlay test;
     #endregion
@@ -324,6 +325,10 @@ public class AutoTest : MonoBehaviour
         {
             isPause = true;
             StartCoroutine(Test());
+            TestButton[0].interactable = false;
+            TestButton[1].interactable = false;
+            TestButton[2].interactable = false;
+            ActiveObject[2].SetActive(false);
         }
         else
         {
@@ -331,6 +336,10 @@ public class AutoTest : MonoBehaviour
             Music.Stop();
             ResetTest();
             StopCoroutine(Test());
+            TestButton[0].interactable = true;
+            TestButton[1].interactable = true;
+            TestButton[2].interactable = true;
+            ActiveObject[2].SetActive(true);
         }
     }
 
@@ -342,6 +351,10 @@ public class AutoTest : MonoBehaviour
         {
             isPause = true;
             StartCoroutine(DelayTest());
+            TestButton[0].interactable = false;
+            TestButton[1].interactable = false;
+            TestButton[2].interactable = false;
+            ActiveObject[2].SetActive(false);
         }
         else
         {
@@ -349,6 +362,10 @@ public class AutoTest : MonoBehaviour
             Music.Stop();
             StopCoroutine(DelayTest());
             ResetTest();
+            TestButton[0].interactable = true;
+            TestButton[1].interactable = true;
+            TestButton[2].interactable = true;
+            ActiveObject[2].SetActive(true);
         }
     }
 
@@ -367,6 +384,8 @@ public class AutoTest : MonoBehaviour
 
     public IEnumerator Test()
     {
+        yield return new WaitForSeconds(.5f);
+
         testResetPage = PageSystem.pageSystem.firstPage;
 
         testBpm = bpm;
@@ -600,6 +619,9 @@ public class AutoTest : MonoBehaviour
         yield return new WaitForSeconds(.5f);
 
         isTest = true;
+        TestButton[0].interactable = true;
+        TestButton[1].interactable = false;
+        TestButton[2].interactable = false;
 
         yield return new WaitForSeconds(delay / 1000);
         Music.Play();
@@ -607,6 +629,8 @@ public class AutoTest : MonoBehaviour
 
     public IEnumerator DelayTest()
     {
+        yield return new WaitForSeconds(.5f);
+
         testResetPage = PageSystem.pageSystem.firstPage;
         float nowPos;
         int delayMs = 0;
@@ -905,10 +929,14 @@ public class AutoTest : MonoBehaviour
         testMs = delayMs;
         NoteFieldParent.transform.localPosition = new Vector3(0, delayMs * testBpm / 150, 0);
 
-        yield return new WaitForSeconds(.5f);
+        yield return new WaitForSeconds(1.0f);
 
         isTest = true;
         Music.Play();
+
+        TestButton[0].interactable = false;
+        TestButton[1].interactable = true;
+        TestButton[2].interactable = false;
     }
 
     /*public IEnumerator TestA()

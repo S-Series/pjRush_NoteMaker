@@ -323,7 +323,11 @@ public class SaveLoad : MonoBehaviour
             EffectDuration.Add((int)(childObject.transform.localScale.y));
         }
 
-        SpeedMs.RemoveAt(0);
+        try
+        {
+            SpeedMs.RemoveAt(0);
+        }
+        catch { }
 
         noteSaved.bpm = bpm;
         noteSaved.startDelayMs = AutoTest.autoTest.delay;

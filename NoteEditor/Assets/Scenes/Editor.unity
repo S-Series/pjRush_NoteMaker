@@ -20375,7 +20375,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 806686654}
         m_MethodName: SpeedSetting
-        m_Mode: 1
+        m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -27432,9 +27432,6 @@ MonoBehaviour:
   Music: {fileID: 294824912}
   testMs: 0
   NoteIndex: 0
-  SpeedMs: []
-  SpeedPos: []
-  SpeedBpm: []
   HitEffect:
   - {fileID: 1904219883}
   - {fileID: 953769344}
@@ -27452,6 +27449,11 @@ MonoBehaviour:
   ActiveObject:
   - {fileID: 417111356}
   - {fileID: 81727132}
+  - {fileID: 1192920099}
+  TestButton:
+  - {fileID: 795184165}
+  - {fileID: 1946825534}
+  - {fileID: 821640394}
 --- !u!1 &1490538222
 GameObject:
   m_ObjectHideFlags: 0
@@ -31288,7 +31290,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1683113866
 Transform:
   m_ObjectHideFlags: 0
@@ -41272,8 +41274,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6382697377024053681}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: -100, y: 0, z: 0}
+  m_LocalScale: {x: 0.75, y: 1, z: 1}
   m_Children:
   - {fileID: 6299665704566406539}
   m_Father: {fileID: 1109854594}

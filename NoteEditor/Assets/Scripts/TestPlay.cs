@@ -135,10 +135,6 @@ public class TestPlay : MonoBehaviour
         PlayButton[0].interactable = false;
         PlayButton[1].interactable = false;
         PlayButton[2].interactable = false;
-
-        print(50 / 100);
-        print(50.00f / 100);
-        print(50 / 100.0f);
     }
 
     private void FixedUpdate()
@@ -201,6 +197,16 @@ public class TestPlay : MonoBehaviour
         if (isPlayReady)
         {
             if (Input.GetKeyDown(KeyCode.Return)) ButtonPlayStart();
+
+            if (Input.GetKeyDown(KeyCode.Keypad1)) SpeedSetting(100);
+            if (Input.GetKeyDown(KeyCode.Keypad2)) SpeedSetting(200);
+            if (Input.GetKeyDown(KeyCode.Keypad3)) SpeedSetting(300);
+            if (Input.GetKeyDown(KeyCode.Keypad4)) SpeedSetting(400);
+            if (Input.GetKeyDown(KeyCode.Keypad5)) SpeedSetting(500);
+            if (Input.GetKeyDown(KeyCode.Keypad6)) SpeedSetting(600);
+            if (Input.GetKeyDown(KeyCode.Keypad7)) SpeedSetting(700);
+            if (Input.GetKeyDown(KeyCode.Keypad8)) SpeedSetting(800);
+            if (Input.GetKeyDown(KeyCode.Keypad9)) SpeedSetting(900);
         }
     }
 
@@ -448,10 +454,8 @@ public class TestPlay : MonoBehaviour
         }
 
         yield return new WaitForSeconds(.5f);
-        SpeedSetting();
+        SpeedSetting(100);
         yield return new WaitForSeconds(.5f);
-
-        isPlayReady = true;
         PlayButton[0].interactable = true;
     }
 
@@ -523,15 +527,23 @@ public class TestPlay : MonoBehaviour
         GuidePos = new List<float>();
     }
 
-    public void SpeedSetting()
+    public void SpeedSetting(int getSpeed)
     {
+        isPlayReady = false;
         try
         {
-            gameSpeed = Convert.ToInt32(SpeedTextInput.text);
-            if (gameSpeed < 50) 
-            { 
-                gameSpeed = 50;
-                SpeedTextInput.text = "50";
+            if (getSpeed == 0)
+            {
+                gameSpeed = Convert.ToInt32(SpeedTextInput.text);
+                if (gameSpeed < 50)
+                {
+                    gameSpeed = 50;
+                    SpeedTextInput.text = "50";
+                }
+            }
+            else
+            {
+                gameSpeed = getSpeed;
             }
 
             gameSpeedMultiple = gameSpeed / bpm;
@@ -577,6 +589,8 @@ public class TestPlay : MonoBehaviour
             guidePosSet.y = GuidePos[i] * multiple;
             GuideLine[i].transform.localPosition = guidePosSet;
         }
+
+        isPlayReady = true;
     }
 
     private void GuideGenerate(float num)

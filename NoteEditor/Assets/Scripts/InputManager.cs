@@ -34,7 +34,7 @@ public class InputManager : MonoBehaviour
 
     public bool isNoteBottom;
 
-    // 0. InputNoteData [Field Number (0 ~ 4) || 1. Line Number (1 ~ 5) || 2. Prefab Number (1 ~ 6)]
+    // { Field Number (0 ~ 4), Line Number (1 ~ 4), Prefab Number (1 ~ 6) }
     // Prefab Number 1 == Chip || Prefab Number 2 == Long
     // Prefab Number 3 == BtChip || Prefab Number 4 == BtLong
     // Prefab Number 5 == Effect || Prefab Number 6 == Bpm
@@ -78,10 +78,6 @@ public class InputManager : MonoBehaviour
 
                 case 4:
                     posX = +300;
-                    break;
-
-                case 5:
-                    posX = 0;
                     break;
 
                 default:
