@@ -743,7 +743,9 @@ public class AutoTest : MonoBehaviour
                 }
                 else
                 {
-                    for (int i = 1; i < SpeedPos.Count; i++)
+                    int speedCount;
+                    speedCount = SpeedPos.Count;
+                    for (int i = 1; i < speedCount; i++)
                     {
                         if (-nowPos <= SpeedPos[i])
                         {
@@ -752,7 +754,12 @@ public class AutoTest : MonoBehaviour
                             print(delayMs);
                             break;
                         }
-                        else {  }
+                        else if (i == speedCount - 1)
+                        {
+                            testBpm = SpeedBpm[i];
+                            delayMs = (int)(SpeedMs[i] + (-nowPos - SpeedPos[i]) * 150 / testBpm);
+                            print(delayMs);
+                        }
                     }
                 }
             }
@@ -928,6 +935,7 @@ public class AutoTest : MonoBehaviour
         Music.time = (delayMs - delay) / 1000;
         testMs = delayMs;
         NoteFieldParent.transform.localPosition = new Vector3(0, delayMs * testBpm / 150, 0);
+        print(delayMs);
 
         yield return new WaitForSeconds(1.0f);
 
