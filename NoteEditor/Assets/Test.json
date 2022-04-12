@@ -1,0 +1,17 @@
+{
+    "Version": "0.9.7",
+    "bpm": 120.0,
+    "startDelayMs": 0.0,
+    "NoteLegnth": [],
+    "NoteMs": [],
+    "NotePos": [],
+    "NoteLine": [],
+    "isDouble": [],
+    "EffectMs": [],
+    "EffectForce": [],
+    "EffectDuration": [],
+    "SpeedMs": [],
+    "SpeedPos": [],
+    "SpeedBpm": [],
+    "SpeedNum": []
+}

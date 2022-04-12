@@ -72,7 +72,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -716386527
   m_SortingLayer: 2
-  m_SortingOrder: 7
+  m_SortingOrder: 10
   m_Sprite: {fileID: 21300000, guid: 883d60a8b23bfd547a51950f780b06bb, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -199,7 +199,7 @@ MeshRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -716386527
   m_SortingLayer: 2
-  m_SortingOrder: 7
+  m_SortingOrder: 10
 --- !u!222 &1814131109174125386
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -300,7 +300,7 @@ MonoBehaviour:
   m_renderer: {fileID: 7306018054008228627}
   m_maskType: 0
   _SortingLayerID: -716386527
-  _SortingOrder: 7
+  _SortingOrder: 10
 --- !u!1 &5368360027475481302
 GameObject:
   m_ObjectHideFlags: 0
