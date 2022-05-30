@@ -8,11 +8,16 @@ using TMPro;
 public class NoteEdit : MonoBehaviour
 {
     public static NoteEdit noteEdit;
-    public GameObject Selected;
-    public bool isNoteEdit;
+    public static bool isNoteEdit = false;
+    public static bool isNoteEditBottom = false;
+    public static bool isNoteEditEffect = false;
+    public static GameObject Selected = null;
+    public static NormalNote SelectedNormal = null;
+    public static SpeedNote SelectedSpeed = null;
+    public static EffectNote SelectedEffect = null;
     private const int maxPage = 984;
-    private readonly float[] rdPosX 
-        = new float[5] {0.0f, 925.926f, 1851.852f, 2777.778f, 3703.704f };
+
+    //* ---------------------------------------------
     [SerializeField] public int guidePosSector;
     [SerializeField] TMP_InputField inputLine;
     [SerializeField] TMP_InputField inputPage;
@@ -22,19 +27,18 @@ public class NoteEdit : MonoBehaviour
     [SerializeField] GameObject MirrorField;
     [SerializeField] List<GameObject> mirror;
 
-    //---------------------------------------------
-
+    //* ---------------------------------------------
     [SerializeField] TMP_InputField inputEffectForce;
     [SerializeField] TMP_InputField inputEffectDuration;
     public TMP_InputField[] inputSpeedBpm;
     public Toggle isDoubleToggle;
 
-    //---------------------------------------------
-
+    //* ---------------------------------------------
     [SerializeField] GameObject OriginalSector;
     [SerializeField] GameObject EffectSector;
     [SerializeField] GameObject SpeedSector;
 
+    //* ---------------------------------------------
     private void Awake()
     {
         noteEdit = this;
@@ -57,32 +61,38 @@ public class NoteEdit : MonoBehaviour
                 if (Selected == null) return;
 
                 isNoteEdit = false;
+                EffectManager.isEffectSelected = false;
                 switch (Selected.gameObject.tag)
                 {
                     case "chip":
                     case "long":
-                        noteEdit.Selected.GetComponentInChildren<SpriteRenderer>()
+                        NoteEdit.Selected.GetComponentInChildren<SpriteRenderer>()
                             .color = new Color32(230, 230, 230, 255);
                         break;
 
                     case "btChip":
-                        noteEdit.Selected.GetComponentInChildren<SpriteRenderer>()
+                        NoteEdit.Selected.GetComponentInChildren<SpriteRenderer>()
                             .color = new Color32(255, 255, 255, 255);
                         break;
 
                     case "btLong":
-                        noteEdit.Selected.GetComponentInChildren<SpriteRenderer>()
+                        NoteEdit.Selected.GetComponentInChildren<SpriteRenderer>()
                             .color = new Color32(255, 255, 255, 150);
                         break;
                 }
                 Selected = null;
+                SelectedNormal = null;
+                SelectedSpeed = null;
+                SelectedEffect = null;
                 isDoubleToggle.interactable = false;
                 ResetNoteInfo();
                 SectorSetOriginal();
             }
 
-            if (Input.GetKeyDown(KeyCode.Tab)){
-                if (Selected.tag == "chip"){
+            if (Input.GetKeyDown(KeyCode.Tab))
+            {
+                if (Selected.tag == "chip")
+                {
                     bool privateBool;
                     privateBool = !Selected.transform.GetChild(0).GetChild(0)
                         .GetComponent<SpriteRenderer>().enabled;
@@ -94,7 +104,7 @@ public class NoteEdit : MonoBehaviour
 
             if (Input.GetKeyDown(KeyCode.Delete))
             {
-                StartCoroutine(DeleteNote());
+                DeleteNote();
             }
 
             if (Selected != null)
@@ -112,20 +122,19 @@ public class NoteEdit : MonoBehaviour
                                 selectPos.x = -300;
                                 Selected.transform.localPosition = selectPos;
                                 DisplayNoteInfo();
-                                MirrorPage();
                                 break;
 
                             case +100:
                                 selectPos.x = -100;
                                 Selected.transform.localPosition = selectPos;
                                 DisplayNoteInfo();
-                                MirrorPage(); break;
+                                break;
 
                             case +300:
                                 selectPos.x = +100;
                                 Selected.transform.localPosition = selectPos;
                                 DisplayNoteInfo();
-                                MirrorPage(); break;
+                                break;
 
                             default:
                                 return;
@@ -142,7 +151,6 @@ public class NoteEdit : MonoBehaviour
                         Selected.transform.localScale = selectScale;
 
                         DisplayNoteInfo();
-                        MirrorPage();
                     }
                 }
 
@@ -159,21 +167,18 @@ public class NoteEdit : MonoBehaviour
                                 selectPos.x = -100;
                                 Selected.transform.localPosition = selectPos;
                                 DisplayNoteInfo();
-                                MirrorPage();
                                 break;
 
                             case -100:
                                 selectPos.x = +100;
                                 Selected.transform.localPosition = selectPos;
                                 DisplayNoteInfo();
-                                MirrorPage();
                                 break;
 
                             case +100:
                                 selectPos.x = +300;
                                 Selected.transform.localPosition = selectPos;
                                 DisplayNoteInfo();
-                                MirrorPage();
                                 break;
 
                             default:
@@ -191,7 +196,6 @@ public class NoteEdit : MonoBehaviour
                         Selected.transform.localScale = selectScale;
 
                         DisplayNoteInfo();
-                        MirrorPage();
                     }
                 }
 
@@ -208,13 +212,13 @@ public class NoteEdit : MonoBehaviour
                     {
                         int length;
                         length = (int)(Selected.transform.localScale.y / 100);
-                        StartCoroutine(UpdateLengthNote(length + 1));
+                        LengthNote(length + 1);
 
                         DisplayNoteInfo();
                     }
                     else
                     {
-                        StartCoroutine(ArrowKeyNoteMove(notePos, isUp));
+                        ArrowKeyNoteMove(notePos, isUp);
                     }
                 }
 
@@ -231,69 +235,43 @@ public class NoteEdit : MonoBehaviour
                     {
                         int length;
                         length = (int)(Selected.transform.localScale.y / 100);
-                        StartCoroutine(UpdateLengthNote(length - 1));
+                        LengthNote(length - 1);
 
                         DisplayNoteInfo();
                     }
                     else
                     {
-                        StartCoroutine(ArrowKeyNoteMove(notePos, isUp));
+                        ArrowKeyNoteMove(notePos, isUp);
                     }
                 }
             }
         }
 
-        if (Selected == null){
+        if (Selected == null)
+        {
             isNoteEdit = false;
             ResetNoteInfo();
         }
     }
-    private IEnumerator UpdateLengthNote(int length){
-        Vector3 pos;
-        pos = Selected.transform.localPosition;
-
-        GameObject NoteField;
-        NoteField = PageSystem.pageSystem.NoteField;
-
-        GameObject editNote;
-        editNote = null;
-        for (int i = 0; i < NoteField.transform.childCount; i++)
-        {
-            if (NoteField.transform.GetChild(i).localPosition == pos)
-            {
-                editNote = NoteField.transform.GetChild(i).gameObject;
-                break;
-            }
-        }
-        if (editNote != null)
-        {
-            Vector3 SelectedScale;
-            if (Selected.tag == "long" || Selected.tag == "btLong")
-            {
-                try
-                {
-                    SelectedScale = Selected.transform.localScale;
-                    if (length < 2)
-                    {
-                        DisplayNoteInfo();
-                        yield break;
-                    }
-                    SelectedScale.y = length * 100;
-
-                    Selected.transform.localScale = SelectedScale;
-                    MirrorPage();
-                }
-                catch { yield break; }
-            }
-        }
-        else { Debug.LogError("조정 대상을 찾지 못함"); yield break; }
-
-        yield return new WaitForSeconds(.1f);
-    }
-    private IEnumerator ArrowKeyNoteMove(Vector3 pos, bool isUp)
+    private void LengthNote(int length)
     {
-        yield return new WaitForSeconds(.1f);
+        if (Selected == null) return;
+        if (SelectedNormal == null) return;
+        if (SelectedNormal.noteObject != Selected) return;
+        if (!NormalNote.normalNotes.Contains(SelectedNormal)) return;
 
+        if (length <= 1) length = 2;
+
+        Vector3 editScale;
+        editScale = Selected.transform.localScale;
+
+        editScale.y = length * 100.0f;
+        SelectedNormal.legnth = length;
+
+        Selected.transform.localScale = editScale;
+    }
+    private void ArrowKeyNoteMove(Vector3 pos, bool isUp)
+    {
         if (isUp == true)
         {
             if (guidePosSector == 1)
@@ -303,7 +281,6 @@ public class NoteEdit : MonoBehaviour
                 if (pos.y < 0) pos.y = 0;
                 Selected.transform.localPosition = pos;
                 DisplayNoteInfo();
-                MirrorPage();
             }
             else
             {
@@ -334,7 +311,6 @@ public class NoteEdit : MonoBehaviour
                 if (pos.y < 0) pos.y = 0;
                 Selected.transform.localPosition = pos;
                 DisplayNoteInfo();
-                MirrorPage();
             }
         }
         else
@@ -346,7 +322,6 @@ public class NoteEdit : MonoBehaviour
                 if (pos.y < 0) pos.y = 0;
                 Selected.transform.localPosition = pos;
                 DisplayNoteInfo();
-                MirrorPage();
             }
             else
             {
@@ -377,9 +352,20 @@ public class NoteEdit : MonoBehaviour
                 if (pos.y < 0) pos.y = 0;
                 Selected.transform.localPosition = pos;
                 DisplayNoteInfo();
-                MirrorPage();
             }
         }
+        //* NormalNote
+        if (SelectedNormal != null
+                && SelectedNormal.noteObject == Selected)
+        { SelectedNormal.pos = pos.y; }
+        //* SpeedNote
+        if (SelectedSpeed != null
+                && SelectedSpeed.noteObject == Selected)
+        { SelectedSpeed.pos = pos.y; }
+        //* EffectNote
+        if (SelectedEffect != null
+                && SelectedEffect.noteObject == Selected)
+        { SelectedEffect.pos = pos.y; }
     }
     private void ResetNoteInfo()
     {
@@ -447,118 +433,14 @@ public class NoteEdit : MonoBehaviour
                 break;
         }
     }
-    IEnumerator DeleteNote()
+    private void DeleteNote()
     {
-        Vector3 pos;
-        pos = Selected.transform.localPosition;
-
-        float posX;
-        posX = Selected.transform.parent.localPosition.x;
-
-        GameObject NoteField;
-        NoteField = PageSystem.pageSystem.NoteField;
-
-        GameObject Parent;
-        Parent = Selected.transform.parent.gameObject;
-
-        if (Selected != null)
-        {
-            Destroy(Selected);
-        }
-        else { Debug.LogError("삭제 대상을 찾지 못함"); yield break; }
-
-        yield return new WaitForSeconds(.1f);
-
-        mirror = new List<GameObject>(5);
-
-        mirror.Add(PageSystem.pageSystem.NoteField);
-
-        for (int i = 0; i < 4; i++)
-        {
-            mirror.Add(MirrorField.transform.GetChild(i).gameObject);
-        }
-
-        mirror.Sort(delegate (GameObject A, GameObject B)
-        {
-            if (A.transform.localPosition.x > B.transform.localPosition.x) return 1;
-            else if (A.transform.localPosition.x < B.transform.localPosition.x) return -1;
-            return 0;
-        });
-
-        if (posX != 0)
-        {
-            Vector3 pagePos;
-            pagePos = PageSystem.pageSystem.NoteField.transform.localPosition;
-
-            Destroy(PageSystem.pageSystem.NoteField);
-            PageSystem.pageSystem.NoteField =
-                Instantiate(Parent, NoteFieldParent.transform);
-            mirror[0] = PageSystem.pageSystem.NoteField;
-            mirror[0].transform.localPosition = pagePos;
-            mirror[0].name = "NoteField";
-            InputManager.input.inputNoteFieldSet(mirror[0]);
-        }
-
-        for (int i = 1; i < 5; i++)
-        {
-            if (posX != rdPosX[i])
-            {
-                Vector3 pagePos;
-                pagePos = mirror[i].transform.localPosition;
-                Destroy(mirror[i]);
-                mirror[i] = Instantiate(Parent, MirrorField.transform);
-                mirror[i].transform.localPosition = pagePos;
-                mirror[i].name = "MirrorField" + i.ToString();
-                Debug.Log("mirror" + i + "생성");
-            }
-        }
+        if (SelectedNormal != null) NormalNote.DeleteNote(SelectedNormal);
+        if (SelectedSpeed != null) SpeedNote.DeleteNote(SelectedSpeed);
+        if (SelectedEffect != null) EffectNote.DeleteNote(SelectedEffect);
+        Destroy(Selected);
     }
-    IEnumerator LengthNote()
-    {
-        Vector3 pos;
-        pos = Selected.transform.localPosition;
-
-        GameObject NoteField;
-        NoteField = PageSystem.pageSystem.NoteField;
-
-        GameObject editNote;
-        editNote = null;
-        for (int i = 0; i < NoteField.transform.childCount; i++)
-        {
-            if (NoteField.transform.GetChild(i).localPosition == pos)
-            {
-                editNote = NoteField.transform.GetChild(i).gameObject;
-                break;
-            }
-        }
-        if (editNote != null)
-        {
-            int legnthInput;
-            Vector3 SelectedScale;
-            if (Selected.tag == "long" || Selected.tag == "btLong")
-            {
-                try
-                {
-                    legnthInput = int.Parse(inputLegnth.text);
-                    SelectedScale = Selected.transform.localScale;
-                    if (legnthInput < 2)
-                    {
-                        DisplayNoteInfo();
-                        yield break;
-                    }
-                    SelectedScale.y = legnthInput * 100;
-
-                    Selected.transform.localScale = SelectedScale;
-                    MirrorPage();
-                }
-                catch { yield break; }
-            }
-        }
-        else { Debug.LogError("조정 대상을 찾지 못함"); yield break; }
-
-        yield return new WaitForSeconds(.1f);
-    }
-    IEnumerator SpeedNote()
+    IEnumerator _SpeedNote()
     {
         float speed;
         try
@@ -566,16 +448,15 @@ public class NoteEdit : MonoBehaviour
             speed = Convert.ToSingle(inputSpeedBpm[1].text);
             if (speed == 0)
             {
-                speed = AutoTest.autoTest.bpm;
-                inputSpeedBpm[1].text = AutoTest.autoTest.bpm.ToString();
+                speed = ValueManager.bpm;
+                inputSpeedBpm[1].text = ValueManager.bpm.ToString();
             }
             Vector3 posChild;
             posChild = Selected.transform.GetChild(0).GetChild(0).localPosition;
             posChild.x = speed;
             Selected.transform.GetChild(0).GetChild(0).localPosition = posChild;
             Selected.transform.GetComponentInChildren<TextMeshPro>().text =
-                posChild.y.ToString() + "\nx " + posChild.x.ToString(); 
-            MirrorPage();
+                posChild.y.ToString() + "\nx " + posChild.x.ToString();
         }
         catch { yield break; }
 
@@ -627,20 +508,6 @@ public class NoteEdit : MonoBehaviour
             mirror[0].transform.localPosition = pagePos;
             mirror[0].name = "NoteField";
             InputManager.input.inputNoteFieldSet(mirror[0]);
-        }
-
-        for (int i = 1; i < 5; i++)
-        {
-            if (posX != rdPosX[i])
-            {
-                Vector3 pagePos;
-                pagePos = mirror[i].transform.localPosition;
-                Destroy(mirror[i]);
-                mirror[i] = Instantiate(Parent, MirrorField.transform);
-                mirror[i].transform.localPosition = pagePos;
-                mirror[i].name = "MirrorField" + i.ToString();
-                Debug.Log("mirror" + i + "생성");
-            }
         }
     }
     IEnumerator SpeedNoteBpm()
@@ -651,8 +518,8 @@ public class NoteEdit : MonoBehaviour
             speedBpm = Convert.ToSingle(inputSpeedBpm[0].text);
             if (speedBpm < 0)
             {
-                speedBpm = AutoTest.autoTest.bpm;
-                inputSpeedBpm[0].text = AutoTest.autoTest.bpm.ToString();
+                speedBpm = ValueManager.bpm;
+                inputSpeedBpm[0].text = ValueManager.bpm.ToString();
             }
 
             Vector3 posChild;
@@ -660,8 +527,8 @@ public class NoteEdit : MonoBehaviour
             posChild.y = speedBpm;
             Selected.transform.GetChild(0).GetChild(0).localPosition = posChild;
             Selected.transform.GetComponentInChildren<TextMeshPro>().text =
-                posChild.y.ToString() + "\nx " + posChild.x.ToString(); 
-            MirrorPage();
+                posChild.y.ToString() + "\nx " + posChild.x.ToString();
+
         }
         catch { yield break; }
 
@@ -713,20 +580,6 @@ public class NoteEdit : MonoBehaviour
             mirror[0].transform.localPosition = pagePos;
             mirror[0].name = "NoteField";
             InputManager.input.inputNoteFieldSet(mirror[0]);
-        }
-
-        for (int i = 1; i < 5; i++)
-        {
-            if (posX != rdPosX[i])
-            {
-                Vector3 pagePos;
-                pagePos = mirror[i].transform.localPosition;
-                Destroy(mirror[i]);
-                mirror[i] = Instantiate(Parent, MirrorField.transform);
-                mirror[i].transform.localPosition = pagePos;
-                mirror[i].name = "MirrorField" + i.ToString();
-                Debug.Log("mirror" + i + "생성");
-            }
         }
     }
 
@@ -769,7 +622,6 @@ public class NoteEdit : MonoBehaviour
             }
             Selected.transform.localPosition = SelectedPos;
             DisplayNoteInfo();
-            MirrorPage();
         }
         catch { return; }
     }
@@ -789,7 +641,6 @@ public class NoteEdit : MonoBehaviour
             SelectedPos.y = SelectedPos.y % 1600 + pageInput * 1600;
 
             Selected.transform.localPosition = SelectedPos;
-            MirrorPage();
         }
         catch { return; }
     }
@@ -815,13 +666,16 @@ public class NoteEdit : MonoBehaviour
     }
     public void ButtonLegnth()
     {
-        StartCoroutine(LengthNote());
+        try
+        {
+            LengthNote(Convert.ToInt32(inputLegnth.text));
+        }
+        catch
+        {   
+            if (Selected == null) inputLegnth.text = "--";
+            else inputLegnth.text = (Selected.transform.localScale.y / 100).ToString();
+        }
     }
-
-    // Effect Force =
-    //      EffectNote.child.transform.localposition.x
-    // Effect Duration = 
-    //      EffectNote.child.transform.localposition.y
     public void ButtonEffect()
     {
         Vector3 forcePos;
@@ -830,7 +684,6 @@ public class NoteEdit : MonoBehaviour
             forcePos = Selected.transform.localPosition;
             forcePos.x = Convert.ToSingle(inputEffectForce.text);
             Selected.transform.GetChild(0).localPosition = forcePos;
-            MirrorPage();
         }
         catch { return; }
     }
@@ -842,7 +695,6 @@ public class NoteEdit : MonoBehaviour
             durationPos = Selected.transform.localPosition;
             durationPos.y = Convert.ToSingle(inputEffectForce.text);
             Selected.transform.GetChild(0).localPosition = durationPos;
-            MirrorPage();
         }
         catch { return; }
     }
@@ -851,118 +703,18 @@ public class NoteEdit : MonoBehaviour
     //      SpeedNote.child.child.transform.localposition.y
     public void ButtonSpeed()
     {
-        StartCoroutine(SpeedNote());
+        //! StartCoroutine(SpeedNote());
     }
     public void ButtonSpeedBpm()
     {
         StartCoroutine(SpeedNoteBpm());
     }
-    public void ToggleDouble(){
-        if (Selected.tag == "chip"){
+    public void ToggleDouble()
+    {
+        if (Selected.tag == "chip")
+        {
             Selected.transform.GetChild(0).GetChild(0)
             .GetComponent<SpriteRenderer>().enabled = isDoubleToggle.isOn;
-            MirrorPage();
-        }
-    }
-    public void MirrorPage()
-    {
-        switch (Selected.gameObject.tag)
-        {
-            case "chip":
-                noteEdit.Selected.GetComponentInChildren<SpriteRenderer>()
-                    .color = new Color32(255, 255, 255, 255);
-                break;
-
-            case "long":
-                noteEdit.Selected.GetComponentInChildren<SpriteRenderer>()
-                    .color = new Color32(255, 255, 255, 230);
-                break;
-
-            case "btChip":
-                noteEdit.Selected.GetComponentInChildren<SpriteRenderer>()
-                    .color = new Color32(255, 255, 255, 255);
-                break;
-
-            case "btLong":
-                noteEdit.Selected.GetComponentInChildren<SpriteRenderer>()
-                    .color = new Color32(255, 255, 255, 150);
-                break;
-
-            default:
-                break;
-        }
-
-        float posX;
-        posX = Selected.transform.parent.localPosition.x;
-
-        mirror = new List<GameObject>(5);
-
-        mirror.Add(PageSystem.pageSystem.NoteField);
-
-        for (int i = 0; i < 4; i++)
-        {
-            mirror.Add(MirrorField.transform.GetChild(i).gameObject);
-        }
-
-        mirror.Sort(delegate (GameObject A, GameObject B)
-        {
-            if (A.transform.localPosition.x > B.transform.localPosition.x) return 1;
-            else if (A.transform.localPosition.x < B.transform.localPosition.x) return -1;
-            return 0;
-        });
-
-        if (posX != 0)
-        {
-            Vector3 pos;
-            pos = PageSystem.pageSystem.NoteField.transform.localPosition;
-
-            Destroy(PageSystem.pageSystem.NoteField);
-            PageSystem.pageSystem.NoteField =
-                Instantiate(Selected.transform.parent.gameObject
-                , NoteFieldParent.transform);
-            mirror[0] = PageSystem.pageSystem.NoteField;
-            mirror[0].transform.localPosition = pos;
-            mirror[0].name = "NoteField";
-            InputManager.input.inputNoteFieldSet(mirror[0]);
-            AutoTest.autoTest.autoNoteFieldSet(mirror[0]);
-        }
-
-        for (int i = 1; i < 5; i++)
-        {
-            if (posX != rdPosX[i])
-            {
-                Vector3 pos;
-                pos = mirror[i].transform.localPosition;
-                Destroy(mirror[i]);
-                mirror[i] = Instantiate(Selected.transform.parent.gameObject
-                , MirrorField.transform);
-                mirror[i].transform.localPosition = pos;
-                mirror[i].name = "MirrorField" + i.ToString();
-                Debug.Log("mirror" + i + "생성");
-            }
-        }
-
-        switch (Selected.gameObject.tag)
-        {
-            case "chip":
-                noteEdit.Selected.GetComponentInChildren<SpriteRenderer>()
-                    .color = new Color32(0, 255, 128, 255);
-                break;
-
-            case "long":
-                noteEdit.Selected.GetComponentInChildren<SpriteRenderer>()
-                    .color = new Color32(0, 255, 128, 230);
-                break;
-
-            case "btChip":
-                noteEdit.Selected.GetComponentInChildren<SpriteRenderer>()
-                    .color = new Color32(0, 255, 255, 255);
-                break;
-
-            case "btLong":
-                noteEdit.Selected.GetComponentInChildren<SpriteRenderer>()
-                    .color = new Color32(0, 255, 255, 150);
-                break;
         }
     }
     public void SectorSetOriginal()
@@ -976,6 +728,7 @@ public class NoteEdit : MonoBehaviour
         OriginalSector.SetActive(false);
         EffectSector.SetActive(true);
         SpeedSector.SetActive(false);
+        EffectManager.isEffectSelected = true;
     }
     public void SectorSetSpeed()
     {

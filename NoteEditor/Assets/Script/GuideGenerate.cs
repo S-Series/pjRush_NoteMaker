@@ -25,8 +25,6 @@ public class GuideGenerate : MonoBehaviour
     GameObject StaticGuide;
     GameObject StaticGuideParent;
 
-    readonly float[] posX = new float[5]{0.0f, 925.926f, 1851.852f, 2777.778f, 3703.704f };
-
     private void Awake()
     {
         StaticGuideParent = StaticGuide.transform.parent.gameObject;
@@ -77,29 +75,36 @@ public class GuideGenerate : MonoBehaviour
         {
             for (int j = 0; j < 5; j++)
             {
-                for (int l = 0; l < 4; l++)
+                // Guide Line
+                for (int l = 0; l < 3; l++)
+                {
+                    float posY;
+                    posY = ((1600 * i) / count + 1600 * l) + 4800 * j;
+                    GameObject copy;
+                    copy = Instantiate(GuideLinePrefab, GuideLineBox.transform);
+                    copy.transform.localPosition = new Vector3(0.0f, posY, 0.0f);
+                    if ((int)(posY % 400) == 0)
+                    {
+                        copy.GetComponent<SpriteRenderer>().color = new Color32(255, 0, 0, 150);
+                    }
+                    else
+                    {
+                        copy.GetComponent<SpriteRenderer>().color = new Color32(165, 165, 255, 150);
+                    }
+                }
+                // Guide Collider
+                for (int l = 0; l < 3; l++)
                 {
                     float pos_y;
                     GameObject copy;
-                    pos_y = 1600 * l + pos * i;
+                    pos_y = 1600 * l + 4800 * j + pos * i;
                     copy = Instantiate(ColliderPrefab, ColliderBox.transform);
-                    copy.transform.localPosition = new Vector3(posX[j], pos_y, 0);
+                    copy.transform.localPosition = new Vector3(0, pos_y, 0);
                     copy.transform.localScale = new Vector3(1.0f, (1600 / count), 1.0f);
                 }
             }
+            
 
-            for (int j = 0; j < 4; j++)
-            {
-                float posY;
-                posY = (1600 * i) / count + 1600 * j;
-                GameObject copy;
-                copy = Instantiate(GuideLinePrefab, GuideLineBox.transform);
-                copy.transform.localPosition = new Vector3(0.0f, posY, 0.0f);
-                if ((int)(posY % 400) == 0)
-                {
-                    copy.GetComponent<SpriteRenderer>().color = new Color32(255, 0, 0, 150);
-                }
-            }
         }
     }
 

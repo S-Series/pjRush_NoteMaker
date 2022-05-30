@@ -1,0 +1,433 @@
+using System;
+using System.IO;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using TMPro;
+
+public class SaveLoad : MonoBehaviour
+{
+    public static SaveLoad saveLoad;
+
+    NoteSavedData noteSaved = new NoteSavedData();
+    private const string editorVersion = "0.9.8";
+    private float bpm;
+    private static bool isSaving = false;
+    private static bool isLoading = false;
+
+    #region Old Save Data ----------------------------------
+    private List<GameObject> note;
+    private List<float> noteMs;
+    private List<float> notePos;
+    private List<int> noteLine;
+    private List<int> noteLegnth;
+    private List<bool> notePowered;
+
+
+    private List<GameObject> effect;
+    private List<float> EffectMs;
+    private List<float> EffectPos;
+    private List<float> EffectForce;
+    private List<int> EffectDuration;
+
+    private List<GameObject> speed;
+    private List<float> SpeedMs;
+    private List<float> SpeedPos;
+    private List<float> SpeedBpm;
+    #endregion
+
+    #region New Save Data ----------------------------------
+    #endregion
+    [SerializeField] GameObject[] PrefabObject;
+    [SerializeField] TMP_InputField inputBpm;
+    [SerializeField] TMP_InputField inputStartDelayMs;
+    [SerializeField] TMP_InputField inputFileName;
+    [SerializeField] TextMeshProUGUI dropdownDifficulty;
+    [SerializeField] GameObject NoteField;
+    [SerializeField] TextMeshPro SaveCompleteMessage;
+    private void Awake()
+    {
+        saveLoad = this;
+    }
+    private void Start()
+    {
+        ResetSavedData();
+
+        try
+        {
+            inputFileName.text = PlayerPrefs.GetString("NoteFileName");
+            StartCoroutine(LoadDataFromJson());
+        }
+        catch
+        {
+            inputFileName.text = "";
+            PlayerPrefs.SetString("NoteFileName", "");
+        }
+    }
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            if (Input.GetKey(KeyCode.LeftControl))
+            {
+                ButtonSave();
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.LeftControl))
+        {
+            if (Input.GetKey(KeyCode.S))
+            {
+                ButtonSave();
+            }
+        }
+    }
+
+    [ContextMenu("Save")]
+    IEnumerator SaveDataToJson()
+    {
+        var wait = new WaitForSeconds(0.5f);
+
+        ResetSavedData();
+
+        noteSaved.Version = editorVersion;
+        bpm = ValueManager.bpm;
+
+        yield return wait;
+
+        for(int i = 0; i < NormalNote.normalNotes.Count; i++)
+        {
+
+        }
+        yield return wait;
+
+        try
+        {
+            string jsonData = JsonUtility.ToJson(noteSaved, true);
+            string path = Path.Combine(Application.dataPath, inputFileName.text + ".json");
+            File.WriteAllText(path, jsonData);
+            PlayerPrefs.SetString("NoteFileName", inputFileName.text);
+            StartCoroutine(DisplaySaveCompleteMessage(true));
+        }
+        catch
+        {
+            StartCoroutine(DisplaySaveCompleteMessage(false));
+        }
+    }
+
+    [ContextMenu("Load")]
+    IEnumerator LoadDataFromJson()
+    {
+        ValueManager.bpm = noteSaved.bpm;
+        ValueManager.delay = noteSaved.startDelayMs;
+
+        for (int i = 0; i < NoteField.transform.childCount; i++)
+        {
+            Destroy(NoteField.transform.GetChild(i).gameObject);
+        }
+        ResetSavedData();
+        try
+        {
+            string path = Path.Combine(Application.dataPath, inputFileName.text + ".json");
+            string jsonData = File.ReadAllText(path);
+            print(path);
+            noteSaved = JsonUtility.FromJson<NoteSavedData>(jsonData);
+        }
+        catch 
+        { 
+            yield break; 
+        }
+
+        NoteClasses.ResetNotes();
+        for (int i = 0; i < noteSaved.NoteMs.Count; i++)
+        {
+            NormalNote normalNote = new NormalNote();
+            normalNote.noteObject = null;
+            normalNote.ms = noteSaved.NoteMs[i];
+            normalNote.line = noteSaved.NoteLine[i];
+            normalNote.legnth = noteSaved.NoteLegnth[i];
+            normalNote.pos = noteSaved.NotePos[i];
+            try { normalNote.isOver = noteSaved.isOver[i]; }
+            catch { normalNote.isOver = false; }
+            NormalNote.normalNotes.Add(normalNote);
+        }
+        for (int i = 0; i < noteSaved.SpeedMs.Count; i++)
+        {
+            SpeedNote speedNote = new SpeedNote();
+            speedNote.noteObject = null;
+            speedNote.ms = noteSaved.SpeedMs[i];
+            speedNote.pos = noteSaved.SpeedPos[i];
+            speedNote.bpm = noteSaved.SpeedBpm[i];
+            speedNote.multiply = noteSaved.SpeedNum[i];
+            SpeedNote.speedNotes.Add(speedNote);
+        }
+        for (int i = 0; i < noteSaved.EffectMs.Count; i++)
+        {
+            EffectNote effectNote = new EffectNote();
+            effectNote.noteObject = null;
+            effectNote.ms = noteSaved.EffectMs[i];
+            effectNote.pos = noteSaved.EffectPos[i];
+            effectNote.type = noteSaved.EffectType[i];
+            effectNote.value = noteSaved.EffectForce[i];
+            EffectNote.effectNotes.Add(effectNote);
+        }
+        //*--------------------------------------
+        NormalNote.Sorting();
+        SpeedNote.Sorting();
+        EffectNote.Sorting();
+        //*--------------------------------------
+        for (int i = 0; i < NormalNote.normalNotes.Count; i++)
+        {
+            NormalNote normalNote;
+            GameObject copyObject;
+
+            Vector3 autoPos = new Vector3(0, 0, 0);
+            Vector3 autoScale = new Vector3(1, 1, 1);
+
+            normalNote = NormalNote.normalNotes[i];
+            if (normalNote.line >= 5)
+            {
+                if (normalNote.legnth == 0)
+                {
+                    copyObject = Instantiate(PrefabObject[2], NoteField.transform);
+                }
+                else
+                {
+                    copyObject = Instantiate(PrefabObject[3], NoteField.transform);
+                    Vector3 scale;
+                    scale = copyObject.transform.localScale;
+                    scale.y = 100.0f * normalNote.legnth;
+                    copyObject.transform.localScale = scale;
+                }
+            }
+            else
+            {
+                if (normalNote.legnth == 0)
+                {
+                    copyObject = Instantiate(PrefabObject[0], NoteField.transform);
+                }
+                else
+                {
+                    copyObject = Instantiate(PrefabObject[1], NoteField.transform);
+                    Vector3 scale;
+                    scale = copyObject.transform.localScale;
+                    scale.y = 100.0f * normalNote.legnth;
+                    copyObject.transform.localScale = scale;
+                }
+            }
+            
+            switch (normalNote.line)
+            {
+                case 1:
+                autoPos.x = -300;
+                break;
+
+                case 2:
+                autoPos.x = -100;
+                break;
+
+                case 3:
+                autoPos.x = +100;
+                break;
+
+                case 4:
+                autoPos.x = +300;
+                break;
+
+                case 5:
+                autoPos.x = -200;
+                break;
+
+                case 6:
+                autoPos.x = +200;
+                break;
+            }
+            autoPos.y = normalNote.pos;
+            autoPos.z = 0;
+            copyObject.transform.localPosition = autoPos;
+
+            normalNote.noteObject = copyObject;
+        }
+        for (int i = 0; i < SpeedNote.speedNotes.Count; i++)
+        {
+            SpeedNote speedNote;
+            GameObject copyObject;
+            
+            speedNote = SpeedNote.speedNotes[i];
+            copyObject = Instantiate(PrefabObject[4], NoteField.transform);
+            copyObject.GetComponentInChildren<TextMeshPro>().text
+                = speedNote.bpm.ToString() + "\nx" + speedNote.multiply.ToString();
+            copyObject.transform.localPosition = new Vector3(0, speedNote.pos, 0);
+            
+            speedNote.noteObject = copyObject;
+        }
+        for (int i = 0; i < EffectNote.effectNotes.Count; i++)
+        {
+            EffectNote effectNote;
+            GameObject copyObject;
+
+            effectNote = EffectNote.effectNotes[i];
+            copyObject = Instantiate(PrefabObject[5], NoteField.transform);
+            copyObject.transform.localPosition = new Vector3(0, effectNote.pos, 0);
+
+            effectNote.noteObject = copyObject;
+        }
+    }
+    IEnumerator CreateNewJsonData()
+    {
+        bool isFileExist = false;
+        ResetSavedData();
+        try
+        {
+            string path = Path.Combine(Application.dataPath, inputFileName.text + ".json");
+            string jsonData = File.ReadAllText(path);
+            print(path);
+            noteSaved = JsonUtility.FromJson<NoteSavedData>(jsonData);
+            isFileExist = true;
+        }
+        catch { isFileExist = false; }
+
+        if (isFileExist == true)
+        {
+            while (false)
+            {
+                yield return null;
+                if (false)
+                {
+                    yield break;
+                }
+            }
+        }
+
+        ResetSavedData();
+        noteSaved.bpm = 120;
+        noteSaved.Version = editorVersion;
+        try
+        {
+            string jsonData = JsonUtility.ToJson(noteSaved, true);
+            string path = Path.Combine(Application.dataPath, inputFileName.text + ".json");
+            File.WriteAllText(path, jsonData);
+            PlayerPrefs.SetString("NoteFileName", inputFileName.text);
+            StartCoroutine(DisplaySaveCompleteMessage(true));
+        }
+        catch
+        {
+            StartCoroutine(DisplaySaveCompleteMessage(false));
+        }
+    }
+    private void ResetSavedData()
+    {
+        NoteField = PageSystem.pageSystem.NoteField;
+
+        note = new List<GameObject>();
+        effect = new List<GameObject>();
+        speed = new List<GameObject>();
+
+        noteSaved.bpm = new float();
+        noteSaved.startDelayMs = new int();
+
+        noteSaved.NoteLegnth = new List<int>();
+        noteSaved.NoteMs = new List<float>();
+        noteSaved.NoteLine = new List<int>();
+        noteSaved.isOver = new List<bool>();
+
+        noteSaved.EffectMs = new List<float>();
+        noteSaved.EffectPos = new List<float>();
+        noteSaved.EffectForce = new List<float>();
+        noteSaved.EffectType = new List<bool>();
+
+        noteSaved.SpeedMs = new List<float>();
+        noteSaved.SpeedPos = new List<float>();
+        noteSaved.SpeedBpm = new List<float>();
+        noteSaved.SpeedNum = new List<float>();
+
+        noteMs = new List<float>();
+        notePos = new List<float>();
+        noteLine = new List<int>();
+        noteLegnth = new List<int>();
+        notePowered = new List<bool>();
+
+        effect = new List<GameObject>();
+        EffectMs = new List<float>();
+        EffectForce = new List<float>();
+        EffectDuration = new List<int>();
+
+        speed = new List<GameObject>();
+        SpeedMs = new List<float>();
+        SpeedPos = new List<float>();
+        SpeedBpm = new List<float>();
+
+        SpeedMs = new List<float>();
+        SpeedBpm = new List<float>();
+        SpeedPos = new List<float>();
+    }
+    public void ButtonSave()
+    {
+        StartCoroutine(SaveDataToJson());
+    }
+    public void ButtonLoad()
+    {
+        StartCoroutine(LoadDataFromJson());
+    }
+    public void ButtonCreate()
+    {
+        if (inputFileName.text == "" || inputFileName.text == null)
+        {
+            SaveCompleteMessage.text = "Missing File name";
+            SaveCompleteMessage.color = new Color32(255, 0, 0, 255);
+            return;
+        }
+        StartCoroutine(CreateNewJsonData());
+    }
+    private IEnumerator DisplaySaveCompleteMessage(bool success)
+    {
+        if (success)
+        {
+            SaveCompleteMessage.text = "Save Completed";
+            SaveCompleteMessage.color = new Color32(0, 255, 0, 255);
+            yield return new WaitForSeconds(3.0f);
+            SaveCompleteMessage.text = "Music File Name";
+            SaveCompleteMessage.color = new Color32(255, 255, 255, 255);
+        }
+        else
+        {
+            SaveCompleteMessage.text = "Save Failed";
+            SaveCompleteMessage.color = new Color32(255, 0, 0, 255);
+            yield return new WaitForSeconds(3.0f);
+            SaveCompleteMessage.text = "Music File Name";
+            SaveCompleteMessage.color = new Color32(255, 255, 255, 255);
+        }
+    }
+    public void ButtonLoadErrorSubmit()
+    {
+        
+    }
+    public void ButtonLoadErrorCancle()
+    {
+
+    }
+}
+
+[System.Serializable]
+public class NoteSavedData
+{
+    public string Version;
+    public float bpm;
+    public int startDelayMs;
+
+    public List<int> NoteLegnth;
+    public List<float> NoteMs;
+    public List<float> NotePos;
+    public List<int> NoteLine;
+    public List<bool> isOver;
+
+    public List<float> EffectMs;
+    public List<float> EffectPos;
+    public List<float> EffectForce;
+    public List<bool> EffectType;
+
+    public List<float> SpeedMs;
+    public List<float> SpeedPos;
+    public List<float> SpeedBpm;
+    public List<float> SpeedNum;
+}
