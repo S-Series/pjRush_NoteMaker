@@ -4,12 +4,10 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - chip
-  - long
-  - btChip
-  - btLong
   - Effect
   - Bpm
+  - Normal
+  - Bottom
   layers:
   - Default
   - TransparentFX

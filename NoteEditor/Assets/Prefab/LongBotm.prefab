@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 6172025202370949265}
   m_Layer: 0
   m_Name: LongBotm
-  m_TagString: btLong
+  m_TagString: Bottom
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

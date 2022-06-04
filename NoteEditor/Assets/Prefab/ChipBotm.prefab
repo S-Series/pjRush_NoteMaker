@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 5073522146540375975}
   m_Layer: 0
   m_Name: ChipBotm
-  m_TagString: btChip
+  m_TagString: Bottom
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

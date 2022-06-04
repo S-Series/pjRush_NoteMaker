@@ -6,6 +6,7 @@ using TMPro;
 
 public class GuideGenerate : MonoBehaviour
 {
+    public static int GuideCount = 1;
     [SerializeField]
     GameObject GuideLineBox;
 
@@ -83,13 +84,13 @@ public class GuideGenerate : MonoBehaviour
                     GameObject copy;
                     copy = Instantiate(GuideLinePrefab, GuideLineBox.transform);
                     copy.transform.localPosition = new Vector3(0.0f, posY, 0.0f);
-                    if ((int)(posY % 400) == 0)
+                    if (Mathf.Approximately(posY % 400, 0.0f))
                     {
-                        copy.GetComponent<SpriteRenderer>().color = new Color32(255, 0, 0, 150);
+                        copy.GetComponent<SpriteRenderer>().color = new Color32(255, 0, 0, 100);
                     }
                     else
                     {
-                        copy.GetComponent<SpriteRenderer>().color = new Color32(165, 165, 255, 150);
+                        copy.GetComponent<SpriteRenderer>().color = new Color32(165, 165, 255, 100);
                     }
                 }
                 // Guide Collider
@@ -106,6 +107,8 @@ public class GuideGenerate : MonoBehaviour
             
 
         }
+    
+        GuideCount = count;
     }
 
     // this function is triggered by Button

@@ -18,7 +18,8 @@ public class NoteTool : MonoBehaviour
             if (!InputManager.isNoteInputAble){
                 ButtonChip();
             }
-            else{
+            else
+            {
                 switch (triggerIndex){
                     case 0:
                         ButtonLong();
@@ -49,38 +50,32 @@ public class NoteTool : MonoBehaviour
     }
     public void ButtonChip()
     {
-        InputManager.isNoteInputAble = true;
-        input.InputObject = input.PreviewNote[0];
+        input.PreviewActivate(0, false, false);
         triggerIndex = 0;
     }
     public void ButtonLong()
     {
-        InputManager.isNoteInputAble = true;
-        input.InputObject = input.PreviewNote[1];
+        input.PreviewActivate(1, false, false);
         triggerIndex = 1;
     }
     public void ButtonBtChip()
     {
-        InputManager.isNoteInputAble = true;
-        input.InputObject = input.PreviewNote[2];
+        input.PreviewActivate(2, true, false);
         triggerIndex = 2;
     }
     public void ButtonBtLong()
     {
-        InputManager.isNoteInputAble = true;
-        input.InputObject = input.PreviewNote[3];
+        input.PreviewActivate(3, true, false);
         triggerIndex = 3;
     }
     public void ButtonEffect()
     {
-        InputManager.isNoteInputAble = true;
-        input.InputObject = input.PreviewNote[4];
+        input.PreviewActivate(4, false, true);
         triggerIndex = 4;
     }
     public void ButtonBpm()
     {
-        InputManager.isNoteInputAble = true;
-        input.InputObject = input.PreviewNote[5];
+        input.PreviewActivate(5, false, true);
         triggerIndex = 5;
     }
 }

@@ -37,8 +37,26 @@ public class NoteEdit : MonoBehaviour
     [SerializeField] GameObject OriginalSector;
     [SerializeField] GameObject EffectSector;
     [SerializeField] GameObject SpeedSector;
-
-    //* ---------------------------------------------
+    public void SectorSetOriginal()
+    {
+        OriginalSector.SetActive(true);
+        EffectSector.SetActive(false);
+        SpeedSector.SetActive(false);
+    }
+    public void SectorSetEffect()
+    {
+        OriginalSector.SetActive(false);
+        EffectSector.SetActive(true);
+        SpeedSector.SetActive(false);
+        EffectManager.isEffectSelected = true;
+    }
+    public void SectorSetSpeed()
+    {
+        OriginalSector.SetActive(false);
+        EffectSector.SetActive(false);
+        SpeedSector.SetActive(true);
+    }
+    //*private ---------------------------------------------
     private void Awake()
     {
         noteEdit = this;
@@ -109,140 +127,30 @@ public class NoteEdit : MonoBehaviour
 
             if (Selected != null)
             {
-                if (Input.GetKeyDown(KeyCode.LeftArrow))
-                {
-                    Vector3 selectPos;
-                    selectPos = Selected.transform.localPosition;
-
-                    if (Selected.tag == "chip" || Selected.tag == "long")
-                    {
-                        switch (Selected.transform.localPosition.x)
-                        {
-                            case -100:
-                                selectPos.x = -300;
-                                Selected.transform.localPosition = selectPos;
-                                DisplayNoteInfo();
-                                break;
-
-                            case +100:
-                                selectPos.x = -100;
-                                Selected.transform.localPosition = selectPos;
-                                DisplayNoteInfo();
-                                break;
-
-                            case +300:
-                                selectPos.x = +100;
-                                Selected.transform.localPosition = selectPos;
-                                DisplayNoteInfo();
-                                break;
-
-                            default:
-                                return;
-                        }
-                    }
-                    else if (Selected.tag == "btChip" || Selected.tag == "btLong")
-                    {
-                        Vector3 selectScale;
-                        selectScale = Selected.transform.localScale;
-                        selectScale.x = 0.75f;
-
-                        selectPos.x = -100;
-                        Selected.transform.localPosition = selectPos;
-                        Selected.transform.localScale = selectScale;
-
-                        DisplayNoteInfo();
-                    }
-                }
-
-                if (Input.GetKeyDown(KeyCode.RightArrow))
-                {
-                    Vector3 selectPos;
-                    selectPos = Selected.transform.localPosition;
-
-                    if (Selected.tag == "chip" || Selected.tag == "long")
-                    {
-                        switch (Selected.transform.localPosition.x)
-                        {
-                            case -300:
-                                selectPos.x = -100;
-                                Selected.transform.localPosition = selectPos;
-                                DisplayNoteInfo();
-                                break;
-
-                            case -100:
-                                selectPos.x = +100;
-                                Selected.transform.localPosition = selectPos;
-                                DisplayNoteInfo();
-                                break;
-
-                            case +100:
-                                selectPos.x = +300;
-                                Selected.transform.localPosition = selectPos;
-                                DisplayNoteInfo();
-                                break;
-
-                            default:
-                                return;
-                        }
-                    }
-                    else if (Selected.CompareTag("btChip") || Selected.CompareTag("btLong"))
-                    {
-                        Vector3 selectScale;
-                        selectScale = Selected.transform.localScale;
-                        selectScale.x = 0.75f;
-
-                        selectPos.x = 100;
-                        Selected.transform.localPosition = selectPos;
-                        Selected.transform.localScale = selectScale;
-
-                        DisplayNoteInfo();
-                    }
-                }
+                if (Input.GetKeyDown(KeyCode.LeftArrow)) { MoveNote(Left: true); }
+                if (Input.GetKeyDown(KeyCode.RightArrow)) { MoveNote(Right: true); }
 
                 if (Input.GetKeyDown(KeyCode.UpArrow))
                 {
-                    bool isUp;
-                    isUp = true;
-
-                    Vector3 notePos;
-                    notePos = Selected.transform.localPosition;
-
                     if ((Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
                         && (Selected.CompareTag("long") || Selected.CompareTag("btLong")))
                     {
                         int length;
                         length = (int)(Selected.transform.localScale.y / 100);
                         LengthNote(length + 1);
-
-                        DisplayNoteInfo();
                     }
-                    else
-                    {
-                        ArrowKeyNoteMove(notePos, isUp);
-                    }
+                    else { MoveNote(Up: true); }
                 }
-
                 if (Input.GetKeyDown(KeyCode.DownArrow))
                 {
-                    bool isUp;
-                    isUp = false;
-
-                    Vector3 notePos;
-                    notePos = Selected.transform.localPosition;
-
                     if ((Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
                         && (Selected.CompareTag("long") || Selected.CompareTag("btLong")))
                     {
                         int length;
                         length = (int)(Selected.transform.localScale.y / 100);
                         LengthNote(length - 1);
-
-                        DisplayNoteInfo();
                     }
-                    else
-                    {
-                        ArrowKeyNoteMove(notePos, isUp);
-                    }
+                    else { MoveNote(Down: true); }
                 }
             }
         }
@@ -270,102 +178,97 @@ public class NoteEdit : MonoBehaviour
 
         Selected.transform.localScale = editScale;
     }
-    private void ArrowKeyNoteMove(Vector3 pos, bool isUp)
+    private void MoveNote(bool Up = false, bool Down = false, bool Left = false, bool Right = false)
     {
-        if (isUp == true)
+        Vector3 pos;
+        pos = Selected.transform.localPosition;
+
+        if (Up)
         {
-            if (guidePosSector == 1)
+            int count;
+            float inputPos;
+            count = Mathf.FloorToInt( pos.y / (1600.0f / GuideGenerate.GuideCount)) + 1;
+            inputPos = Mathf.Floor(1600.0f / GuideGenerate.GuideCount * 100) * count / 100;
+            if (inputPos >= 1600.0f * 999) inputPos = 1600.0f * 999;
+            pos.y = inputPos;
+        }
+        else if (Down)
+        {
+            int count;
+            float inputPos;
+            count = Mathf.CeilToInt( pos.y / (1600.0f / GuideGenerate.GuideCount)) + 1;
+            inputPos = Mathf.Ceil(1600.0f / GuideGenerate.GuideCount * 100) * count / 100;
+            if (inputPos < 0.0f) inputPos = 0.0f;
+            pos.y = inputPos;
+        }
+        else if (Left)
+        {
+            if (Selected.CompareTag("Effect") || Selected.CompareTag("Bpm")) return;
+            if (Selected.CompareTag("Normal"))
             {
-                pos.y = pos.y - pos.y % 1600 + 1600;
-
-                if (pos.y < 0) pos.y = 0;
-                Selected.transform.localPosition = pos;
-                DisplayNoteInfo();
+                int getLine;
+                getLine = SelectedNormal.line - 1;
+                if (getLine < 1) getLine = 1;
+                pos.x = -500.0f + getLine * 200.0f;
             }
-            else
+            else if (Selected.CompareTag("Bottom"))
             {
-                int guideNum;
-
-                if (pos.y % 1600 == 0)
-                {
-                    guideNum = 0;
-                }
-                else
-                {
-                    guideNum = (int)((pos.y % 1600) / (1600 / guidePosSector));
-                }
-
-                if (guideNum == 0)
-                {
-                    pos.y = pos.y - pos.y % 1600 + (1600 / guidePosSector);
-                }
-                else if (guideNum + 1 == guidePosSector)
-                {
-                    pos.y = pos.y - pos.y % 1600 + 1600;
-                }
-                else
-                {
-                    pos.y = pos.y - pos.y % 1600 + (1600 / guidePosSector) * (guideNum + 1);
-                }
-
-                if (pos.y < 0) pos.y = 0;
-                Selected.transform.localPosition = pos;
-                DisplayNoteInfo();
+                pos.x = -200.0f;
             }
+        }
+        else if (Right)
+        {
+            if (Selected.CompareTag("Effect") || Selected.CompareTag("Bpm")) return;
+            if (Selected.CompareTag("Normal"))
+            {
+                int getLine;
+                getLine = SelectedNormal.line + 1;
+                if (getLine > 4) getLine = 4;
+                pos.x = -500.0f + getLine * 200.0f;
+            }
+            else if (Selected.CompareTag("Bottom"))
+            {
+                pos.x = +200.0f;
+            }
+        }
+        else { return; }
+        NotePosition(pos);
+        DisplayNoteInfo();
+    }
+    private void NotePosition(Vector3 inputPos)
+    {
+        Selected.transform.localPosition = inputPos;
+
+        if (Selected.CompareTag("Effect"))
+        {
+            if (SelectedEffect == null) SelectedEffect = EffectNote.GetClass(Selected);
+            SelectedEffect.pos = inputPos.y;
+        }
+        else if (Selected.CompareTag("Bpm"))
+        {
+            if (SelectedSpeed == null) SelectedSpeed = SpeedNote.GetClass(Selected);
+            SelectedSpeed.pos = inputPos.y;
         }
         else
         {
-            if (guidePosSector == 1)
+            if (SelectedNormal == null) SelectedNormal = NormalNote.GetClass(Selected);
+            SelectedNormal.pos = inputPos.y; 
+            if (Selected.CompareTag("Normal"))
             {
-                pos.y = pos.y - pos.y % 1600 - 1600;
-
-                if (pos.y < 0) pos.y = 0;
-                Selected.transform.localPosition = pos;
-                DisplayNoteInfo();
+                if (Mathf.Approximately(-300.0f, inputPos.x)) SelectedNormal.line = 1;
+                else if (Mathf.Approximately(-100.0f, inputPos.x)) SelectedNormal.line = 2;
+                else if (Mathf.Approximately(+100.0f, inputPos.x)) SelectedNormal.line = 3;
+                else if (Mathf.Approximately(+300.0f, inputPos.x)) SelectedNormal.line = 4;
+                else return;
             }
-            else
+            else if (Selected.CompareTag("Bottom"))
             {
-                int guideNum;
-
-                if (pos.y / 1600 == 0)
-                {
-                    guideNum = 0;
-                }
-                else
-                {
-                    guideNum = (int)((pos.y % 1600) / (1600 / guidePosSector));
-                }
-
-                if (guideNum == 0)
-                {
-                    pos.y = pos.y - pos.y % 1600 - (1600 / guidePosSector);
-                }
-                else if (guideNum - 1 == 0)
-                {
-                    pos.y -= pos.y % 1600;
-                }
-                else
-                {
-                    pos.y = pos.y - pos.y % 1600 + (1600 / guidePosSector) * (guideNum - 1);
-                }
-
-                if (pos.y < 0) pos.y = 0;
-                Selected.transform.localPosition = pos;
-                DisplayNoteInfo();
+                if (Mathf.Approximately(-200.0f, inputPos.x)) SelectedNormal.line = 5;
+                else if (Mathf.Approximately(+200.0f, inputPos.x)) SelectedNormal.line = 6;
+                else return;
             }
+            else { return; }
         }
-        //* NormalNote
-        if (SelectedNormal != null
-                && SelectedNormal.noteObject == Selected)
-        { SelectedNormal.pos = pos.y; }
-        //* SpeedNote
-        if (SelectedSpeed != null
-                && SelectedSpeed.noteObject == Selected)
-        { SelectedSpeed.pos = pos.y; }
-        //* EffectNote
-        if (SelectedEffect != null
-                && SelectedEffect.noteObject == Selected)
-        { SelectedEffect.pos = pos.y; }
     }
     private void ResetNoteInfo()
     {
@@ -374,65 +277,6 @@ public class NoteEdit : MonoBehaviour
         inputPosY.text = "--";
         inputLegnth.text = "--";
     }
-    public void DisplayNoteInfo()
-    {
-        switch (Selected.tag)
-        {
-            case "Effect":
-                break;
-
-            case "Bpm":
-                break;
-
-            default:
-                switch (Selected.transform.localPosition.x)
-                {
-                    case -300:
-                        inputLine.text = "1";
-                        break;
-
-                    case -100:
-                        inputLine.text = "2";
-                        break;
-
-                    case +100:
-                        inputLine.text = "3";
-                        break;
-
-                    case +300:
-                        inputLine.text = "4";
-                        break;
-
-                    case 0:
-                        inputLine.text = "5";
-                        break;
-
-                    default:
-                        return;
-                }
-
-                try
-                {
-                    float posY;
-                    posY = Selected.transform.localPosition.y;
-
-                    inputPage.text = ((posY - posY % 1600) / 1600).ToString();
-                    inputPosY.text = (posY % 1600).ToString();
-                }
-                catch { return; }
-
-                try
-                {
-                    if (Selected.tag == "long" || Selected.tag == "btLong")
-                    {
-                        inputLegnth.text = ((int)(Selected.transform.localScale.y / 100)).ToString();
-                    }
-                    else { inputLegnth.text = "--"; }
-                }
-                catch { return; }
-                break;
-        }
-    }
     private void DeleteNote()
     {
         if (SelectedNormal != null) NormalNote.DeleteNote(SelectedNormal);
@@ -440,300 +284,75 @@ public class NoteEdit : MonoBehaviour
         if (SelectedEffect != null) EffectNote.DeleteNote(SelectedEffect);
         Destroy(Selected);
     }
-    IEnumerator _SpeedNote()
+    //*public ---------------------------------------------
+    public void DisplayNoteInfo()
     {
-        float speed;
-        try
+        if (Selected == null) return;
+        switch (Selected.tag)
         {
-            speed = Convert.ToSingle(inputSpeedBpm[1].text);
-            if (speed == 0)
-            {
-                speed = ValueManager.bpm;
-                inputSpeedBpm[1].text = ValueManager.bpm.ToString();
-            }
-            Vector3 posChild;
-            posChild = Selected.transform.GetChild(0).GetChild(0).localPosition;
-            posChild.x = speed;
-            Selected.transform.GetChild(0).GetChild(0).localPosition = posChild;
-            Selected.transform.GetComponentInChildren<TextMeshPro>().text =
-                posChild.y.ToString() + "\nx " + posChild.x.ToString();
-        }
-        catch { yield break; }
+            case "Effect":
+                if (SelectedEffect == null)
+                {
+                    try
+                    {
+                        SelectedEffect = EffectNote.GetClass(Selected);
+                        if (SelectedEffect == null) return;
+                    }
+                    catch { return; }
+                }
+                inputPage.text = Mathf.FloorToInt((SelectedEffect.pos / 1600.0f) + 1).ToString();
+                inputPosY.text = (SelectedEffect.pos % 1600.0f).ToString();
+                inputEffectDuration.text = SelectedEffect.value.ToString();
+                break;
 
-        Vector3 pos;
-        pos = Selected.transform.localPosition;
+            case "Bpm":
+                if (SelectedSpeed == null)
+                {
+                    try
+                    {
+                        SelectedSpeed = SpeedNote.GetClass(Selected);
+                        if (SelectedSpeed == null) return;
+                    }
+                    catch { return; }
+                }
+                inputPage.text = Mathf.FloorToInt((SelectedSpeed.pos / 1600.0f) + 1).ToString();
+                inputPosY.text = (SelectedSpeed.pos % 1600.0f).ToString();
+                inputSpeedBpm[0].text = SelectedSpeed.bpm.ToString();
+                inputSpeedBpm[1].text = SelectedSpeed.multiply.ToString();
+                break;
 
-        float posX;
-        posX = Selected.transform.parent.localPosition.x;
-
-        GameObject NoteField;
-        NoteField = PageSystem.pageSystem.NoteField;
-
-        GameObject Parent;
-        Parent = Selected.transform.parent.gameObject;
-        /*
-        if (Selected != null)
-        {
-            Destroy(Selected);
-        }
-        else { Debug.LogError("삭제 대상을 찾지 못함"); yield break; }*/
-
-        yield return new WaitForSeconds(.1f);
-
-        mirror = new List<GameObject>(5);
-
-        mirror.Add(PageSystem.pageSystem.NoteField);
-
-        for (int i = 0; i < 4; i++)
-        {
-            mirror.Add(MirrorField.transform.GetChild(i).gameObject);
-        }
-
-        mirror.Sort(delegate (GameObject A, GameObject B)
-        {
-            if (A.transform.localPosition.x > B.transform.localPosition.x) return 1;
-            else if (A.transform.localPosition.x < B.transform.localPosition.x) return -1;
-            return 0;
-        });
-
-        if (posX != 0)
-        {
-            Vector3 pagePos;
-            pagePos = PageSystem.pageSystem.NoteField.transform.localPosition;
-
-            Destroy(PageSystem.pageSystem.NoteField);
-            PageSystem.pageSystem.NoteField =
-                Instantiate(Parent, NoteFieldParent.transform);
-            mirror[0] = PageSystem.pageSystem.NoteField;
-            mirror[0].transform.localPosition = pagePos;
-            mirror[0].name = "NoteField";
-            InputManager.input.inputNoteFieldSet(mirror[0]);
+            default:
+                if (SelectedNormal == null)
+                {
+                    try
+                    {
+                        SelectedNormal = NormalNote.GetClass(Selected);
+                        if (SelectedNormal == null) return;
+                    }
+                    catch { return; }
+                }
+                inputPage.text = Mathf.FloorToInt((SelectedNormal.pos / 1600.0f) + 1).ToString();
+                inputPosY.text = (SelectedNormal.pos % 1600.0f).ToString();
+                inputLine.text = SelectedNormal.line.ToString();
+                inputLegnth.text = SelectedNormal.legnth.ToString();
+                break;
         }
     }
-    IEnumerator SpeedNoteBpm()
+    //*Button ---------------------------------------------
+    // For All Note
+    public void btnPosY()
     {
-        float speedBpm;
-        try
-        {
-            speedBpm = Convert.ToSingle(inputSpeedBpm[0].text);
-            if (speedBpm < 0)
-            {
-                speedBpm = ValueManager.bpm;
-                inputSpeedBpm[0].text = ValueManager.bpm.ToString();
-            }
 
-            Vector3 posChild;
-            posChild = Selected.transform.GetChild(0).GetChild(0).localPosition;
-            posChild.y = speedBpm;
-            Selected.transform.GetChild(0).GetChild(0).localPosition = posChild;
-            Selected.transform.GetComponentInChildren<TextMeshPro>().text =
-                posChild.y.ToString() + "\nx " + posChild.x.ToString();
-
-        }
-        catch { yield break; }
-
-        Vector3 pos;
-        pos = Selected.transform.localPosition;
-
-        float posX;
-        posX = Selected.transform.parent.localPosition.x;
-
-        GameObject NoteField;
-        NoteField = PageSystem.pageSystem.NoteField;
-
-        GameObject Parent;
-        Parent = Selected.transform.parent.gameObject;
-        /*
-        if (Selected != null)
-        {
-            Destroy(Selected);
-        }
-        else { Debug.LogError("삭제 대상을 찾지 못함"); yield break; }*/
-
-        yield return new WaitForSeconds(.1f);
-
-        mirror = new List<GameObject>(5);
-
-        mirror.Add(PageSystem.pageSystem.NoteField);
-
-        for (int i = 0; i < 4; i++)
-        {
-            mirror.Add(MirrorField.transform.GetChild(i).gameObject);
-        }
-
-        mirror.Sort(delegate (GameObject A, GameObject B)
-        {
-            if (A.transform.localPosition.x > B.transform.localPosition.x) return 1;
-            else if (A.transform.localPosition.x < B.transform.localPosition.x) return -1;
-            return 0;
-        });
-
-        if (posX != 0)
-        {
-            Vector3 pagePos;
-            pagePos = PageSystem.pageSystem.NoteField.transform.localPosition;
-
-            Destroy(PageSystem.pageSystem.NoteField);
-            PageSystem.pageSystem.NoteField =
-                Instantiate(Parent, NoteFieldParent.transform);
-            mirror[0] = PageSystem.pageSystem.NoteField;
-            mirror[0].transform.localPosition = pagePos;
-            mirror[0].name = "NoteField";
-            InputManager.input.inputNoteFieldSet(mirror[0]);
-        }
     }
-
-    // these fuction is triggered by button
-    // ------------------------------------------------------------
-    public void ButtonLine()
+    public void btnPage()
     {
-        int lineInput;
-        Vector3 SelectedPos;
-        try
-        {
-            lineInput = int.Parse(inputLine.text);
-            SelectedPos = Selected.transform.localPosition;
-            if (lineInput < 1 || lineInput > 5)
-            {
-                DisplayNoteInfo();
-                return;
-            }
-            switch (lineInput)
-            {
-                case 1:
-                    SelectedPos.x = -300;
-                    break;
 
-                case 2:
-                    SelectedPos.x = -100;
-                    break;
+    }
+    // NormalNote
+    public void btnLine()
+    {
 
-                case 3:
-                    SelectedPos.x = +100;
-                    break;
-
-                case 4:
-                    SelectedPos.x = +300;
-                    break;
-
-                case 5:
-                    SelectedPos.x = 0;
-                    break;
-            }
-            Selected.transform.localPosition = SelectedPos;
-            DisplayNoteInfo();
-        }
-        catch { return; }
     }
-    public void ButtonPage()
-    {
-        int pageInput;
-        Vector3 SelectedPos;
-        try
-        {
-            pageInput = int.Parse(inputPage.text);
-            SelectedPos = Selected.transform.localPosition;
-            if (pageInput < 1 || pageInput > maxPage)
-            {
-                DisplayNoteInfo();
-                return;
-            }
-            SelectedPos.y = SelectedPos.y % 1600 + pageInput * 1600;
-
-            Selected.transform.localPosition = SelectedPos;
-        }
-        catch { return; }
-    }
-    public void ButtonPos()
-    {
-        float posInput;
-        Vector3 SelectedPos;
-        try
-        {
-            posInput = Convert.ToSingle(inputPosY.text);
-            Debug.Log(posInput);
-            SelectedPos = Selected.transform.localPosition;
-            if (posInput < 0 || posInput >= 1600)
-            {
-                DisplayNoteInfo();
-                return;
-            }
-            SelectedPos.y = SelectedPos.y - SelectedPos.y % 1600 + posInput;
-
-            Selected.transform.localPosition = SelectedPos;
-        }
-        catch { return; }
-    }
-    public void ButtonLegnth()
-    {
-        try
-        {
-            LengthNote(Convert.ToInt32(inputLegnth.text));
-        }
-        catch
-        {   
-            if (Selected == null) inputLegnth.text = "--";
-            else inputLegnth.text = (Selected.transform.localScale.y / 100).ToString();
-        }
-    }
-    public void ButtonEffect()
-    {
-        Vector3 forcePos;
-        try
-        {
-            forcePos = Selected.transform.localPosition;
-            forcePos.x = Convert.ToSingle(inputEffectForce.text);
-            Selected.transform.GetChild(0).localPosition = forcePos;
-        }
-        catch { return; }
-    }
-    public void ButtonDuration()
-    {
-        Vector3 durationPos;
-        try
-        {
-            durationPos = Selected.transform.localPosition;
-            durationPos.y = Convert.ToSingle(inputEffectForce.text);
-            Selected.transform.GetChild(0).localPosition = durationPos;
-        }
-        catch { return; }
-    }
-
-    // Speed Bpm = 
-    //      SpeedNote.child.child.transform.localposition.y
-    public void ButtonSpeed()
-    {
-        //! StartCoroutine(SpeedNote());
-    }
-    public void ButtonSpeedBpm()
-    {
-        StartCoroutine(SpeedNoteBpm());
-    }
-    public void ToggleDouble()
-    {
-        if (Selected.tag == "chip")
-        {
-            Selected.transform.GetChild(0).GetChild(0)
-            .GetComponent<SpriteRenderer>().enabled = isDoubleToggle.isOn;
-        }
-    }
-    public void SectorSetOriginal()
-    {
-        OriginalSector.SetActive(true);
-        EffectSector.SetActive(false);
-        SpeedSector.SetActive(false);
-    }
-    public void SectorSetEffect()
-    {
-        OriginalSector.SetActive(false);
-        EffectSector.SetActive(true);
-        SpeedSector.SetActive(false);
-        EffectManager.isEffectSelected = true;
-    }
-    public void SectorSetSpeed()
-    {
-        OriginalSector.SetActive(false);
-        EffectSector.SetActive(false);
-        SpeedSector.SetActive(true);
-    }
+    // SpeedNote
+    // EffectNote
 }

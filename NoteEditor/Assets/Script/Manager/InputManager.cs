@@ -18,7 +18,7 @@ public class InputManager : MonoBehaviour
     [SerializeField] GameObject NullObject;
     [SerializeField] GameObject inputCollider;
     public GameObject InputObject;
-
+    private int inputIndexValue = 0;
     public float posY;
     private void Awake()
     {
@@ -46,6 +46,8 @@ public class InputManager : MonoBehaviour
                     PreviewNote[i].SetActive(false);
                 }
             }
+
+            InputObject.transform.localPosition = inputPosValue;
         }
         else
         {
@@ -55,15 +57,63 @@ public class InputManager : MonoBehaviour
     }
     public void NoteGenerate()
     {
-        Vector3 generatePos;
-        generatePos = inputPosValue;
+        GameObject copyObject;
+        copyObject = Instantiate(NotePrefab[inputIndexValue], NoteField.transform);
+        copyObject.transform.localPosition = inputPosValue;
+
+        if (inputIndexValue == 5)
+        {
+            SpeedNote inputSpeedNote;
+            inputSpeedNote = new SpeedNote();
+            if (SpeedNote.speedNotes.Exists(value => Mathf.Approximately(value.pos, inputPosValue.y)))
+            {
+                // 중복값 오류 알람
+                return;
+            }
+        }
+        else if (inputIndexValue == 6)
+        {
+            EffectNote inputEffectNote;
+            inputEffectNote = new EffectNote();
+            if (EffectNote.effectNotes.Exists(value => Mathf.Approximately(value.pos, inputPosValue.y)))
+            {
+                // 중복값 오류 알람
+                return;
+            }
+        }
+        else
+        {
+            NormalNote inputNormalNote;
+            inputNormalNote = new NormalNote();
+
+            if (inputPosValue.x < -200.0f) inputNormalNote.line = 1;
+            else if (inputPosValue.x < -0.0f) inputNormalNote.line = 2;
+            else if (inputPosValue.x < +200.0f) inputNormalNote.line = 3;
+            else inputNormalNote.line = 4;
+
+            if (NormalNote.normalNotes.Exists(value => Mathf.Approximately(value.pos, inputPosValue.y))
+            && NormalNote.normalNotes.Exists(value => value.line == inputNormalNote.line))
+            {
+                // 중복 노트 오류 알람
+                return;
+            }
+        }
     }
-    public void inputNoteFieldSet(GameObject gameObject)
+    public void PreviewActivate(int previewIndex, bool isBottom, bool isOthers)
     {
-        NoteField = gameObject;
-    }
-    private void PreviewView()
-    {
-        
+        inputIndexValue = previewIndex;
+        isNoteInputAble = true;
+        isNoteBottom = isBottom;
+        isNoteOther = isOthers;
+        inputCollider.SetActive(true);
+        for (int i = 0; i < 6; i++)
+        {
+            if (i == previewIndex) 
+            {
+                PreviewNote[i].SetActive(true);
+                InputObject = PreviewNote[i];
+            }
+            else PreviewNote[i].SetActive(false);
+        }
     }
 }
