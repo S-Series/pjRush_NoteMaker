@@ -6,11 +6,13 @@ using TMPro;
 
 public class ValueManager : MonoBehaviour
 {
+    private static ValueManager valueManager;
     [SerializeField] TMP_InputField bpmInputField;
     [SerializeField] TMP_InputField delayInputField;
     public static float bpm = 120;
     public static int delay = 0;
-    public void btnBpm()
+    private void Awake() {valueManager = this;}
+    public void inputBpm()
     {
         try
         {
@@ -24,17 +26,28 @@ public class ValueManager : MonoBehaviour
             bpmInputField.text = "120";
         }
     }
-    public void btnDelay()
+    public void inputDelay()
     {
         try
         {
             delay = Convert.ToInt32(delayInputField.text);
-            delayInputField.text = bpm.ToString();
+            if (delay < 0) delay = 0;
+            delayInputField.text = delay.ToString();
         }
         catch
         {
             delay = 0;
             delayInputField.text = "0";
         }
+        if (delay < 0) 
+        {
+            delay = 0;
+            delayInputField.text = "0";
+        }
+    }
+    public static void DisplayValue()
+    {
+        valueManager.bpmInputField.text = bpm.ToString();
+        valueManager.delayInputField.text = delay.ToString();
     }
 }

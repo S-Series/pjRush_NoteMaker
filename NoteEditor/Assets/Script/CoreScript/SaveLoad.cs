@@ -8,9 +8,10 @@ using TMPro;
 public class SaveLoad : MonoBehaviour
 {
     public static SaveLoad saveLoad;
+    public static bool s_isWorking = false;
 
-    NoteSavedData noteSaved = new NoteSavedData();
-    private const string editorVersion = "0.9.8";
+    static NoteSavedData noteSaved = new NoteSavedData();
+    private const string editorVersion = "1.0";
     private float bpm;
     private static bool isSaving = false;
     private static bool isLoading = false;
@@ -42,9 +43,9 @@ public class SaveLoad : MonoBehaviour
     [SerializeField] TMP_InputField inputBpm;
     [SerializeField] TMP_InputField inputStartDelayMs;
     [SerializeField] TMP_InputField inputFileName;
-    [SerializeField] TextMeshProUGUI dropdownDifficulty;
     [SerializeField] GameObject NoteField;
     [SerializeField] TextMeshPro SaveCompleteMessage;
+    [SerializeField] GameObject[] BlockObject;
     private void Awake()
     {
         saveLoad = this;
@@ -86,19 +87,54 @@ public class SaveLoad : MonoBehaviour
     [ContextMenu("Save")]
     IEnumerator SaveDataToJson()
     {
+        s_isWorking = true;
+        BlockObject[0].SetActive(true);
         var wait = new WaitForSeconds(0.5f);
 
         ResetSavedData();
 
-        noteSaved.Version = editorVersion;
-        bpm = ValueManager.bpm;
-
+        NormalNote.Sorting();
+        SpeedNote.Sorting();
+        EffectNote.Sorting();
         yield return wait;
+        NoteClasses.CalculateNoteMs();
 
-        for(int i = 0; i < NormalNote.normalNotes.Count; i++)
+        noteSaved.Version = editorVersion;
+        noteSaved.bpm = ValueManager.bpm;
+        noteSaved.startDelayMs = ValueManager.delay;
+
+        for (int i = 0; i < NormalNote.normalNotes.Count; i++)
         {
-
+            NormalNote savingNotes;
+            savingNotes = NormalNote.normalNotes[i];
+            noteSaved.NoteMs.Add(savingNotes.ms);
+            noteSaved.NotePos.Add(savingNotes.pos);
+            noteSaved.NoteLine.Add(savingNotes.line);
+            noteSaved.NoteLegnth.Add(savingNotes.legnth);
+            noteSaved.isNotePowered.Add(savingNotes.isPowered);
+            yield return null;
         }
+        for (int i = 0; i < SpeedNote.speedNotes.Count; i++)
+        {
+            SpeedNote savingNotes;
+            savingNotes = SpeedNote.speedNotes[i];
+            noteSaved.SpeedMs.Add(savingNotes.ms);
+            noteSaved.SpeedPos.Add(savingNotes.pos);
+            noteSaved.SpeedBpm.Add(savingNotes.bpm);
+            noteSaved.SpeedNum.Add(savingNotes.multiply);
+            yield return null;
+        }
+        for (int i = 0; i < EffectNote.effectNotes.Count; i++)
+        {
+            EffectNote savingNotes;
+            savingNotes = EffectNote.effectNotes[i];
+            noteSaved.EffectMs.Add(savingNotes.ms);
+            noteSaved.EffectPos.Add(savingNotes.pos);
+            noteSaved.EffectForce.Add(savingNotes.value);
+            noteSaved.EffectIsPause.Add(savingNotes.isPause);
+            yield return null;
+        }
+
         yield return wait;
 
         try
@@ -113,19 +149,18 @@ public class SaveLoad : MonoBehaviour
         {
             StartCoroutine(DisplaySaveCompleteMessage(false));
         }
+        s_isWorking = false;
+        BlockObject[0].SetActive(false);
     }
 
     [ContextMenu("Load")]
     IEnumerator LoadDataFromJson()
     {
-        ValueManager.bpm = noteSaved.bpm;
-        ValueManager.delay = noteSaved.startDelayMs;
+        s_isWorking = true;
+        BlockObject[1].SetActive(true);
 
-        for (int i = 0; i < NoteField.transform.childCount; i++)
-        {
-            Destroy(NoteField.transform.GetChild(i).gameObject);
-        }
         ResetSavedData();
+        NoteClasses.ResetNotes();
         try
         {
             string path = Path.Combine(Application.dataPath, inputFileName.text + ".json");
@@ -133,144 +168,190 @@ public class SaveLoad : MonoBehaviour
             print(path);
             noteSaved = JsonUtility.FromJson<NoteSavedData>(jsonData);
         }
-        catch 
-        { 
-            yield break; 
+        catch
+        {
+            s_isWorking = false;
+            BlockObject[1].SetActive(false);
+            yield break;
         }
 
-        NoteClasses.ResetNotes();
-        for (int i = 0; i < noteSaved.NoteMs.Count; i++)
+        if (noteSaved.Version != editorVersion)
         {
-            NormalNote normalNote = new NormalNote();
-            normalNote.noteObject = null;
-            normalNote.ms = noteSaved.NoteMs[i];
-            normalNote.line = noteSaved.NoteLine[i];
-            normalNote.legnth = noteSaved.NoteLegnth[i];
-            normalNote.pos = noteSaved.NotePos[i];
-            try { normalNote.isOver = noteSaved.isOver[i]; }
-            catch { normalNote.isOver = false; }
-            NormalNote.normalNotes.Add(normalNote);
-        }
-        for (int i = 0; i < noteSaved.SpeedMs.Count; i++)
-        {
-            SpeedNote speedNote = new SpeedNote();
-            speedNote.noteObject = null;
-            speedNote.ms = noteSaved.SpeedMs[i];
-            speedNote.pos = noteSaved.SpeedPos[i];
-            speedNote.bpm = noteSaved.SpeedBpm[i];
-            speedNote.multiply = noteSaved.SpeedNum[i];
-            SpeedNote.speedNotes.Add(speedNote);
-        }
-        for (int i = 0; i < noteSaved.EffectMs.Count; i++)
-        {
-            EffectNote effectNote = new EffectNote();
-            effectNote.noteObject = null;
-            effectNote.ms = noteSaved.EffectMs[i];
-            effectNote.pos = noteSaved.EffectPos[i];
-            effectNote.type = noteSaved.EffectType[i];
-            effectNote.value = noteSaved.EffectForce[i];
-            EffectNote.effectNotes.Add(effectNote);
-        }
-        //*--------------------------------------
-        NormalNote.Sorting();
-        SpeedNote.Sorting();
-        EffectNote.Sorting();
-        //*--------------------------------------
-        for (int i = 0; i < NormalNote.normalNotes.Count; i++)
-        {
-            NormalNote normalNote;
-            GameObject copyObject;
-
-            Vector3 autoPos = new Vector3(0, 0, 0);
-            Vector3 autoScale = new Vector3(1, 1, 1);
-
-            normalNote = NormalNote.normalNotes[i];
-            if (normalNote.line >= 5)
+            BlockObject[1].SetActive(false);
+            BlockObject[2].SetActive(true);
+            while (true)
             {
-                if (normalNote.legnth == 0)
+                if (Input.GetKeyDown(KeyCode.Return))
                 {
-                    copyObject = Instantiate(PrefabObject[2], NoteField.transform);
+                     BlockObject[1].SetActive(true);
+                    BlockObject[2].SetActive(false);
+                    break;
+                }
+                if (Input.GetKeyDown(KeyCode.Backspace))
+                {
+                    s_isWorking = false;
+                    BlockObject[2].SetActive(false);
+                    yield break;
+                }
+                yield return null;
+            }
+        }
+
+        try
+        {
+            ValueManager.bpm = noteSaved.bpm;
+            ValueManager.delay = noteSaved.startDelayMs;
+            ValueManager.DisplayValue();
+
+            for (int i = 0; i < NoteField.transform.childCount; i++)
+            {
+                Destroy(NoteField.transform.GetChild(i).gameObject);
+            }
+
+            NoteClasses.ResetNotes();
+            for (int i = 0; i < noteSaved.NoteMs.Count; i++)
+            {
+                NormalNote normalNote = new NormalNote();
+                normalNote.noteObject = null;
+                normalNote.ms = noteSaved.NoteMs[i];
+                normalNote.line = noteSaved.NoteLine[i];
+                normalNote.legnth = noteSaved.NoteLegnth[i];
+                normalNote.pos = noteSaved.NotePos[i];
+                try { normalNote.isPowered = noteSaved.isNotePowered[i]; }
+                catch { normalNote.isPowered = false; }
+                NormalNote.normalNotes.Add(normalNote);
+            }
+            for (int i = 0; i < noteSaved.SpeedMs.Count; i++)
+            {
+                SpeedNote speedNote = new SpeedNote();
+                speedNote.noteObject = null;
+                speedNote.ms = noteSaved.SpeedMs[i];
+                speedNote.pos = noteSaved.SpeedPos[i];
+                speedNote.bpm = noteSaved.SpeedBpm[i];
+                speedNote.multiply = noteSaved.SpeedNum[i];
+                SpeedNote.speedNotes.Add(speedNote);
+            }
+            for (int i = 0; i < noteSaved.EffectMs.Count; i++)
+            {
+                EffectNote effectNote = new EffectNote();
+                effectNote.noteObject = null;
+                effectNote.ms = noteSaved.EffectMs[i];
+                effectNote.pos = noteSaved.EffectPos[i];
+                effectNote.isPause = noteSaved.EffectIsPause[i];
+                effectNote.value = noteSaved.EffectForce[i];
+                EffectNote.effectNotes.Add(effectNote);
+            }
+            //*--------------------------------------
+            NormalNote.Sorting();
+            SpeedNote.Sorting();
+            EffectNote.Sorting();
+            //*--------------------------------------
+            for (int i = 0; i < NormalNote.normalNotes.Count; i++)
+            {
+                NormalNote normalNote;
+                GameObject copyObject;
+
+                Vector3 autoPos = new Vector3(0, 0, 0);
+                Vector3 autoScale = new Vector3(1, 1, 1);
+
+                normalNote = NormalNote.normalNotes[i];
+                if (normalNote.line >= 5)
+                {
+                    if (normalNote.legnth == 0)
+                    {
+                        copyObject = Instantiate(PrefabObject[2], NoteField.transform);
+                    }
+                    else
+                    {
+                        copyObject = Instantiate(PrefabObject[3], NoteField.transform);
+                        Vector3 scale;
+                        scale = copyObject.transform.localScale;
+                        scale.y = 100.0f * normalNote.legnth;
+                        copyObject.transform.localScale = scale;
+                    }
                 }
                 else
                 {
-                    copyObject = Instantiate(PrefabObject[3], NoteField.transform);
-                    Vector3 scale;
-                    scale = copyObject.transform.localScale;
-                    scale.y = 100.0f * normalNote.legnth;
-                    copyObject.transform.localScale = scale;
+                    if (normalNote.legnth == 0)
+                    {
+                        copyObject = Instantiate(PrefabObject[0], NoteField.transform);
+                    }
+                    else
+                    {
+                        copyObject = Instantiate(PrefabObject[1], NoteField.transform);
+                        Vector3 scale;
+                        scale = copyObject.transform.localScale;
+                        scale.y = 100.0f * normalNote.legnth;
+                        copyObject.transform.localScale = scale;
+                    }
                 }
-            }
-            else
-            {
-                if (normalNote.legnth == 0)
+
+                switch (normalNote.line)
                 {
-                    copyObject = Instantiate(PrefabObject[0], NoteField.transform);
+                    case 1:
+                        autoPos.x = -300;
+                        break;
+
+                    case 2:
+                        autoPos.x = -100;
+                        break;
+
+                    case 3:
+                        autoPos.x = +100;
+                        break;
+
+                    case 4:
+                        autoPos.x = +300;
+                        break;
+
+                    case 5:
+                        autoPos.x = -200;
+                        break;
+
+                    case 6:
+                        autoPos.x = +200;
+                        break;
                 }
-                else
-                {
-                    copyObject = Instantiate(PrefabObject[1], NoteField.transform);
-                    Vector3 scale;
-                    scale = copyObject.transform.localScale;
-                    scale.y = 100.0f * normalNote.legnth;
-                    copyObject.transform.localScale = scale;
-                }
+                autoPos.y = normalNote.pos;
+                autoPos.z = 0;
+                copyObject.transform.localPosition = autoPos;
+
+                normalNote.noteObject = copyObject;
             }
-            
-            switch (normalNote.line)
+            for (int i = 0; i < SpeedNote.speedNotes.Count; i++)
             {
-                case 1:
-                autoPos.x = -300;
-                break;
+                SpeedNote speedNote;
+                GameObject copyObject;
 
-                case 2:
-                autoPos.x = -100;
-                break;
+                speedNote = SpeedNote.speedNotes[i];
+                copyObject = Instantiate(PrefabObject[4], NoteField.transform);
+                copyObject.GetComponentInChildren<TextMeshPro>().text
+                    = speedNote.bpm.ToString() + "\nx" + speedNote.multiply.ToString();
+                copyObject.transform.localPosition = new Vector3(0, speedNote.pos, 0);
 
-                case 3:
-                autoPos.x = +100;
-                break;
-
-                case 4:
-                autoPos.x = +300;
-                break;
-
-                case 5:
-                autoPos.x = -200;
-                break;
-
-                case 6:
-                autoPos.x = +200;
-                break;
+                speedNote.noteObject = copyObject;
             }
-            autoPos.y = normalNote.pos;
-            autoPos.z = 0;
-            copyObject.transform.localPosition = autoPos;
+            for (int i = 0; i < EffectNote.effectNotes.Count; i++)
+            {
+                EffectNote effectNote;
+                GameObject copyObject;
 
-            normalNote.noteObject = copyObject;
+                effectNote = EffectNote.effectNotes[i];
+                copyObject = Instantiate(PrefabObject[5], NoteField.transform);
+                copyObject.transform.localPosition = new Vector3(0, effectNote.pos, 0);
+                copyObject.transform.GetChild(0).GetChild(0).localScale
+                    = new Vector3(3.25f, effectNote.value, 1.0f);
+                copyObject.GetComponentInChildren<TextMeshPro>().text = effectNote.value.ToString();
+                if (effectNote.isPause) copyObject.transform.GetChild(0).GetChild(0).gameObject.SetActive(false);
+                else copyObject.transform.GetChild(0).GetChild(0).gameObject.SetActive(true);
+
+                effectNote.noteObject = copyObject;
+            }
         }
-        for (int i = 0; i < SpeedNote.speedNotes.Count; i++)
+        catch
         {
-            SpeedNote speedNote;
-            GameObject copyObject;
-            
-            speedNote = SpeedNote.speedNotes[i];
-            copyObject = Instantiate(PrefabObject[4], NoteField.transform);
-            copyObject.GetComponentInChildren<TextMeshPro>().text
-                = speedNote.bpm.ToString() + "\nx" + speedNote.multiply.ToString();
-            copyObject.transform.localPosition = new Vector3(0, speedNote.pos, 0);
-            
-            speedNote.noteObject = copyObject;
-        }
-        for (int i = 0; i < EffectNote.effectNotes.Count; i++)
-        {
-            EffectNote effectNote;
-            GameObject copyObject;
-
-            effectNote = EffectNote.effectNotes[i];
-            copyObject = Instantiate(PrefabObject[5], NoteField.transform);
-            copyObject.transform.localPosition = new Vector3(0, effectNote.pos, 0);
-
-            effectNote.noteObject = copyObject;
+            ResetSavedData();
+            Debug.Log("파일 오류");
         }
     }
     IEnumerator CreateNewJsonData()
@@ -317,29 +398,12 @@ public class SaveLoad : MonoBehaviour
     }
     private void ResetSavedData()
     {
+        noteSaved = new NoteSavedData();
         NoteField = PageSystem.pageSystem.NoteField;
 
         note = new List<GameObject>();
         effect = new List<GameObject>();
         speed = new List<GameObject>();
-
-        noteSaved.bpm = new float();
-        noteSaved.startDelayMs = new int();
-
-        noteSaved.NoteLegnth = new List<int>();
-        noteSaved.NoteMs = new List<float>();
-        noteSaved.NoteLine = new List<int>();
-        noteSaved.isOver = new List<bool>();
-
-        noteSaved.EffectMs = new List<float>();
-        noteSaved.EffectPos = new List<float>();
-        noteSaved.EffectForce = new List<float>();
-        noteSaved.EffectType = new List<bool>();
-
-        noteSaved.SpeedMs = new List<float>();
-        noteSaved.SpeedPos = new List<float>();
-        noteSaved.SpeedBpm = new List<float>();
-        noteSaved.SpeedNum = new List<float>();
 
         noteMs = new List<float>();
         notePos = new List<float>();
@@ -400,7 +464,7 @@ public class SaveLoad : MonoBehaviour
     }
     public void ButtonLoadErrorSubmit()
     {
-        
+
     }
     public void ButtonLoadErrorCancle()
     {
@@ -415,19 +479,19 @@ public class NoteSavedData
     public float bpm;
     public int startDelayMs;
 
-    public List<int> NoteLegnth;
-    public List<float> NoteMs;
-    public List<float> NotePos;
-    public List<int> NoteLine;
-    public List<bool> isOver;
+    public List<int> NoteLegnth = new List<int>();
+    public List<float> NoteMs = new List<float>();
+    public List<float> NotePos = new List<float>();
+    public List<int> NoteLine = new List<int>();
+    public List<bool> isNotePowered = new List<bool>();
 
-    public List<float> EffectMs;
-    public List<float> EffectPos;
-    public List<float> EffectForce;
-    public List<bool> EffectType;
+    public List<float> EffectMs = new List<float>();
+    public List<float> EffectPos = new List<float>();
+    public List<float> EffectForce = new List<float>();
+    public List<bool> EffectIsPause = new List<bool>();
 
-    public List<float> SpeedMs;
-    public List<float> SpeedPos;
-    public List<float> SpeedBpm;
-    public List<float> SpeedNum;
+    public List<float> SpeedMs = new List<float>();
+    public List<float> SpeedPos = new List<float>();
+    public List<float> SpeedBpm = new List<float>();
+    public List<float> SpeedNum = new List<float>();
 }

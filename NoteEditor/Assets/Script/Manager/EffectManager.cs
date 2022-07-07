@@ -57,7 +57,7 @@ public class EffectManager : MonoBehaviour
     private void EffectPreview()
     {
         print("run1");
-        if (!AutoTest.isTest && 
+        if (!AutoTest.s_isTest && 
             !TestPlay.isPlay && 
             !TestPlay.isPlayReady)
         {

@@ -5,77 +5,93 @@ using UnityEngine;
 public class NoteTool : MonoBehaviour
 {
     InputManager input;
-    private int triggerIndex = 0;
+    [SerializeField] Transform frameObject;
+    private static GameObject Frame;
+    private readonly float[] posX = new float[3]{-5.0f, 112.5f, 230.0f};
+    private readonly float[] posY = new float[2]{-50.0f, -170.0f};
+    private enum Status {Note, LongNote, Bottom, BottomLong, Speed, Effect};
+    private Status status = Status.Note;
     private void Start()
     {
         input = InputManager.input;
+        Frame = frameObject.gameObject;
     }
-    private void Update() {
-        if (Input.GetKeyDown(KeyCode.Tab)){
-            if (AutoTest.isTest) return;
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            if (AutoTest.s_isTest) return;
             if (NoteEdit.isNoteEdit) return;
             if (TestPlay.isPlay || TestPlay.isPlayReady) return;
-            if (!InputManager.isNoteInputAble){
-                ButtonChip();
-            }
+            if (!InputManager.isNoteInputAble) { ButtonChip(); }
             else
             {
-                switch (triggerIndex){
-                    case 0:
+                switch (status){
+                    case Status.Note:
                         ButtonLong();
                         break;
 
-                    case 1:
+                    case Status.LongNote:
                         ButtonBtChip();
                         break;
 
-                    case 2:
+                    case Status.Bottom:
                         ButtonBtLong();
                         break;
 
-                    case 3:
-                        ButtonEffect();
-                        break;
-
-                    case 4:
+                    case Status.BottomLong:
                         ButtonBpm();
                         break;
 
-                    case 5:
+                    case Status.Speed:
+                        ButtonEffect();
+                        break;
+
+                    case Status.Effect:
                         ButtonChip();
                         break;
                 }
             }
         }
     }
+    public static void disableFrame()
+    {
+        Frame.SetActive(false);
+    }
     public void ButtonChip()
     {
         input.PreviewActivate(0, false, false);
-        triggerIndex = 0;
+        status = Status.Note;
+        frameObject.localPosition = new Vector3(posX[0], posY[0], 0.0f);
     }
     public void ButtonLong()
     {
         input.PreviewActivate(1, false, false);
-        triggerIndex = 1;
+        status = Status.LongNote;
+        frameObject.localPosition = new Vector3(posX[0], posY[1], 0.0f);
     }
     public void ButtonBtChip()
     {
         input.PreviewActivate(2, true, false);
-        triggerIndex = 2;
+        status = Status.Bottom;
+        frameObject.localPosition = new Vector3(posX[1], posY[0], 0.0f);
     }
     public void ButtonBtLong()
     {
         input.PreviewActivate(3, true, false);
-        triggerIndex = 3;
-    }
-    public void ButtonEffect()
-    {
-        input.PreviewActivate(4, false, true);
-        triggerIndex = 4;
+        status = Status.BottomLong;
+        frameObject.localPosition = new Vector3(posX[1], posY[1], 0.0f);
     }
     public void ButtonBpm()
     {
+        input.PreviewActivate(4, false, true);
+        status = Status.Speed;
+        frameObject.localPosition = new Vector3(posX[2], posY[0], 0.0f);
+    }
+    public void ButtonEffect()
+    {
         input.PreviewActivate(5, false, true);
-        triggerIndex = 5;
+        status = Status.Effect;
+        frameObject.localPosition = new Vector3(posX[2], posY[1], 0.0f);
     }
 }

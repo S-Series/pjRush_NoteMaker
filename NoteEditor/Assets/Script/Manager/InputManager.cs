@@ -40,13 +40,13 @@ public class InputManager : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Escape))
             {
                 isNoteInputAble = false;
+                NoteTool.disableFrame();
                 NoteEdit.noteEdit.SectorSetOriginal();
                 for (int i = 0; i < 6; i++)
                 {
                     PreviewNote[i].SetActive(false);
                 }
             }
-
             InputObject.transform.localPosition = inputPosValue;
         }
         else
@@ -57,11 +57,13 @@ public class InputManager : MonoBehaviour
     }
     public void NoteGenerate()
     {
+        print(inputIndexValue);
+
         GameObject copyObject;
         copyObject = Instantiate(NotePrefab[inputIndexValue], NoteField.transform);
         copyObject.transform.localPosition = inputPosValue;
 
-        if (inputIndexValue == 5)
+        if (inputIndexValue == 4)
         {
             SpeedNote inputSpeedNote;
             inputSpeedNote = new SpeedNote();
@@ -70,8 +72,18 @@ public class InputManager : MonoBehaviour
                 // 중복값 오류 알람
                 return;
             }
+            inputSpeedNote.ms = 0.0f;
+            inputSpeedNote.pos = inputPosValue.y;
+            inputSpeedNote.bpm = ValueManager.bpm;
+            inputSpeedNote.multiply = 1.00f;
+            inputSpeedNote.noteObject = copyObject;
+            SpeedNote.speedNotes.Add(inputSpeedNote);
+
+            NoteEdit.Selected = copyObject;
+            NoteEdit.SelectedSpeed = inputSpeedNote;
+            NoteEdit.selectedType = NoteEdit.SelectedType.Speed;
         }
-        else if (inputIndexValue == 6)
+        else if (inputIndexValue == 5)
         {
             EffectNote inputEffectNote;
             inputEffectNote = new EffectNote();
@@ -80,16 +92,28 @@ public class InputManager : MonoBehaviour
                 // 중복값 오류 알람
                 return;
             }
+            inputEffectNote.ms = 0.0f;
+            inputEffectNote.pos = inputPosValue.y;
+            inputEffectNote.isPause = false;
+            inputEffectNote.value = 400.0f;
+            inputEffectNote.noteObject = copyObject;
+            EffectNote.effectNotes.Add(inputEffectNote);
+
+            NoteEdit.Selected = copyObject;
+            NoteEdit.SelectedEffect = inputEffectNote;
+            NoteEdit.selectedType = NoteEdit.SelectedType.Effect;
         }
         else
         {
             NormalNote inputNormalNote;
             inputNormalNote = new NormalNote();
 
-            if (inputPosValue.x < -200.0f) inputNormalNote.line = 1;
-            else if (inputPosValue.x < -0.0f) inputNormalNote.line = 2;
-            else if (inputPosValue.x < +200.0f) inputNormalNote.line = 3;
-            else inputNormalNote.line = 4;
+            if (Mathf.Approximately(inputPosValue.x, +200.0f)) inputNormalNote.line = 6;
+            else if (Mathf.Approximately(inputPosValue.x, -200.0f)) inputNormalNote.line = 5;
+            else if (Mathf.Approximately(inputPosValue.x, +300.0f)) inputNormalNote.line = 4;
+            else if (Mathf.Approximately(inputPosValue.x, +100.0f)) inputNormalNote.line = 3;
+            else if (Mathf.Approximately(inputPosValue.x, -100.0f)) inputNormalNote.line = 2;
+            else inputNormalNote.line = 1;
 
             if (NormalNote.normalNotes.Exists(value => Mathf.Approximately(value.pos, inputPosValue.y))
             && NormalNote.normalNotes.Exists(value => value.line == inputNormalNote.line))
@@ -97,7 +121,19 @@ public class InputManager : MonoBehaviour
                 // 중복 노트 오류 알람
                 return;
             }
+            inputNormalNote.ms = 0.0f;
+            inputNormalNote.pos = inputPosValue.y;
+            if (inputIndexValue == 1 || inputIndexValue == 3) {inputNormalNote.legnth = 4;}
+            else inputNormalNote.legnth = 0;
+            inputNormalNote.isPowered = false;
+            inputNormalNote.noteObject = copyObject;
+            NormalNote.normalNotes.Add(inputNormalNote);
+
+            NoteEdit.Selected = copyObject;
+            NoteEdit.SelectedNormal = inputNormalNote;
+            NoteEdit.selectedType = NoteEdit.SelectedType.Normal;
         }
+        NoteEdit.noteEdit.DisplayNoteInfo();
     }
     public void PreviewActivate(int previewIndex, bool isBottom, bool isOthers)
     {

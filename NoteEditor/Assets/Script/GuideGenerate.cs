@@ -112,7 +112,7 @@ public class GuideGenerate : MonoBehaviour
     }
 
     // this function is triggered by Button
-    public void ButtonGuideGenerate()
+    public void inputGuideGenerate()
     {
         int count;
         try
