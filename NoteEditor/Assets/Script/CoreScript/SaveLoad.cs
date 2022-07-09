@@ -53,17 +53,7 @@ public class SaveLoad : MonoBehaviour
     private void Start()
     {
         ResetSavedData();
-
-        try
-        {
-            inputFileName.text = PlayerPrefs.GetString("NoteFileName");
-            StartCoroutine(LoadDataFromJson());
-        }
-        catch
-        {
-            inputFileName.text = "";
-            PlayerPrefs.SetString("NoteFileName", "");
-        }
+        StartCoroutine(StartLoad(PlayerPrefs.GetString("NoteFileName")));
     }
     private void Update()
     {
@@ -183,11 +173,11 @@ public class SaveLoad : MonoBehaviour
             {
                 if (Input.GetKeyDown(KeyCode.Return))
                 {
-                     BlockObject[1].SetActive(true);
+                    BlockObject[1].SetActive(true);
                     BlockObject[2].SetActive(false);
                     break;
                 }
-                if (Input.GetKeyDown(KeyCode.Backspace))
+                if (Input.GetKeyDown(KeyCode.Escape))
                 {
                     s_isWorking = false;
                     BlockObject[2].SetActive(false);
@@ -347,6 +337,9 @@ public class SaveLoad : MonoBehaviour
 
                 effectNote.noteObject = copyObject;
             }
+            PlayerPrefs.SetString("NoteFileName", inputFileName.text);
+            s_isWorking = false;
+            BlockObject[1].SetActive(false);
         }
         catch
         {
@@ -356,28 +349,37 @@ public class SaveLoad : MonoBehaviour
     }
     IEnumerator CreateNewJsonData()
     {
+        s_isWorking = true;
+        BlockObject[3].SetActive(true);
         bool isFileExist = false;
         ResetSavedData();
         try
         {
             string path = Path.Combine(Application.dataPath, inputFileName.text + ".json");
             string jsonData = File.ReadAllText(path);
-            print(path);
             noteSaved = JsonUtility.FromJson<NoteSavedData>(jsonData);
             isFileExist = true;
         }
         catch { isFileExist = false; }
 
-        if (isFileExist == true)
+        while (isFileExist)
         {
-            while (false)
+            BlockObject[3].SetActive(false);
+            BlockObject[4].SetActive(true);
+            if (Input.GetKeyDown(KeyCode.Return))
             {
-                yield return null;
-                if (false)
-                {
-                    yield break;
-                }
+                BlockObject[3].SetActive(true);
+                BlockObject[4].SetActive(false);
+                break;
             }
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                s_isWorking = false;
+                BlockObject[3].SetActive(false);
+                BlockObject[4].SetActive(false);
+                yield break;
+            }
+            yield return null;
         }
 
         ResetSavedData();
@@ -394,6 +396,32 @@ public class SaveLoad : MonoBehaviour
         catch
         {
             StartCoroutine(DisplaySaveCompleteMessage(false));
+        }
+        BlockObject[3].SetActive(false);
+        yield return SaveDataToJson();
+    }
+    private IEnumerator StartLoad(string fileName)
+    {
+        if (fileName == "") {yield break;}
+
+        s_isWorking = true;
+        inputFileName.text = fileName;
+        BlockObject[5].SetActive(true);
+        while(true)
+        {
+            if (Input.GetKeyDown(KeyCode.Return))
+            {
+                BlockObject[5].SetActive(false);
+                yield return LoadDataFromJson();
+                break;
+            }
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                BlockObject[5].SetActive(false);
+                inputFileName.text = "";
+                break;
+            }
+            yield return null;
         }
     }
     private void ResetSavedData()
@@ -435,12 +463,6 @@ public class SaveLoad : MonoBehaviour
     }
     public void ButtonCreate()
     {
-        if (inputFileName.text == "" || inputFileName.text == null)
-        {
-            SaveCompleteMessage.text = "Missing File name";
-            SaveCompleteMessage.color = new Color32(255, 0, 0, 255);
-            return;
-        }
         StartCoroutine(CreateNewJsonData());
     }
     private IEnumerator DisplaySaveCompleteMessage(bool success)
@@ -461,14 +483,6 @@ public class SaveLoad : MonoBehaviour
             SaveCompleteMessage.text = "Music File Name";
             SaveCompleteMessage.color = new Color32(255, 255, 255, 255);
         }
-    }
-    public void ButtonLoadErrorSubmit()
-    {
-
-    }
-    public void ButtonLoadErrorCancle()
-    {
-
     }
 }
 

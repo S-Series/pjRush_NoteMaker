@@ -193,7 +193,9 @@ public class AutoTest : MonoBehaviour
         autoTestViewObject[1].SetActive(true);
         s_isTest = false;
         s_testMs = 0;
-        MovingPos = new Vector3(0, 0, 0);
+        autoMusic.Stop();
+        MovingPos = new Vector3(0, 1600 * PageSystem.nowOnPage, 0);
+        autoNoteField.transform.localPosition = MovingPos;
     }
     private void autoJudgeEffect(int line, bool isLong = false)
     {
