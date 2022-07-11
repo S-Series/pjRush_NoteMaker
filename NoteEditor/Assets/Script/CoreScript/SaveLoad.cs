@@ -11,7 +11,7 @@ public class SaveLoad : MonoBehaviour
     public static bool s_isWorking = false;
 
     static NoteSavedData noteSaved = new NoteSavedData();
-    private const string editorVersion = "1.0";
+    private const string editorVersion = "0.9.9";
     private float bpm;
     private static bool isSaving = false;
     private static bool isLoading = false;
@@ -206,10 +206,19 @@ public class SaveLoad : MonoBehaviour
                 normalNote.ms = noteSaved.NoteMs[i];
                 normalNote.line = noteSaved.NoteLine[i];
                 normalNote.legnth = noteSaved.NoteLegnth[i];
-                normalNote.pos = noteSaved.NotePos[i];
+                try { normalNote.pos = noteSaved.NotePos[i]; }
+                catch { normalNote.pos = noteSaved.bpm * normalNote.ms / 150.0f; }
                 try { normalNote.isPowered = noteSaved.isNotePowered[i]; }
                 catch { normalNote.isPowered = false; }
                 NormalNote.normalNotes.Add(normalNote);
+            }
+            if (NormalNote.normalNotes.Count != 0)
+            {
+                print(NormalNote.normalNotes[0].pos);
+                if (NormalNote.normalNotes[0].pos < 1600.0f)
+                {
+                    foreach(NormalNote _note in NormalNote.normalNotes) { _note.pos += 1600.0f; }
+                }
             }
             for (int i = 0; i < noteSaved.SpeedMs.Count; i++)
             {
@@ -344,6 +353,8 @@ public class SaveLoad : MonoBehaviour
         catch
         {
             ResetSavedData();
+            s_isWorking = false;
+            BlockObject[1].SetActive(false);
             Debug.Log("파일 오류");
         }
     }

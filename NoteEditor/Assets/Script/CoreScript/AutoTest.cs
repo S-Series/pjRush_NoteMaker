@@ -46,6 +46,7 @@ public class AutoTest : MonoBehaviour
     private NormalNote autoTestNormal;
     private SpeedNote autoTestSpeed;
     private EffectNote autoTestEffect;
+    [SerializeField] private GameObject[] testLoadingBlock;
     
     //*Private -----------------------------------------------*//
     private void Awake()
@@ -56,7 +57,7 @@ public class AutoTest : MonoBehaviour
     private void FixedUpdate()
     {
         if (!s_isTest) return;
-        s_testMs++;
+        s_testMs+=autoTestMultiply;
     }
     private void Update()
     {
@@ -119,6 +120,7 @@ public class AutoTest : MonoBehaviour
     }
     private void Test(float startPos)
     {
+        s_testBpm = ValueManager.bpm;
         autoTestViewObject[0].SetActive(true);
         autoTestViewObject[1].SetActive(false);
         autoTestNormalNotes = new List<NormalNote>();
@@ -176,26 +178,80 @@ public class AutoTest : MonoBehaviour
             autoTestEffectBpm.Add(effectBpm);
         }
 
+        testIndex = new int[3]{0, 0, 0};
+        float delayBpm = ValueManager.bpm;
+        float delayMs = 150 * startPos / delayBpm;
+        if (!Mathf.Approximately(startPos, 0.0f))
+        {
+            for (int i = autoTestEffectNotes.Count - 1; i > -1; i--)
+            {
+                if (autoTestEffectNotes[i].pos <= startPos)
+                {
+                    EffectNote retouchEffect = autoTestEffectNotes[i];
+                    if (retouchEffect.pos + retouchEffect.value >= startPos)
+                    {
+                        startPos = (Mathf.FloorToInt(retouchEffect.pos / 1600.0f) - 1) * 1600.0f;
+                        if (startPos < 0.0f) { startPos = 0.0f; }
+                    }
+                    break;
+                }
+            }
+        }
+        if (!Mathf.Approximately(startPos, 0.0f))
+        {
+            for (int i = 0; i < autoTestNormalNotes.Count; i++)
+            {
+                if (autoTestNormalNotes[i].pos >= startPos)
+                {
+                    testIndex[0] = i;
+                    break;
+                }
+            }
+            for (int i = autoTestSpeedNotes.Count - 1; i > -1; i--)
+            {
+                if (autoTestSpeedNotes[i].pos <= startPos)
+                {
+                    SpeedNote retouchSpeed = autoTestSpeedNotes[i];
+                    delayBpm = retouchSpeed.bpm;
+                    delayMs = retouchSpeed.ms + 150 * (startPos - retouchSpeed.pos) / delayBpm;
+                    testIndex[1] = i;
+                    break;
+                }
+            }
+            for (int i = 0; i < autoTestEffectNotes.Count; i++)
+            {
+                if (autoTestEffectNotes[i].pos >= startPos)
+                {
+                    testIndex[2] = i;
+                    break;
+                }
+            }
+        }
+
         if (autoTestNormalNotes.Count == 0) {isTesting[0] = false;}
-        else {autoTestNormal = autoTestNormalNotes[0];}
+        else {autoTestNormal = autoTestNormalNotes[testIndex[0]];}
 
         if (autoTestSpeedNotes.Count == 0) {isTesting[1] = false;}
-        else {autoTestSpeed = autoTestSpeedNotes[0];}
+        else {autoTestSpeed = autoTestSpeedNotes[testIndex[1]];}
 
         if (autoTestEffectNotes.Count == 0) {isTesting[2] = false;}
-        else {autoTestEffect = autoTestEffectNotes[0];}
+        else {autoTestEffect = autoTestEffectNotes[testIndex[2]];}
         
-        StartCoroutine(StartingTest(0.0f));
+        print(delayMs);
+        StartCoroutine(StartingTest(delayMs));
     }
     private void TestEnd()
     {
+        testLoadingBlock[0].SetActive(false);
+        testLoadingBlock[1].SetActive(false);
         autoTestViewObject[0].SetActive(false);
         autoTestViewObject[1].SetActive(true);
         s_isTest = false;
         s_testMs = 0;
         autoMusic.Stop();
         MovingPos = new Vector3(0, 1600 * PageSystem.nowOnPage, 0);
-        autoNoteField.transform.localPosition = MovingPos;
+        MovingField[0].localPosition = MovingPos;
+        MovingField[1].localPosition = MovingPos;
     }
     private void autoJudgeEffect(int line, bool isLong = false)
     {
@@ -210,6 +266,7 @@ public class AutoTest : MonoBehaviour
     //*IEnumerator -----------------------------------------------*//
     private IEnumerator StartTest(float startPos)
     {
+        testLoadingBlock[0].SetActive(true);
         testIndex = new int[3]{0, 0, 0};
         isTesting = new bool[3]{true,true,true};
         s_testMs = 0;
@@ -220,12 +277,18 @@ public class AutoTest : MonoBehaviour
         yield return NoteClasses.CalculateNoteMs();
         Test(startPos);
     }
-    private IEnumerator StartingTest(float musicDelay)
+    private IEnumerator StartingTest(float delayMs)
     {
+        testLoadingBlock[0].SetActive(false);
+        testLoadingBlock[1].SetActive(true);
         yield return new WaitForSeconds(1.0f);
         s_isTest = true;
+        s_testMs = delayMs;
+        float waitMs = ValueManager.delay / 1000.0f;
+        try { autoMusic.time = delayMs / 1000.0f; }
+        catch { TestEnd(); }
         autoMusic.pitch = autoTestMultiply;
-        yield return new WaitForSeconds(autoTestMultiply * ValueManager.delay / 1000.0f);
+        yield return new WaitForSeconds(autoTestMultiply * waitMs);
         autoMusic.Play();
     }
     private IEnumerator LongNoteEffect(int line, int legnth)
@@ -257,7 +320,8 @@ public class AutoTest : MonoBehaviour
     //*Buttons -----------------------------------------------*//
     public void ButtonTest()
     {
-        if (SaveLoad.s_isWorking) return;
+        
+        if (SaveLoad.s_isWorking){print("A"); return;}
         if (!s_isTest)
         {
             StartCoroutine(StartTest(0.0f));
@@ -272,12 +336,12 @@ public class AutoTest : MonoBehaviour
         if (SaveLoad.s_isWorking) return;
         if (!s_isTest)
         {
-            StartCoroutine(StartTest(0.0f));
+            if ((PageSystem.nowOnPage - 2) * 1600 <= 0) {ButtonTest(); return;}
+            StartCoroutine(StartTest((PageSystem.nowOnPage - 2) * 1600));
         }
         else
         {
             TestEnd();
         }
     }
-    
 }

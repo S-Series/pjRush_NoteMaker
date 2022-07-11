@@ -15,6 +15,7 @@ public class NoteTool : MonoBehaviour
     {
         input = InputManager.input;
         Frame = frameObject.gameObject;
+        disableFrame();
     }
     private void Update()
     {

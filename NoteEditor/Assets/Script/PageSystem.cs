@@ -27,6 +27,7 @@ public class PageSystem : MonoBehaviour
     }
 
     private void Update(){
+        if (AutoTest.s_isTest) { NoteField.transform.localPosition = new Vector3(0, 0, 0); }
         if (!AutoTest.s_isTest && !TestPlay.isPlay && !TestPlay.isPlayReady){
             if (Input.GetAxis("Mouse ScrollWheel") > 0)
             {
