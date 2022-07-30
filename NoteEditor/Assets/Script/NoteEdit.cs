@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -108,6 +108,7 @@ public class NoteEdit : MonoBehaviour
                             .color = new Color32(255, 255, 255, 150);
                         break;
                 }
+                Selected.GetComponentInChildren<SpriteRenderer>().color = new Color32(255, 255, 255, 255);
                 Selected = null;
                 SelectedNormal = null;
                 SelectedSpeed = null;
@@ -158,7 +159,7 @@ public class NoteEdit : MonoBehaviour
                         if (selectedType == SelectedType.Normal)
                         {
                             if (SelectedNormal.legnth == 0) {MoveNote(Down: true);}
-                            else {LengthNote(SelectedNormal.legnth + 1);}
+                            else {LengthNote(SelectedNormal.legnth - 1);}
                         }
                         else { MoveNote(Down: true); }
                     }
@@ -292,6 +293,7 @@ public class NoteEdit : MonoBehaviour
         if (SelectedSpeed != null) SpeedNote.DeleteNote(SelectedSpeed);
         if (SelectedEffect != null) EffectNote.DeleteNote(SelectedEffect);
         Destroy(Selected);
+        Selected = null;
     }
     //*public ---------------------------------------------
     public void DisplayNoteInfo()
@@ -343,6 +345,15 @@ public class NoteEdit : MonoBehaviour
                 selectedType = SelectedType.Null;
                 Debug.LogError("NoteType Out Of Range");
                 return;
+        }
+        Selected.GetComponentInChildren<SpriteRenderer>().color = new Color32(0, 255, 0, 255);
+    }
+    public static void CheckSelect()
+    {
+        if (Selected != null) 
+        {
+            Selected.GetComponentInChildren<SpriteRenderer>().color 
+            = new Color32(255, 255, 255, 255);
         }
     }
     //*input Field && Button ---------------------------------------------

@@ -59,21 +59,19 @@ public class InputManager : MonoBehaviour
     {
         print(inputIndexValue);
 
+        NoteEdit.CheckSelect();
         GameObject copyObject;
         copyObject = Instantiate(NotePrefab[inputIndexValue], NoteField.transform);
-        copyObject.transform.localPosition = inputPosValue;
+        Vector3 generatePos = inputPosValue;
+        generatePos.y += PageSystem.nowOnPage * 1600.0f;
+        copyObject.transform.localPosition = generatePos;
 
         if (inputIndexValue == 4)
         {
             SpeedNote inputSpeedNote;
             inputSpeedNote = new SpeedNote();
-            if (SpeedNote.speedNotes.Exists(value => Mathf.Approximately(value.pos, inputPosValue.y)))
-            {
-                // 중복값 오류 알람
-                return;
-            }
             inputSpeedNote.ms = 0.0f;
-            inputSpeedNote.pos = inputPosValue.y;
+            inputSpeedNote.pos = generatePos.y;
             inputSpeedNote.bpm = ValueManager.bpm;
             inputSpeedNote.multiply = 1.00f;
             inputSpeedNote.noteObject = copyObject;
@@ -87,13 +85,8 @@ public class InputManager : MonoBehaviour
         {
             EffectNote inputEffectNote;
             inputEffectNote = new EffectNote();
-            if (EffectNote.effectNotes.Exists(value => Mathf.Approximately(value.pos, inputPosValue.y)))
-            {
-                // 중복값 오류 알람
-                return;
-            }
             inputEffectNote.ms = 0.0f;
-            inputEffectNote.pos = inputPosValue.y;
+            inputEffectNote.pos = generatePos.y;
             inputEffectNote.isPause = false;
             inputEffectNote.value = 400.0f;
             inputEffectNote.noteObject = copyObject;
@@ -108,21 +101,15 @@ public class InputManager : MonoBehaviour
             NormalNote inputNormalNote;
             inputNormalNote = new NormalNote();
 
-            if (Mathf.Approximately(inputPosValue.x, +200.0f)) inputNormalNote.line = 6;
-            else if (Mathf.Approximately(inputPosValue.x, -200.0f)) inputNormalNote.line = 5;
-            else if (Mathf.Approximately(inputPosValue.x, +300.0f)) inputNormalNote.line = 4;
-            else if (Mathf.Approximately(inputPosValue.x, +100.0f)) inputNormalNote.line = 3;
-            else if (Mathf.Approximately(inputPosValue.x, -100.0f)) inputNormalNote.line = 2;
+            if (Mathf.Approximately(generatePos.x, +200.0f)) inputNormalNote.line = 6;
+            else if (Mathf.Approximately(generatePos.x, -200.0f)) inputNormalNote.line = 5;
+            else if (Mathf.Approximately(generatePos.x, +300.0f)) inputNormalNote.line = 4;
+            else if (Mathf.Approximately(generatePos.x, +100.0f)) inputNormalNote.line = 3;
+            else if (Mathf.Approximately(generatePos.x, -100.0f)) inputNormalNote.line = 2;
             else inputNormalNote.line = 1;
 
-            if (NormalNote.normalNotes.Exists(value => Mathf.Approximately(value.pos, inputPosValue.y))
-            && NormalNote.normalNotes.Exists(value => value.line == inputNormalNote.line))
-            {
-                // 중복 노트 오류 알람
-                return;
-            }
             inputNormalNote.ms = 0.0f;
-            inputNormalNote.pos = inputPosValue.y;
+            inputNormalNote.pos = generatePos.y;
             if (inputIndexValue == 1 || inputIndexValue == 3) {inputNormalNote.legnth = 4;}
             else inputNormalNote.legnth = 0;
             inputNormalNote.isPowered = false;

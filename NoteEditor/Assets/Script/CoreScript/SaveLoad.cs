@@ -289,30 +289,35 @@ public class SaveLoad : MonoBehaviour
                 {
                     case 1:
                         autoPos.x = -300;
+                        autoPos.z = 0;
                         break;
 
                     case 2:
                         autoPos.x = -100;
+                        autoPos.z = 0;
                         break;
 
                     case 3:
                         autoPos.x = +100;
+                        autoPos.z = 0;
                         break;
 
                     case 4:
                         autoPos.x = +300;
+                        autoPos.z = 0;
                         break;
 
                     case 5:
                         autoPos.x = -200;
+                        autoPos.z = -.01f;
                         break;
 
                     case 6:
                         autoPos.x = +200;
+                        autoPos.z = -.01f;
                         break;
                 }
                 autoPos.y = normalNote.pos;
-                autoPos.z = 0;
                 copyObject.transform.localPosition = autoPos;
 
                 normalNote.noteObject = copyObject;

@@ -38,6 +38,21 @@ public class NoteClasses : MonoBehaviour
         SpeedNote.Sorting();
         EffectNote.Sorting();
     }
+    public static void EnableCollider(bool isActive)
+    {
+        foreach(NormalNote note in NormalNote.normalNotes)
+        {
+            note.noteObject.GetComponent<BoxCollider2D>().enabled = isActive;
+        }
+        foreach(SpeedNote note in SpeedNote.speedNotes)
+        {
+            note.noteObject.GetComponent<BoxCollider2D>().enabled = isActive;
+        }
+        foreach(EffectNote note in EffectNote.effectNotes)
+        {
+            note.noteObject.GetComponent<BoxCollider2D>().enabled = isActive;
+        }
+    }
     public static IEnumerator CalculateNoteMs()
     {
         NormalNote editNormal;

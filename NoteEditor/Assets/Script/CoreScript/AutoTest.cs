@@ -52,7 +52,6 @@ public class AutoTest : MonoBehaviour
     private void Awake()
     {
         autoTest = this;
-        TestEnd();
     }
     private void FixedUpdate()
     {
@@ -73,6 +72,7 @@ public class AutoTest : MonoBehaviour
                 else {StartCoroutine(LongNoteEffect(autoTestNormal.line, autoTestNormal.legnth));}
 
                 testIndex[0]++;
+                ScoreManager.scoreManager.AutoTestComboAdd();
                 if (testIndex[0] >= autoTestNormalNotes.Count) {isTesting[0] = false;}
                 else {autoTestNormal = autoTestNormalNotes[testIndex[0]];}
             }
@@ -116,7 +116,7 @@ public class AutoTest : MonoBehaviour
         else {MovingPos.y = EffectPos + SpeedPos + ((s_testMs - SpeedMs - EffectMs) * s_testBpm) / 150;}
 
         MovingField[0].localPosition = - MovingPos;
-        MovingField[1].localPosition = - MovingPos * 3;
+        MovingField[1].localPosition = -3.0f * MovingPos * 4;
     }
     private void Test(float startPos)
     {
@@ -142,6 +142,16 @@ public class AutoTest : MonoBehaviour
             autoNormalNote.isPowered = normalNote.isPowered;
             autoNormalNote.legnth = normalNote.legnth;
             autoNormalNote.noteObject = Instantiate(normalNote.noteObject, autoNoteField.transform);
+            autoNormalNote.noteObject.GetComponent<BoxCollider2D>().enabled = false;
+            Vector3 pos = autoNormalNote.noteObject.transform.localPosition;
+            pos.y *= 4;
+            autoNormalNote.noteObject.transform.localPosition = pos;
+            if (autoNormalNote.legnth != 0)
+            {
+                Vector3 scale = autoNormalNote.noteObject.transform.localScale;
+                scale.y *= 4;
+                autoNormalNote.noteObject.transform.localScale = scale;
+            }
             autoTestNormalNotes.Add(autoNormalNote);
         }
         for (int i = 0; i < SpeedNote.speedNotes.Count; i++)
@@ -250,8 +260,10 @@ public class AutoTest : MonoBehaviour
         s_testMs = 0;
         autoMusic.Stop();
         MovingPos = new Vector3(0, 1600 * PageSystem.nowOnPage, 0);
-        MovingField[0].localPosition = MovingPos;
+        MovingField[0].transform.localPosition = new Vector3(0, 0, 0);
         MovingField[1].localPosition = MovingPos;
+        ScoreManager.scoreManager.AutoTestComboReset();
+        NoteClasses.EnableCollider(true);
     }
     private void autoJudgeEffect(int line, bool isLong = false)
     {
@@ -274,6 +286,7 @@ public class AutoTest : MonoBehaviour
         SpeedPos = 0;
         EffectPos = 0;
         NoteClasses.SortingNotes();
+        NoteClasses.EnableCollider(false);
         yield return NoteClasses.CalculateNoteMs();
         Test(startPos);
     }
@@ -298,6 +311,7 @@ public class AutoTest : MonoBehaviour
             autoTestAnimator[line - 1].SetTrigger(AnimateTrigger);
             autoTestPreviewAnimator[line - 1].SetTrigger(AnimateTrigger);
             autoTestJudgeSound[1].Play();
+            ScoreManager.scoreManager.AutoTestComboAdd();
             yield return new WaitForSeconds(15 / s_testBpm);
         }
     }

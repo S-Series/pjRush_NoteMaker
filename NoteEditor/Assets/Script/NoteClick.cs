@@ -14,6 +14,7 @@ public class NoteClick : MonoBehaviour
         if (AutoTest.s_isTest) return;
         if (InputManager.isNoteInputAble) return;
 
+        NoteEdit.CheckSelect();
         NoteEdit.isNoteEdit = true;
         NoteEdit.Selected = this.gameObject;
         if (tag == NormalNoteTag || tag == BottomNoteTag)
