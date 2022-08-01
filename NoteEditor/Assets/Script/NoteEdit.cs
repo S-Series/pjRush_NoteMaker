@@ -576,17 +576,6 @@ public class NoteEdit : MonoBehaviour
 
         int line = SelectedNormal.line;
         float[] range = new float[2]{SelectedNormal.pos, SelectedNormal.pos + 100.0f * legnth};
-        foreach (NormalNote noraml in NormalNote.normalNotes)
-        {
-            if (noraml.line == line)
-            {
-                if (noraml.pos >= range[0] && noraml.pos <= range[1])
-                {
-                    inputNormalLegnth.text = "overlap";
-                    return;
-                }
-            }
-        }
         Vector3 noteScale;
         SelectedNormal.legnth = legnth;
         noteScale = Selected.transform.localScale;

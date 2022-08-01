@@ -197,6 +197,7 @@ public class NormalNote
     public float ms;
     public float pos;
     public bool isPowered;
+    public bool isRight;
     public static void Sorting()
     {
         normalNotes.Sort(delegate (NormalNote A, NormalNote B)

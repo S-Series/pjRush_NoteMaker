@@ -11,7 +11,7 @@ public class SaveLoad : MonoBehaviour
     public static bool s_isWorking = false;
 
     static NoteSavedData noteSaved = new NoteSavedData();
-    private const string editorVersion = "0.9.9";
+    private const string editorVersion = "0.9.11";
     private float bpm;
     private static bool isSaving = false;
     private static bool isLoading = false;
@@ -194,9 +194,7 @@ public class SaveLoad : MonoBehaviour
             ValueManager.DisplayValue();
 
             for (int i = 0; i < NoteField.transform.childCount; i++)
-            {
-                Destroy(NoteField.transform.GetChild(i).gameObject);
-            }
+                { Destroy(NoteField.transform.GetChild(i).gameObject); }
 
             NoteClasses.ResetNotes();
             for (int i = 0; i < noteSaved.NoteMs.Count; i++)
@@ -210,6 +208,8 @@ public class SaveLoad : MonoBehaviour
                 catch { normalNote.pos = noteSaved.bpm * normalNote.ms / 150.0f; }
                 try { normalNote.isPowered = noteSaved.isNotePowered[i]; }
                 catch { normalNote.isPowered = false; }
+                try { normalNote.isRight = noteSaved.isNoteRight[i]; }
+                catch { normalNote.isRight = false; }
                 NormalNote.normalNotes.Add(normalNote);
             }
             if (NormalNote.normalNotes.Count != 0)
@@ -514,6 +514,7 @@ public class NoteSavedData
     public List<float> NotePos = new List<float>();
     public List<int> NoteLine = new List<int>();
     public List<bool> isNotePowered = new List<bool>();
+    public List<bool> isNoteRight = new List<bool>();
 
     public List<float> EffectMs = new List<float>();
     public List<float> EffectPos = new List<float>();

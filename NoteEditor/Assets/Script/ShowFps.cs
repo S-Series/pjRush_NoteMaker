@@ -33,7 +33,6 @@ public class ShowFps : MonoBehaviour
 
     void OnGUI()//소스로 GUI 표시.
     {
-
         msec = deltaTime * 1000.0f;
         fps = 1.0f / deltaTime;  //초당 프레임 - 1초에
 
