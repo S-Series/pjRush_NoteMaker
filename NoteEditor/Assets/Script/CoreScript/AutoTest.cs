@@ -23,7 +23,7 @@ public class AutoTest : MonoBehaviour
     public AudioSource autoMusic;
     
     //*SerializeField -----------------------------------------------*//
-    [SerializeField] private GameObject autoNoteField;
+    [SerializeField] private GameObject[] autoNoteField;
     [SerializeField] private GameObject[] autoTestViewObject;
     [SerializeField] private Transform[] MovingField;
     [SerializeField] private Animator[] autoTestAnimator;
@@ -127,9 +127,13 @@ public class AutoTest : MonoBehaviour
         autoTestSpeedNotes = new List<SpeedNote>();
         autoTestEffectNotes = new List<EffectNote>();
         autoTestEffectBpm = new List<float>();
-        for (int i = 0; i < autoNoteField.transform.childCount; i++)
+        for (int i = 0; i < autoNoteField[0].transform.childCount; i++)
         {
-            Destroy(autoNoteField.transform.GetChild(i).gameObject);
+            Destroy(autoNoteField[0].transform.GetChild(i).gameObject);
+        }
+        for (int i = 0; i < autoNoteField[1].transform.childCount; i++)
+        {
+            Destroy(autoNoteField[1].transform.GetChild(i).gameObject);
         }
         //*-------------------------------------------------------------------
         for (int i = 0; i < NormalNote.normalNotes.Count; i++)
@@ -141,7 +145,9 @@ public class AutoTest : MonoBehaviour
             autoNormalNote.line = normalNote.line;
             autoNormalNote.isPowered = normalNote.isPowered;
             autoNormalNote.legnth = normalNote.legnth;
-            autoNormalNote.noteObject = Instantiate(normalNote.noteObject, autoNoteField.transform);
+            if (autoNormalNote.isRight)
+                { autoNormalNote.noteObject = Instantiate(normalNote.noteObject, autoNoteField[1].transform); }
+            else { autoNormalNote.noteObject = Instantiate(normalNote.noteObject, autoNoteField[0].transform); }
             autoNormalNote.noteObject.GetComponent<BoxCollider2D>().enabled = false;
             Vector3 pos = autoNormalNote.noteObject.transform.localPosition;
             pos.y *= 4;

@@ -56,7 +56,6 @@ public class NoteEdit : MonoBehaviour
         OriginalSector.SetActive(false);
         EffectSector.SetActive(true);
         SpeedSector.SetActive(false);
-        EffectManager.isEffectSelected = true;
     }
     public void SectorSetSpeed()
     {
@@ -89,7 +88,6 @@ public class NoteEdit : MonoBehaviour
 
                 selectedType = SelectedType.Null;
                 isNoteEdit = false;
-                EffectManager.isEffectSelected = false;
                 switch (Selected.gameObject.tag)
                 {
                     case "chip":
