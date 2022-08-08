@@ -8,6 +8,7 @@ using TMPro;
 public class AutoTest : MonoBehaviour
 {
     private const string AnimateTrigger = "Play";
+    private const float testSpeed = 2.5f;
 
     //*Static -----------------------------------------------*//
     public static AutoTest autoTest;
@@ -116,7 +117,8 @@ public class AutoTest : MonoBehaviour
         else {MovingPos.y = EffectPos + SpeedPos + ((s_testMs - SpeedMs - EffectMs) * s_testBpm) / 150;}
 
         MovingField[0].localPosition = - MovingPos;
-        MovingField[1].localPosition = -3.0f * MovingPos * 4;
+        MovingField[1].localPosition = -3.0f * MovingPos * testSpeed;
+        MovingField[2].localPosition = -3.0f * MovingPos * testSpeed;
     }
     private void Test(float startPos)
     {
@@ -150,12 +152,18 @@ public class AutoTest : MonoBehaviour
             else { autoNormalNote.noteObject = Instantiate(normalNote.noteObject, autoNoteField[0].transform); }
             autoNormalNote.noteObject.GetComponent<BoxCollider2D>().enabled = false;
             Vector3 pos = autoNormalNote.noteObject.transform.localPosition;
-            pos.y *= 4;
+            pos.y *= testSpeed;
             autoNormalNote.noteObject.transform.localPosition = pos;
             if (autoNormalNote.legnth != 0)
             {
                 Vector3 scale = autoNormalNote.noteObject.transform.localScale;
-                scale.y *= 4;
+                scale.y *= testSpeed;
+                autoNormalNote.noteObject.transform.localScale = scale;
+            }
+            else 
+            {
+                Vector3 scale = autoNormalNote.noteObject.transform.localScale;
+                scale.y /= testSpeed;
                 autoNormalNote.noteObject.transform.localScale = scale;
             }
             autoTestNormalNotes.Add(autoNormalNote);
