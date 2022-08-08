@@ -145,11 +145,9 @@ public class AutoTest : MonoBehaviour
             autoNormalNote.ms = normalNote.ms;
             autoNormalNote.pos = normalNote.pos;
             autoNormalNote.line = normalNote.line;
-            autoNormalNote.isPowered = normalNote.isPowered;
+            autoNormalNote.status = normalNote.status;
             autoNormalNote.legnth = normalNote.legnth;
-            if (autoNormalNote.isRight)
-                { autoNormalNote.noteObject = Instantiate(normalNote.noteObject, autoNoteField[1].transform); }
-            else { autoNormalNote.noteObject = Instantiate(normalNote.noteObject, autoNoteField[0].transform); }
+            autoNormalNote.noteObject = Instantiate(normalNote.noteObject, autoNoteField[0].transform);
             autoNormalNote.noteObject.GetComponent<BoxCollider2D>().enabled = false;
             Vector3 pos = autoNormalNote.noteObject.transform.localPosition;
             pos.y *= testSpeed;

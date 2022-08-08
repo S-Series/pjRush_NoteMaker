@@ -112,7 +112,8 @@ public class InputManager : MonoBehaviour
             inputNormalNote.pos = generatePos.y;
             if (inputIndexValue == 1 || inputIndexValue == 3) {inputNormalNote.legnth = 4;}
             else inputNormalNote.legnth = 0;
-            inputNormalNote.isPowered = false;
+            if (inputIndexValue == 6) {inputNormalNote.status = NormalNote.Status.Simpled;}
+            else { inputNormalNote.status = NormalNote.Status.Noraml; }
             inputNormalNote.noteObject = copyObject;
             NormalNote.normalNotes.Add(inputNormalNote);
 
@@ -129,7 +130,7 @@ public class InputManager : MonoBehaviour
         isNoteBottom = isBottom;
         isNoteOther = isOthers;
         inputCollider.SetActive(true);
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < 7; i++)
         {
             if (i == previewIndex) 
             {

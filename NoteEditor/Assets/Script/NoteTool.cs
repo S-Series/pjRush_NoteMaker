@@ -7,9 +7,9 @@ public class NoteTool : MonoBehaviour
     InputManager input;
     [SerializeField] Transform frameObject;
     private static GameObject Frame;
-    private readonly float[] posX = new float[3]{-5.0f, 112.5f, 230.0f};
+    private readonly float[] posX = new float[4]{-5.0f, 112.5f, 230.0f, 347.5f};
     private readonly float[] posY = new float[2]{-50.0f, -170.0f};
-    private enum Status {Note, LongNote, Bottom, BottomLong, Speed, Effect};
+    private enum Status {Note, LongNote, Bottom, BottomLong, Speed, Effect, Tik};
     private Status status = Status.Note;
     private void Start()
     {
@@ -49,6 +49,10 @@ public class NoteTool : MonoBehaviour
                         break;
 
                     case Status.Effect:
+                        ButtonTik();
+                        break;
+
+                    case Status.Tik:
                         ButtonChip();
                         break;
                 }
@@ -94,5 +98,11 @@ public class NoteTool : MonoBehaviour
         input.PreviewActivate(5, false, true);
         status = Status.Effect;
         frameObject.localPosition = new Vector3(posX[2], posY[1], 0.0f);
+    }
+    public void ButtonTik()
+    {
+        input.PreviewActivate(6, false, false);
+        status = Status.Effect;
+        frameObject.localPosition = new Vector3(posX[3], posY[0], 0.0f);   
     }
 }

@@ -122,7 +122,7 @@ public class NoteEdit : MonoBehaviour
                 {
                     if (SelectedNormal.legnth == 0)
                     {
-                        SelectedNormal.isPowered = !SelectedNormal.isPowered;
+                        //SelectedNormal.isPowered = !SelectedNormal.isPowered;
                     }
                 }
             }

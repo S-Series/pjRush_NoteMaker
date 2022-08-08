@@ -101,7 +101,7 @@ public class SaveLoad : MonoBehaviour
             noteSaved.NotePos.Add(savingNotes.pos);
             noteSaved.NoteLine.Add(savingNotes.line);
             noteSaved.NoteLegnth.Add(savingNotes.legnth);
-            noteSaved.isNotePowered.Add(savingNotes.isPowered);
+            noteSaved.NoteStatuses.Add(savingNotes.status);
             yield return null;
         }
         for (int i = 0; i < SpeedNote.speedNotes.Count; i++)
@@ -206,10 +206,8 @@ public class SaveLoad : MonoBehaviour
                 normalNote.legnth = noteSaved.NoteLegnth[i];
                 try { normalNote.pos = noteSaved.NotePos[i]; }
                 catch { normalNote.pos = noteSaved.bpm * normalNote.ms / 150.0f; }
-                try { normalNote.isPowered = noteSaved.isNotePowered[i]; }
-                catch { normalNote.isPowered = false; }
-                try { normalNote.isRight = noteSaved.isNoteRight[i]; }
-                catch { normalNote.isRight = false; }
+                try { normalNote.status = noteSaved.NoteStatuses[i]; }
+                catch { normalNote.status = NormalNote.Status.Noraml; }
                 NormalNote.normalNotes.Add(normalNote);
             }
             if (NormalNote.normalNotes.Count != 0)
@@ -513,8 +511,7 @@ public class NoteSavedData
     public List<float> NoteMs = new List<float>();
     public List<float> NotePos = new List<float>();
     public List<int> NoteLine = new List<int>();
-    public List<bool> isNotePowered = new List<bool>();
-    public List<bool> isNoteRight = new List<bool>();
+    public List<NormalNote.Status> NoteStatuses = new List<NormalNote.Status>();
 
     public List<float> EffectMs = new List<float>();
     public List<float> EffectPos = new List<float>();

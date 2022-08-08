@@ -191,13 +191,13 @@ public class NoteClasses : MonoBehaviour
 public class NormalNote
 {
     public static List<NormalNote> normalNotes = new List<NormalNote>();
+    public enum Status { Noraml, Powered, Simpled };
     public GameObject noteObject;
     public int line;
     public int legnth;
     public float ms;
     public float pos;
-    public bool isPowered;
-    public bool isRight;
+    public Status status = Status.Noraml;
     public static void Sorting()
     {
         normalNotes.Sort(delegate (NormalNote A, NormalNote B)
