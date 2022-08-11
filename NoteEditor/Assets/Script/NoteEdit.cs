@@ -73,8 +73,6 @@ public class NoteEdit : MonoBehaviour
         selectedType = SelectedType.Null;
         isNoteEdit = false;
         guidePosSector = 1;
-        ResetNoteInfo();
-
         SectorSetOriginal();
     }
     private void Update()
@@ -112,25 +110,15 @@ public class NoteEdit : MonoBehaviour
                 SelectedSpeed = null;
                 SelectedEffect = null;
                 toggleNormalPowered.interactable = false;
-                ResetNoteInfo();
                 SectorSetOriginal();
             }
 
-            if (Input.GetKeyDown(KeyCode.Tab))
+            if (Input.GetKeyDown(KeyCode.F))
             {
-                if (Selected.tag == NormalNoteTag)
-                {
-                    if (SelectedNormal.legnth == 0)
-                    {
-                        //SelectedNormal.isPowered = !SelectedNormal.isPowered;
-                    }
-                }
+                btnPowered(false);
             }
 
-            if (Input.GetKeyDown(KeyCode.Delete))
-            {
-                DeleteNote();
-            }
+            if (Input.GetKeyDown(KeyCode.Delete)) { DeleteNote(); }
 
             if (Selected != null)
             {
@@ -139,7 +127,11 @@ public class NoteEdit : MonoBehaviour
 
                 if (Input.GetKeyDown(KeyCode.UpArrow))
                 {
-                    if ((Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)))
+                    if ((Input.GetKey(KeyCode.LeftControl)))
+                    {
+                        MovePage(isUp:true);
+                    }
+                    else if ((Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)))
                     {
                         if (selectedType == SelectedType.Normal)
                         {
@@ -152,7 +144,11 @@ public class NoteEdit : MonoBehaviour
                 }
                 if (Input.GetKeyDown(KeyCode.DownArrow))
                 {
-                    if ((Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)))
+                    if ((Input.GetKey(KeyCode.LeftControl)))
+                    {
+                        MovePage(isUp:false);
+                    }
+                    else if ((Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)))
                     {
                         if (selectedType == SelectedType.Normal)
                         {
@@ -169,7 +165,6 @@ public class NoteEdit : MonoBehaviour
         if (Selected == null)
         {
             isNoteEdit = false;
-            ResetNoteInfo();
         }
     }
     private void LengthNote(int length)
@@ -246,6 +241,66 @@ public class NoteEdit : MonoBehaviour
         NotePosition(pos);
         DisplayNoteInfo();
     }
+    private void MovePage(bool isUp)
+    {
+        int nowPage;
+        float nowPos;
+        Vector3 nowVec;
+        nowVec = Selected.transform.localPosition;
+        switch (selectedType)
+        {
+            case SelectedType.Normal:
+                nowPos = SelectedNormal.pos % 1600.0f;
+                nowPage = Mathf.FloorToInt(SelectedNormal.pos / 1600) + 1;
+                break;
+
+            case SelectedType.Speed:
+                nowPage = Mathf.FloorToInt(SelectedSpeed.pos / 1600) + 1;
+                nowPos = SelectedNormal.pos % 1600.0f;
+                break;
+
+            case SelectedType.Effect:
+                nowPage = Mathf.FloorToInt(SelectedEffect.pos / 1600) + 1;
+                nowPos = SelectedNormal.pos % 1600.0f;
+                break;
+
+            case SelectedType.Null:
+            default: return;
+        }
+
+        if (isUp)
+        {
+            if (nowPage > 998) { return; }
+            nowPage++;
+        }
+        else
+        {
+            if (nowPage < 1) { return; }
+            nowPage--;
+        }
+        
+        switch (selectedType)
+        {
+            case SelectedType.Normal:
+                SelectedNormal.pos = (1600.0f * (nowPage - 1)) + nowPos;
+                Selected.transform.localPosition = new Vector3(nowVec.x, SelectedNormal.pos, nowVec.z);
+                break;
+
+            case SelectedType.Speed:
+                SelectedSpeed.pos = (1600.0f * (nowPage - 1)) + nowPos;
+                Selected.transform.localPosition = new Vector3(nowVec.x, SelectedSpeed.pos, nowVec.z);
+                break;
+
+            case SelectedType.Effect:
+                SelectedEffect.pos = (1600.0f * (nowPage - 1)) + nowPos;
+                Selected.transform.localPosition = new Vector3(nowVec.x, SelectedEffect.pos, nowVec.z);
+                break;
+
+            case SelectedType.Null:
+            default: return;
+        }
+        DisplayNoteInfo();
+    }
     private void NotePosition(Vector3 inputPos)
     {
         Selected.transform.localPosition = inputPos;
@@ -281,10 +336,6 @@ public class NoteEdit : MonoBehaviour
             else { return; }
         }
     }
-    private void ResetNoteInfo()
-    {
-
-    }
     private void DeleteNote()
     {
         if (SelectedNormal != null) NormalNote.DeleteNote(SelectedNormal);
@@ -306,9 +357,16 @@ public class NoteEdit : MonoBehaviour
                 inputNotePos.text = 
                     (SelectedNormal.pos % 1600.0f).ToString();
                 inputNotePage.text = Mathf.FloorToInt(SelectedNormal.pos / 1600.0f).ToString();
-                if (SelectedNormal.line >= 5) {inputNormalLine.text = (SelectedNormal.line - 4).ToString();}
-                else {inputNormalLine.text = SelectedNormal.line.ToString();}
+                if (SelectedNormal.line >= 5)
+                    {inputNormalLine.text = (SelectedNormal.line - 4).ToString();}
+                else 
+                {
+                    inputNormalLine.text = SelectedNormal.line.ToString();
+                    if (!SelectedNormal.isSimpled && SelectedNormal.legnth == 0) 
+                        { toggleNormalPowered.interactable = true; }
+                }
                 inputNormalLegnth.text = SelectedNormal.legnth.ToString();
+                toggleNormalPowered.isOn = SelectedNormal.isPowered;
                 break;
 
             case SpeedNoteTag:
@@ -462,7 +520,7 @@ public class NoteEdit : MonoBehaviour
         print(notePos.y);
         DisplayNoteInfo();
     }
-    /*public void btnPos(bool isUp, bool isPage)
+    public void btnPos(bool isUp, bool isPage)
     {
         float addPos;
         if (isUp) addPos = 100.0f;
@@ -492,7 +550,7 @@ public class NoteEdit : MonoBehaviour
                 break;
         }
         DisplayNoteInfo();
-    }*/
+    }
     // NormalNote
     public void inputValueLine()
     {
@@ -578,6 +636,18 @@ public class NoteEdit : MonoBehaviour
         SelectedNormal.legnth = legnth;
         noteScale = Selected.transform.localScale;
         noteScale.y = 100.0f * legnth;
+        DisplayNoteInfo();
+    }
+    public void btnPowered(bool byToggle)
+    {
+        if (selectedType != SelectedType.Normal) return;
+        if (SelectedNormal.isSimpled) return;
+        if (SelectedNormal.legnth != 0) return;
+        if (!byToggle) { toggleNormalPowered.isOn = !toggleNormalPowered.isOn; }
+        SpriteRenderer childSprite;
+        childSprite = Selected.transform.GetChild(0).GetComponent<SpriteRenderer>();
+        childSprite.enabled = toggleNormalPowered.isOn;
+        SelectedNormal.isPowered = toggleNormalPowered.isOn;
         DisplayNoteInfo();
     }
     // SpeedNote

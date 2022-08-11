@@ -191,17 +191,23 @@ public class NoteClasses : MonoBehaviour
 public class NormalNote
 {
     public static List<NormalNote> normalNotes = new List<NormalNote>();
-    public enum Status { Noraml, Powered, Simpled };
     public GameObject noteObject;
     public int line;
     public int legnth;
     public float ms;
     public float pos;
-    public Status status = Status.Noraml;
+    public bool isPowered;
+    public bool isSimpled;
     public static void Sorting()
     {
         normalNotes.Sort(delegate (NormalNote A, NormalNote B)
         {
+            if (Mathf.Approximately(A.pos, B.pos))
+            {
+                if (!A.isSimpled && B.isSimpled) return +1;
+                else if (A.isSimpled && !B.isSimpled) return -1;
+                else ;
+            }
             if (A.pos > B.pos) return +1;
             else if (A.pos < B.pos) return -1;
             else

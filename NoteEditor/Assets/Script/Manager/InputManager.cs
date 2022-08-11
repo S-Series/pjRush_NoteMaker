@@ -42,7 +42,7 @@ public class InputManager : MonoBehaviour
                 isNoteInputAble = false;
                 NoteTool.disableFrame();
                 NoteEdit.noteEdit.SectorSetOriginal();
-                for (int i = 0; i < 6; i++)
+                for (int i = 0; i < 7; i++)
                 {
                     PreviewNote[i].SetActive(false);
                 }
@@ -112,8 +112,8 @@ public class InputManager : MonoBehaviour
             inputNormalNote.pos = generatePos.y;
             if (inputIndexValue == 1 || inputIndexValue == 3) {inputNormalNote.legnth = 4;}
             else inputNormalNote.legnth = 0;
-            if (inputIndexValue == 6) {inputNormalNote.status = NormalNote.Status.Simpled;}
-            else { inputNormalNote.status = NormalNote.Status.Noraml; }
+            if (inputIndexValue == 6) { inputNormalNote.isSimpled = true; }
+            else { inputNormalNote.isSimpled = false; }
             inputNormalNote.noteObject = copyObject;
             NormalNote.normalNotes.Add(inputNormalNote);
 

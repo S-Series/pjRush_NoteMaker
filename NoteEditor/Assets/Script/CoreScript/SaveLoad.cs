@@ -101,7 +101,8 @@ public class SaveLoad : MonoBehaviour
             noteSaved.NotePos.Add(savingNotes.pos);
             noteSaved.NoteLine.Add(savingNotes.line);
             noteSaved.NoteLegnth.Add(savingNotes.legnth);
-            noteSaved.NoteStatuses.Add(savingNotes.status);
+            noteSaved.NotePowered.Add(savingNotes.isPowered);
+            noteSaved.NoteSimpled.Add(savingNotes.isSimpled);
             yield return null;
         }
         for (int i = 0; i < SpeedNote.speedNotes.Count; i++)
@@ -206,8 +207,8 @@ public class SaveLoad : MonoBehaviour
                 normalNote.legnth = noteSaved.NoteLegnth[i];
                 try { normalNote.pos = noteSaved.NotePos[i]; }
                 catch { normalNote.pos = noteSaved.bpm * normalNote.ms / 150.0f; }
-                try { normalNote.status = noteSaved.NoteStatuses[i]; }
-                catch { normalNote.status = NormalNote.Status.Noraml; }
+                try { normalNote.isPowered = noteSaved.NotePowered[i]; }
+                catch { normalNote.isPowered = false; }
                 NormalNote.normalNotes.Add(normalNote);
             }
             if (NormalNote.normalNotes.Count != 0)
@@ -272,6 +273,8 @@ public class SaveLoad : MonoBehaviour
                     if (normalNote.legnth == 0)
                     {
                         copyObject = Instantiate(PrefabObject[0], NoteField.transform);
+                        copyObject.transform.GetChild(0).GetComponent
+                            <SpriteRenderer>().enabled = normalNote.isSimpled;
                     }
                     else
                     {
@@ -511,7 +514,8 @@ public class NoteSavedData
     public List<float> NoteMs = new List<float>();
     public List<float> NotePos = new List<float>();
     public List<int> NoteLine = new List<int>();
-    public List<NormalNote.Status> NoteStatuses = new List<NormalNote.Status>();
+    public List<bool> NotePowered = new List<bool>();
+    public List<bool> NoteSimpled = new List<bool>();
 
     public List<float> EffectMs = new List<float>();
     public List<float> EffectPos = new List<float>();

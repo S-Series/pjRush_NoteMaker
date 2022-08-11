@@ -8,7 +8,7 @@ using TMPro;
 public class AutoTest : MonoBehaviour
 {
     private const string AnimateTrigger = "Play";
-    private const float testSpeed = 2.5f;
+    private const float testSpeed = 3.0f;
 
     //*Static -----------------------------------------------*//
     public static AutoTest autoTest;
@@ -24,7 +24,7 @@ public class AutoTest : MonoBehaviour
     public AudioSource autoMusic;
     
     //*SerializeField -----------------------------------------------*//
-    [SerializeField] private GameObject[] autoNoteField;
+    [SerializeField] private GameObject autoNoteField;
     [SerializeField] private GameObject[] autoTestViewObject;
     [SerializeField] private Transform[] MovingField;
     [SerializeField] private Animator[] autoTestAnimator;
@@ -118,7 +118,6 @@ public class AutoTest : MonoBehaviour
 
         MovingField[0].localPosition = - MovingPos;
         MovingField[1].localPosition = -3.0f * MovingPos * testSpeed;
-        MovingField[2].localPosition = -3.0f * MovingPos * testSpeed;
     }
     private void Test(float startPos)
     {
@@ -129,13 +128,9 @@ public class AutoTest : MonoBehaviour
         autoTestSpeedNotes = new List<SpeedNote>();
         autoTestEffectNotes = new List<EffectNote>();
         autoTestEffectBpm = new List<float>();
-        for (int i = 0; i < autoNoteField[0].transform.childCount; i++)
+        for (int i = 0; i < autoNoteField.transform.childCount; i++)
         {
-            Destroy(autoNoteField[0].transform.GetChild(i).gameObject);
-        }
-        for (int i = 0; i < autoNoteField[1].transform.childCount; i++)
-        {
-            Destroy(autoNoteField[1].transform.GetChild(i).gameObject);
+            Destroy(autoNoteField.transform.GetChild(i).gameObject);
         }
         //*-------------------------------------------------------------------
         for (int i = 0; i < NormalNote.normalNotes.Count; i++)
@@ -145,9 +140,9 @@ public class AutoTest : MonoBehaviour
             autoNormalNote.ms = normalNote.ms;
             autoNormalNote.pos = normalNote.pos;
             autoNormalNote.line = normalNote.line;
-            autoNormalNote.status = normalNote.status;
+            autoNormalNote.isPowered = normalNote.isPowered;
             autoNormalNote.legnth = normalNote.legnth;
-            autoNormalNote.noteObject = Instantiate(normalNote.noteObject, autoNoteField[0].transform);
+            autoNormalNote.noteObject = Instantiate(normalNote.noteObject, autoNoteField.transform);
             autoNormalNote.noteObject.GetComponent<BoxCollider2D>().enabled = false;
             Vector3 pos = autoNormalNote.noteObject.transform.localPosition;
             pos.y *= testSpeed;
@@ -163,6 +158,12 @@ public class AutoTest : MonoBehaviour
                 Vector3 scale = autoNormalNote.noteObject.transform.localScale;
                 scale.y /= testSpeed;
                 autoNormalNote.noteObject.transform.localScale = scale;
+                if (autoNormalNote.isSimpled)
+                {
+                    Vector3 guideScale = autoNormalNote.noteObject.transform.GetChild(0).localScale;
+                    guideScale.y *= testSpeed;
+                    autoNormalNote.noteObject.transform.GetChild(0).localScale = guideScale;
+                }
             }
             autoTestNormalNotes.Add(autoNormalNote);
         }

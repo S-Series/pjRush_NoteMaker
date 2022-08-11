@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 7363486463903387942}
   m_Layer: 0
   m_Name: TikNote
-  m_TagString: Untagged
+  m_TagString: Normal
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
