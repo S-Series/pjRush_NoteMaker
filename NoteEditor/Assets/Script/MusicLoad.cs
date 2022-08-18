@@ -39,7 +39,7 @@ public class MusicLoad : MonoBehaviour
     {
         loadSuccessCheck.SetActive(false);
         string path;
-        path = Application.dataPath + "/" + songName.text + ".mp3";
+        path = Application.dataPath + "/_DataBox/" + songName.text + ".mp3";
         // Debug.Log(path);
         using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(path, AudioType.MPEG))
         {

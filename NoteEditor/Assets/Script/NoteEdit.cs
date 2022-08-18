@@ -640,15 +640,13 @@ public class NoteEdit : MonoBehaviour
     }
     public void btnPowered(bool byToggle)
     {
-        if (selectedType != SelectedType.Normal) return;
-        if (SelectedNormal.legnth != 0) return;
-        if (SelectedNormal.line > 4) return;
+        if (selectedType != SelectedType.Normal) { print("1"); return; }
+        if (SelectedNormal.legnth != 0) { print("2"); return; }
+        if (SelectedNormal.line > 4) { print("3"); return; }
         if (!byToggle) { toggleNormalPowered.isOn = !toggleNormalPowered.isOn; }
-        GameObject childObject;
-        childObject = Selected.transform.GetChild(0).gameObject;
-        childObject.SetActive(toggleNormalPowered.isOn);
-        //Selected.GetComponent<SpriteRenderer>().enabled = !toggleNormalPowered.isOn;
+        Selected.transform.GetChild(0).gameObject.SetActive(toggleNormalPowered.isOn);
         SelectedNormal.isPowered = toggleNormalPowered.isOn;
+        print(SelectedNormal.isPowered);
         DisplayNoteInfo();
     }
     // SpeedNote

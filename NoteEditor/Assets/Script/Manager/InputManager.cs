@@ -76,10 +76,6 @@ public class InputManager : MonoBehaviour
             inputSpeedNote.multiply = 1.00f;
             inputSpeedNote.noteObject = copyObject;
             SpeedNote.speedNotes.Add(inputSpeedNote);
-
-            NoteEdit.Selected = copyObject;
-            NoteEdit.SelectedSpeed = inputSpeedNote;
-            NoteEdit.selectedType = NoteEdit.SelectedType.Speed;
         }
         else if (inputIndexValue == 5)
         {
@@ -91,10 +87,6 @@ public class InputManager : MonoBehaviour
             inputEffectNote.value = 400.0f;
             inputEffectNote.noteObject = copyObject;
             EffectNote.effectNotes.Add(inputEffectNote);
-
-            NoteEdit.Selected = copyObject;
-            NoteEdit.SelectedEffect = inputEffectNote;
-            NoteEdit.selectedType = NoteEdit.SelectedType.Effect;
         }
         else
         {
@@ -116,10 +108,6 @@ public class InputManager : MonoBehaviour
             else { inputNormalNote.isPowered = false; }
             inputNormalNote.noteObject = copyObject;
             NormalNote.normalNotes.Add(inputNormalNote);
-
-            NoteEdit.Selected = copyObject;
-            NoteEdit.SelectedNormal = inputNormalNote;
-            NoteEdit.selectedType = NoteEdit.SelectedType.Normal;
         }
         NoteEdit.noteEdit.DisplayNoteInfo();
     }

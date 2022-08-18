@@ -11,7 +11,7 @@ public class SaveLoad : MonoBehaviour
     public static bool s_isWorking = false;
 
     static NoteSavedData noteSaved = new NoteSavedData();
-    private const string editorVersion = "0.9.11";
+    private const string editorVersion = "0.9.11.hotfix_B";
     private float bpm;
     private static bool isSaving = false;
     private static bool isLoading = false;
@@ -130,7 +130,8 @@ public class SaveLoad : MonoBehaviour
         try
         {
             string jsonData = JsonUtility.ToJson(noteSaved, true);
-            string path = Path.Combine(Application.dataPath, inputFileName.text + ".json");
+            string path = Application.dataPath + "/_DataBox/" + inputFileName.text + ".json";
+            print(path);
             File.WriteAllText(path, jsonData);
             PlayerPrefs.SetString("NoteFileName", inputFileName.text);
             StartCoroutine(DisplaySaveCompleteMessage(true));
@@ -153,7 +154,7 @@ public class SaveLoad : MonoBehaviour
         NoteClasses.ResetNotes();
         try
         {
-            string path = Path.Combine(Application.dataPath, inputFileName.text + ".json");
+            string path = Application.dataPath + "/_DataBox/" + inputFileName.text + ".json";
             string jsonData = File.ReadAllText(path);
             print(path);
             noteSaved = JsonUtility.FromJson<NoteSavedData>(jsonData);

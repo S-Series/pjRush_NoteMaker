@@ -1,0 +1,18 @@
+{
+    "Version": "0.9.11.hotfix_B",
+    "bpm": 120.0,
+    "startDelayMs": 0,
+    "NoteLegnth": [],
+    "NoteMs": [],
+    "NotePos": [],
+    "NoteLine": [],
+    "NotePowered": [],
+    "EffectMs": [],
+    "EffectPos": [],
+    "EffectForce": [],
+    "EffectIsPause": [],
+    "SpeedMs": [],
+    "SpeedPos": [],
+    "SpeedBpm": [],
+    "SpeedNum": []
+}
