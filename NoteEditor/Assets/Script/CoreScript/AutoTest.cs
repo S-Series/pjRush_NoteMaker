@@ -70,7 +70,7 @@ public class AutoTest : MonoBehaviour
                 if (autoTestNormal == null) {autoTestNormal = autoTestNormalNotes[testIndex[0]];}
 
                 if (autoTestNormal.legnth == 0) {autoJudgeEffect(autoTestNormal.line);}
-                else {StartCoroutine(LongNoteEffect(autoTestNormal.line, autoTestNormal.legnth));}
+                else {StartCoroutine(LongNoteEffect(autoTestNormal.line, autoTestNormal.legnth, autoTestNormal.noteObject));}
 
                 testIndex[0]++;
                 ScoreManager.scoreManager.AutoTestComboAdd();
@@ -158,12 +158,13 @@ public class AutoTest : MonoBehaviour
                 Vector3 scale = autoNormalNote.noteObject.transform.localScale;
                 scale.y /= testSpeed;
                 autoNormalNote.noteObject.transform.localScale = scale;
-                if (autoNormalNote.isSimpled)
+                /*if (autoNormalNote.isPowered)
                 {
-                    Vector3 guideScale = autoNormalNote.noteObject.transform.GetChild(0).localScale;
-                    guideScale.y *= testSpeed;
-                    autoNormalNote.noteObject.transform.GetChild(0).localScale = guideScale;
-                }
+                    Vector3 guideScale = autoNormalNote.noteObject.
+                        transform.GetChild(0).GetChild(0).localScale;
+                    guideScale.y *= testSpeed * 2.0f;
+                    autoNormalNote.noteObject.transform.GetChild(0).GetChild(0).localScale = guideScale;
+                }*/
             }
             autoTestNormalNotes.Add(autoNormalNote);
         }
@@ -297,6 +298,7 @@ public class AutoTest : MonoBehaviour
         s_testMs = 0;
         SpeedMs = 0;
         SpeedPos = 0;
+        EffectMs = 0;
         EffectPos = 0;
         NoteClasses.SortingNotes();
         NoteClasses.EnableCollider(false);
@@ -317,8 +319,9 @@ public class AutoTest : MonoBehaviour
         yield return new WaitForSeconds(autoTestMultiply * waitMs);
         autoMusic.Play();
     }
-    private IEnumerator LongNoteEffect(int line, int legnth)
+    private IEnumerator LongNoteEffect(int line, int legnth, GameObject note)
     {
+        note.GetComponent<Animator>().SetTrigger("Catch");
         for (int i = 0; i < legnth; i ++)
         {
             autoTestAnimator[line - 1].SetTrigger(AnimateTrigger);
@@ -327,6 +330,7 @@ public class AutoTest : MonoBehaviour
             ScoreManager.scoreManager.AutoTestComboAdd();
             yield return new WaitForSeconds(15 / s_testBpm);
         }
+        note.GetComponent<Animator>().SetTrigger("Exit");
     }
     private IEnumerator EffectNoteStart(float startPos, float startMs, float value,  float bpm, bool isPause)
     {

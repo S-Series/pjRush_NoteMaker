@@ -362,7 +362,7 @@ public class NoteEdit : MonoBehaviour
                 else 
                 {
                     inputNormalLine.text = SelectedNormal.line.ToString();
-                    if (!SelectedNormal.isSimpled && SelectedNormal.legnth == 0) 
+                    if (!SelectedNormal.isPowered && SelectedNormal.legnth == 0) 
                         { toggleNormalPowered.interactable = true; }
                 }
                 inputNormalLegnth.text = SelectedNormal.legnth.ToString();
@@ -641,12 +641,13 @@ public class NoteEdit : MonoBehaviour
     public void btnPowered(bool byToggle)
     {
         if (selectedType != SelectedType.Normal) return;
-        if (SelectedNormal.isSimpled) return;
         if (SelectedNormal.legnth != 0) return;
+        if (SelectedNormal.line > 4) return;
         if (!byToggle) { toggleNormalPowered.isOn = !toggleNormalPowered.isOn; }
-        SpriteRenderer childSprite;
-        childSprite = Selected.transform.GetChild(0).GetComponent<SpriteRenderer>();
-        childSprite.enabled = toggleNormalPowered.isOn;
+        GameObject childObject;
+        childObject = Selected.transform.GetChild(0).gameObject;
+        childObject.SetActive(toggleNormalPowered.isOn);
+        //Selected.GetComponent<SpriteRenderer>().enabled = !toggleNormalPowered.isOn;
         SelectedNormal.isPowered = toggleNormalPowered.isOn;
         DisplayNoteInfo();
     }

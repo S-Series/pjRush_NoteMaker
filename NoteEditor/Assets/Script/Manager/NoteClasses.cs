@@ -197,16 +197,14 @@ public class NormalNote
     public float ms;
     public float pos;
     public bool isPowered;
-    public bool isSimpled;
     public static void Sorting()
     {
         normalNotes.Sort(delegate (NormalNote A, NormalNote B)
         {
             if (Mathf.Approximately(A.pos, B.pos))
             {
-                if (!A.isSimpled && B.isSimpled) return +1;
-                else if (A.isSimpled && !B.isSimpled) return -1;
-                else ;
+                if (!A.isPowered && B.isPowered) return +1;
+                else if (A.isPowered && !B.isPowered) return -1;
             }
             if (A.pos > B.pos) return +1;
             else if (A.pos < B.pos) return -1;

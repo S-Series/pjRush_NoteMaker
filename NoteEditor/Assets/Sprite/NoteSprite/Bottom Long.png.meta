@@ -115,9 +115,9 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 243
-        width: 580
-        height: 81
+        y: 680
+        width: 2304
+        height: 340
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -136,9 +136,9 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 162
-        width: 580
-        height: 81
+        y: 340
+        width: 2304
+        height: 340
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -157,9 +157,9 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 81
-        width: 580
-        height: 81
+        y: 0
+        width: 2304
+        height: 340
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -169,27 +169,6 @@ TextureImporter:
       bones: []
       spriteID: 44724790ed7809ca0800000000000000
       internalID: -6012156114828515516
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Bottom Long_3
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 0
-        width: 580
-        height: 81
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: c59fb22068b751860800000000000000
-      internalID: 7500036569947699548
       vertices: []
       indices: 
       edges: []

@@ -112,8 +112,8 @@ public class InputManager : MonoBehaviour
             inputNormalNote.pos = generatePos.y;
             if (inputIndexValue == 1 || inputIndexValue == 3) {inputNormalNote.legnth = 4;}
             else inputNormalNote.legnth = 0;
-            if (inputIndexValue == 6) { inputNormalNote.isSimpled = true; }
-            else { inputNormalNote.isSimpled = false; }
+            if (inputIndexValue == 6) { inputNormalNote.isPowered = true; }
+            else { inputNormalNote.isPowered = false; }
             inputNormalNote.noteObject = copyObject;
             NormalNote.normalNotes.Add(inputNormalNote);
 
