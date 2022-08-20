@@ -20,7 +20,7 @@ public class NoteEdit : MonoBehaviour
     private const string BottomNoteTag = "Bottom";
     private const string SpeedNoteTag = "Bpm";
     private const string EffectNoteTag = "Effect";
-    public enum SelectedType {Null, Normal, Speed, Effect}
+    public enum SelectedType { Null, Normal, Speed, Effect }
     public static SelectedType selectedType = SelectedType.Null;
 
     //* ---------------------------------------------
@@ -129,14 +129,14 @@ public class NoteEdit : MonoBehaviour
                 {
                     if ((Input.GetKey(KeyCode.LeftControl)))
                     {
-                        MovePage(isUp:true);
+                        MovePage(isUp: true);
                     }
                     else if ((Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)))
                     {
                         if (selectedType == SelectedType.Normal)
                         {
-                            if (SelectedNormal.legnth == 0) {MoveNote(Up: true);}
-                            else {LengthNote(SelectedNormal.legnth + 1);}
+                            if (SelectedNormal.legnth == 0) { MoveNote(Up: true); }
+                            else { LengthNote(SelectedNormal.legnth + 1); }
                         }
                         else { MoveNote(Up: true); }
                     }
@@ -146,14 +146,14 @@ public class NoteEdit : MonoBehaviour
                 {
                     if ((Input.GetKey(KeyCode.LeftControl)))
                     {
-                        MovePage(isUp:false);
+                        MovePage(isUp: false);
                     }
                     else if ((Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)))
                     {
                         if (selectedType == SelectedType.Normal)
                         {
-                            if (SelectedNormal.legnth == 0) {MoveNote(Down: true);}
-                            else {LengthNote(SelectedNormal.legnth - 1);}
+                            if (SelectedNormal.legnth == 0) { MoveNote(Down: true); }
+                            else { LengthNote(SelectedNormal.legnth - 1); }
                         }
                         else { MoveNote(Down: true); }
                     }
@@ -193,7 +193,7 @@ public class NoteEdit : MonoBehaviour
         {
             int count;
             float inputPos;
-            count = Mathf.FloorToInt( pos.y / (1600.0f / GuideGenerate.GuideCount)) + 1;
+            count = Mathf.FloorToInt(pos.y / (1600.0f / GuideGenerate.GuideCount)) + 1;
             inputPos = Mathf.Floor(1600.0f / GuideGenerate.GuideCount * 100) * count / 100;
             if (inputPos >= 1600.0f * 999) inputPos = 1600.0f * 999;
             pos.y = inputPos;
@@ -202,7 +202,7 @@ public class NoteEdit : MonoBehaviour
         {
             int count;
             float inputPos;
-            count = Mathf.CeilToInt( pos.y / (1600.0f / GuideGenerate.GuideCount)) - 1;
+            count = Mathf.CeilToInt(pos.y / (1600.0f / GuideGenerate.GuideCount)) - 1;
             inputPos = Mathf.Ceil(1600.0f / GuideGenerate.GuideCount * 100) * count / 100;
             if (inputPos < 0.0f) inputPos = 0.0f;
             pos.y = inputPos;
@@ -256,12 +256,12 @@ public class NoteEdit : MonoBehaviour
 
             case SelectedType.Speed:
                 nowPage = Mathf.FloorToInt(SelectedSpeed.pos / 1600) + 1;
-                nowPos = SelectedNormal.pos % 1600.0f;
+                nowPos = SelectedSpeed.pos % 1600.0f;
                 break;
 
             case SelectedType.Effect:
                 nowPage = Mathf.FloorToInt(SelectedEffect.pos / 1600) + 1;
-                nowPos = SelectedNormal.pos % 1600.0f;
+                nowPos = SelectedEffect.pos % 1600.0f;
                 break;
 
             case SelectedType.Null:
@@ -278,7 +278,7 @@ public class NoteEdit : MonoBehaviour
             if (nowPage < 1) { return; }
             nowPage--;
         }
-        
+
         switch (selectedType)
         {
             case SelectedType.Normal:
@@ -318,7 +318,7 @@ public class NoteEdit : MonoBehaviour
         else
         {
             if (SelectedNormal == null) SelectedNormal = NormalNote.GetClass(Selected);
-            SelectedNormal.pos = inputPos.y; 
+            SelectedNormal.pos = inputPos.y;
             if (Selected.CompareTag("Normal"))
             {
                 if (Mathf.Approximately(-300.0f, inputPos.x)) SelectedNormal.line = 1;
@@ -354,16 +354,16 @@ public class NoteEdit : MonoBehaviour
             case BottomNoteTag:
                 selectedType = SelectedType.Normal;
                 SectorSetOriginal();
-                inputNotePos.text = 
+                inputNotePos.text =
                     (SelectedNormal.pos % 1600.0f).ToString();
                 inputNotePage.text = Mathf.FloorToInt(SelectedNormal.pos / 1600.0f).ToString();
                 if (SelectedNormal.line >= 5)
-                    {inputNormalLine.text = (SelectedNormal.line - 4).ToString();}
-                else 
+                { inputNormalLine.text = (SelectedNormal.line - 4).ToString(); }
+                else
                 {
                     inputNormalLine.text = SelectedNormal.line.ToString();
-                    if (!SelectedNormal.isPowered && SelectedNormal.legnth == 0) 
-                        { toggleNormalPowered.interactable = true; }
+                    if (!SelectedNormal.isPowered && SelectedNormal.legnth == 0)
+                    { toggleNormalPowered.interactable = true; }
                 }
                 inputNormalLegnth.text = SelectedNormal.legnth.ToString();
                 toggleNormalPowered.isOn = SelectedNormal.isPowered;
@@ -388,7 +388,7 @@ public class NoteEdit : MonoBehaviour
                 {
                     isPauseOnOff[0].SetActive(true);
                     isPauseOnOff[1].SetActive(false);
-                    
+
                 }
                 else
                 {
@@ -396,7 +396,7 @@ public class NoteEdit : MonoBehaviour
                     isPauseOnOff[1].SetActive(true);
                 }
                 break;
-                
+
             default:
                 selectedType = SelectedType.Null;
                 Debug.LogError("NoteType Out Of Range");
@@ -406,9 +406,9 @@ public class NoteEdit : MonoBehaviour
     }
     public static void CheckSelect()
     {
-        if (Selected != null) 
+        if (Selected != null)
         {
-            Selected.GetComponentInChildren<SpriteRenderer>().color 
+            Selected.GetComponentInChildren<SpriteRenderer>().color
             = new Color32(255, 255, 255, 255);
         }
     }
@@ -444,7 +444,7 @@ public class NoteEdit : MonoBehaviour
             }
             Selected.transform.localPosition = notePos;
         }
-        catch 
+        catch
         {
             switch (selectedType)
             {
@@ -470,7 +470,7 @@ public class NoteEdit : MonoBehaviour
     {
         int page;
         Vector3 notePos;
-        try {page = Convert.ToInt32(inputNotePage.text);}
+        try { page = Convert.ToInt32(inputNotePage.text); }
         catch
         {
             switch (selectedType)
@@ -566,7 +566,7 @@ public class NoteEdit : MonoBehaviour
                 {
                     SelectedNormal.line = 5;
                     notePos.x = -200.0f;
-                } 
+                }
                 else if (line == 2)
                 {
                     SelectedNormal.line = 6;
@@ -631,7 +631,7 @@ public class NoteEdit : MonoBehaviour
         }
 
         int line = SelectedNormal.line;
-        float[] range = new float[2]{SelectedNormal.pos, SelectedNormal.pos + 100.0f * legnth};
+        float[] range = new float[2] { SelectedNormal.pos, SelectedNormal.pos + 100.0f * legnth };
         Vector3 noteScale;
         SelectedNormal.legnth = legnth;
         noteScale = Selected.transform.localScale;
@@ -640,9 +640,9 @@ public class NoteEdit : MonoBehaviour
     }
     public void btnPowered(bool byToggle)
     {
-        if (selectedType != SelectedType.Normal) { print("1"); return; }
-        if (SelectedNormal.legnth != 0) { print("2"); return; }
-        if (SelectedNormal.line > 4) { print("3"); return; }
+        if (selectedType != SelectedType.Normal) { return; }
+        if (SelectedNormal.legnth != 0) { return; }
+        if (SelectedNormal.line > 4) { return; }
         if (!byToggle) { toggleNormalPowered.isOn = !toggleNormalPowered.isOn; }
         Selected.transform.GetChild(0).gameObject.SetActive(toggleNormalPowered.isOn);
         SelectedNormal.isPowered = toggleNormalPowered.isOn;
@@ -666,12 +666,13 @@ public class NoteEdit : MonoBehaviour
             return;
         }
         SelectedSpeed.bpm = inputBpm;
-        //ToDo : 텍스트 표시하기
+        DisplaySpeedText(SelectedSpeed);
         DisplayNoteInfo();
     }
     public void inputValueMultiply()
     {
         if (Selected == null) return;
+        if (SelectedSpeed == null) return;
         if (selectedType != SelectedType.Speed) return;
         float inputMultiply;
         try
@@ -685,8 +686,13 @@ public class NoteEdit : MonoBehaviour
             return;
         }
         SelectedSpeed.multiply = inputMultiply;
-        //ToDo : 텍스트 표시하기
+        DisplaySpeedText(SelectedSpeed);
         DisplayNoteInfo();
+    }
+    public void DisplaySpeedText(SpeedNote _speedNote)
+    {
+        _speedNote.noteObject.GetComponentInChildren<TextMeshPro>().text
+            = string.Format("{0:F2}", _speedNote.bpm) + " x " + string.Format("{0:F1}", _speedNote.multiply);
     }
     // EffectNote
     public void btnTypeChange()
@@ -715,13 +721,13 @@ public class NoteEdit : MonoBehaviour
         if (Selected == null)
         {
             Debug.Log("run");
-            return;    
+            return;
         }
         if (selectedType != SelectedType.Effect) return;
-        
+
 
         float inputValue;
-        try {inputValue = Convert.ToSingle(inputEffectValue.text);}
+        try { inputValue = Convert.ToSingle(inputEffectValue.text); }
         catch
         {
             inputEffectValue.text = SelectedEffect.value.ToString();
@@ -759,9 +765,9 @@ public class NoteEdit : MonoBehaviour
             }
         }*/
         SelectedEffect.value = inputValue;
-        
+
         Selected.GetComponentInChildren<TextMeshPro>().text = inputValue.ToString();
         Selected.transform.GetChild(0).GetChild(0).localScale = new Vector3(3.25f, inputValue, 1.0f);
-        
+
     }
 }

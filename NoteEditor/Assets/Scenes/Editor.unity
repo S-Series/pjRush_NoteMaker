@@ -11369,6 +11369,36 @@ MeshRenderer:
   m_SortingLayerID: -179495133
   m_SortingLayer: 4
   m_SortingOrder: 2
+--- !u!1 &417910174
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 417910175}
+  m_Layer: 0
+  m_Name: NoteBox
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &417910175
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 417910174}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1323971629}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &421561555
 GameObject:
   m_ObjectHideFlags: 0
@@ -15252,7 +15282,7 @@ SpriteRenderer:
   m_SortingLayer: 2
   m_SortingOrder: 15
   m_Sprite: {fileID: 21300000, guid: 250c0d2ac0b57084985002128b98cd59, type: 3}
-  m_Color: {r: 1, g: 0.7254902, b: 0, a: 0.39215687}
+  m_Color: {r: 0, g: 0.16618204, b: 1, a: 0.78431374}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -20224,6 +20254,36 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 760730572}
   m_CullTransparentMesh: 0
+--- !u!1 &769306360
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 769306361}
+  m_Layer: 0
+  m_Name: GuideBox
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &769306361
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 769306360}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1323971629}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &771488920
 GameObject:
   m_ObjectHideFlags: 0
@@ -25775,7 +25835,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   autoMusic: {fileID: 294824912}
-  autoNoteField: {fileID: 1323971628}
+  autoNoteField: {fileID: 417910174}
   autoTestViewObject:
   - {fileID: 623726048}
   - {fileID: 1368010575}
@@ -25799,6 +25859,9 @@ MonoBehaviour:
   autoTestJudgeSound:
   - {fileID: 1482244681}
   - {fileID: 66680482}
+  GuideLine: {fileID: 4336387985356658915, guid: b6d0868d32511a34a951c70c37b5579c,
+    type: 3}
+  GuideLineBox: {fileID: 769306361}
   testLoadingBlock:
   - {fileID: 705176918}
   - {fileID: 1798552980}
@@ -30666,7 +30729,9 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: -4800, z: -0}
   m_LocalScale: {x: 1, y: 3, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 417910175}
+  - {fileID: 769306361}
   m_Father: {fileID: 264438620}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -50296,9 +50361,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '120
-
-    x 1'
+  m_text: Bpm  x  Multiply
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 9a51bdf2bb91d924086c3de8d1232bf4, type: 2}
   m_sharedMaterial: {fileID: -4825197400760029201, guid: 9a51bdf2bb91d924086c3de8d1232bf4,
@@ -51161,7 +51224,7 @@ Transform:
   m_GameObject: {fileID: 3533958091954600382}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 17.1875, y: 0.30875, z: 1}
+  m_LocalScale: {x: 17.1875, y: 0.294, z: 1}
   m_Children: []
   m_Father: {fileID: 3019012243308904855}
   m_RootOrder: 0
@@ -51225,7 +51288,7 @@ Transform:
   m_GameObject: {fileID: 8900672144508374396}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 17, y: 0.3125, z: 1}
+  m_LocalScale: {x: 17, y: 0.294, z: 1}
   m_Children: []
   m_Father: {fileID: 1114509353862159667}
   m_RootOrder: 0

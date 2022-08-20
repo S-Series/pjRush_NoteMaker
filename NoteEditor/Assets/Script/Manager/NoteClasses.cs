@@ -273,11 +273,16 @@ public class EffectNote
     {
         effectNotes.Sort(delegate (EffectNote A, EffectNote B)
         {
-            if (Mathf.Approximately(A.pos, B.pos)) {Debug.Log("Note Overlap"); return 0;}
+            //if (Mathf.Approximately(A.pos, B.pos)) {Debug.Log("Note Overlap"); return 0;}
 
-            if (A.pos > B.pos) {return +1;}
-            else if (A.pos < B.pos) {return -1;}
-            else {return 0;}
+            if (A.pos > B.pos) { return +1; }
+            else if (A.pos < B.pos) { return -1; }
+            else
+            {
+                if (A.isPause && !B.isPause) { return +1; }
+                else if (!A.isPause && B.isPause) { return -1; }
+                else return 0;
+            }
         });
     }
     public static EffectNote GetClass(GameObject _noteObject)

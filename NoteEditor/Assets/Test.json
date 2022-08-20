@@ -1,37 +1,12 @@
 {
-    "Version": "0.9.11",
+    "Version": "0.9.11.hotfix_B",
     "bpm": 120.0,
     "startDelayMs": 0,
-    "NoteLegnth": [
-        0,
-        0,
-        0,
-        0
-    ],
-    "NoteMs": [
-        0.0,
-        0.0,
-        0.0,
-        0.0
-    ],
-    "NotePos": [
-        17600.0,
-        17600.0,
-        17600.0,
-        17600.0
-    ],
-    "NoteLine": [
-        1,
-        2,
-        3,
-        4
-    ],
-    "NotePowered": [
-        false,
-        false,
-        false,
-        false
-    ],
+    "NoteLegnth": [],
+    "NoteMs": [],
+    "NotePos": [],
+    "NoteLine": [],
+    "NotePowered": [],
     "EffectMs": [],
     "EffectPos": [],
     "EffectForce": [],

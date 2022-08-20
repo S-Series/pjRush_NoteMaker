@@ -75,6 +75,7 @@ public class InputManager : MonoBehaviour
             inputSpeedNote.bpm = ValueManager.bpm;
             inputSpeedNote.multiply = 1.00f;
             inputSpeedNote.noteObject = copyObject;
+            NoteEdit.noteEdit.DisplaySpeedText(inputSpeedNote);
             SpeedNote.speedNotes.Add(inputSpeedNote);
         }
         else if (inputIndexValue == 5)

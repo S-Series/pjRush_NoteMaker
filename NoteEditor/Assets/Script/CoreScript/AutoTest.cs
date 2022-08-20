@@ -12,7 +12,7 @@ public class AutoTest : MonoBehaviour
 
     //*Static -----------------------------------------------*//
     public static AutoTest autoTest;
-    public static float s_testMs = 0;
+    public static int s_testMs = 0;
     public static float s_testBpm = 120.0f;
     public static bool s_isTest = false;
     public static List<NormalNote> autoTestNormalNotes = new List<NormalNote>();
@@ -30,6 +30,9 @@ public class AutoTest : MonoBehaviour
     [SerializeField] private Animator[] autoTestAnimator;
     [SerializeField] private Animator[] autoTestPreviewAnimator;
     [SerializeField] private AudioSource[] autoTestJudgeSound;
+    [SerializeField] private GameObject GuideLine;
+    [SerializeField] private Transform GuideLineBox;
+    [SerializeField] private GameObject[] testLoadingBlock;
     
     //*Private -----------------------------------------------*//
     private Vector3 MovingPos = new Vector3(0, 0, 0);
@@ -47,7 +50,7 @@ public class AutoTest : MonoBehaviour
     private NormalNote autoTestNormal;
     private SpeedNote autoTestSpeed;
     private EffectNote autoTestEffect;
-    [SerializeField] private GameObject[] testLoadingBlock;
+    private List<GameObject> GuideLines = new List<GameObject>();
     
     //*Private -----------------------------------------------*//
     private void Awake()
@@ -57,7 +60,7 @@ public class AutoTest : MonoBehaviour
     private void FixedUpdate()
     {
         if (!s_isTest) return;
-        s_testMs+=autoTestMultiply;
+        s_testMs ++;
     }
     private void Update()
     {
@@ -65,7 +68,7 @@ public class AutoTest : MonoBehaviour
         //* NormalNote
         if (isTesting[0])
         {
-            if (autoTestNormal.ms <= s_testMs)
+            if (autoTestNormal.ms <= s_testMs / autoTestMultiply)
             {
                 if (autoTestNormal == null) {autoTestNormal = autoTestNormalNotes[testIndex[0]];}
 
@@ -81,7 +84,7 @@ public class AutoTest : MonoBehaviour
         //* SppedNote
         if (isTesting[1])
         {
-            if (autoTestSpeed.ms <= s_testMs)
+            if (autoTestSpeed.ms <= s_testMs / autoTestMultiply)
             {
                 if (autoTestSpeed == null) {autoTestSpeed = autoTestSpeedNotes[testIndex[1]];}
 
@@ -100,7 +103,7 @@ public class AutoTest : MonoBehaviour
         if (isTesting[2])
         {
             print("testing");
-            if (autoTestEffect.ms <= s_testMs)
+            if (autoTestEffect.ms <= s_testMs / autoTestMultiply)
             {
                 print("test Run");
                 if (autoTestEffect == null) {autoTestEffect = autoTestEffectNotes[testIndex[2]];}
@@ -114,7 +117,7 @@ public class AutoTest : MonoBehaviour
         }
 
         if (isOnEffect) {MovingPos.y = autoTestEffectPos;}
-        else {MovingPos.y = EffectPos + SpeedPos + ((s_testMs - SpeedMs - EffectMs) * s_testBpm) / 150;}
+        else {MovingPos.y = EffectPos + SpeedPos + (((s_testMs / autoTestMultiply) - SpeedMs - EffectMs) * s_testBpm) / 150;}
 
         MovingField[0].localPosition = - MovingPos;
         MovingField[1].localPosition = -3.0f * MovingPos * testSpeed;
@@ -131,6 +134,19 @@ public class AutoTest : MonoBehaviour
         for (int i = 0; i < autoNoteField.transform.childCount; i++)
         {
             Destroy(autoNoteField.transform.GetChild(i).gameObject);
+        }
+        for (int i = 0; i < GuideLines.Count; i++)
+        {
+            Destroy(GuideLines[i]);
+        }
+        GuideLines = new List<GameObject>();
+        for (int i = 0; i < 1000; i++)
+        {
+            GameObject copyObject;
+            copyObject = Instantiate(GuideLine, GuideLineBox);
+            GuideLine.GetComponentInChildren<TextMeshPro>().text = string.Format("{0:D3}", i);
+            GuideLine.transform.localPosition = new Vector3(0.0f, 1600.0f * i * testSpeed, 0.0f);
+            GuideLines.Add(copyObject);
         }
         //*-------------------------------------------------------------------
         for (int i = 0; i < NormalNote.normalNotes.Count; i++)
@@ -179,6 +195,7 @@ public class AutoTest : MonoBehaviour
             autoSpeedNote.noteObject = null;
             autoTestSpeedNotes.Add(autoSpeedNote);
         }
+        int startEffectMs = 0;
         for (int i = 0; i < EffectNote.effectNotes.Count; i++)
         {
             EffectNote effectNote = EffectNote.effectNotes[i];
@@ -199,12 +216,32 @@ public class AutoTest : MonoBehaviour
                     break;
                 }
             }
+            if (autoEffectNote.pos <= startPos)
+            {
+                if (autoEffectNote.isPause) { startEffectMs += Convert.ToInt32(150 * autoEffectNote.value / effectBpm); }
+            }
             autoTestEffectBpm.Add(effectBpm);
-        }
+            foreach(GameObject guide in GuideLines)
+            {
 
+                if (guide.transform.localPosition.y > autoEffectNote.pos)
+                {
+                    Vector3 _pos;
+                    _pos = guide.transform.localPosition;
+                    if (autoEffectNote.isPause)
+                    {
+                        if (_pos.y - autoEffectNote.value <= autoEffectNote.pos) _pos.y = autoEffectNote.pos * testSpeed;
+                        else _pos.y -= autoEffectNote.pos * testSpeed;
+                    }
+                    else { _pos.y += autoEffectNote.pos * testSpeed; }
+                    guide.transform.localPosition = _pos;
+                }
+            }
+        }
         testIndex = new int[3]{0, 0, 0};
         float delayBpm = ValueManager.bpm;
-        float delayMs = 150 * startPos / delayBpm;
+        int delayMs = Convert.ToInt32(150 * startPos / delayBpm);
+        EffectMs = startEffectMs;
         if (!Mathf.Approximately(startPos, 0.0f))
         {
             for (int i = autoTestEffectNotes.Count - 1; i > -1; i--)
@@ -237,7 +274,7 @@ public class AutoTest : MonoBehaviour
                 {
                     SpeedNote retouchSpeed = autoTestSpeedNotes[i];
                     delayBpm = retouchSpeed.bpm;
-                    delayMs = retouchSpeed.ms + 150 * (startPos - retouchSpeed.pos) / delayBpm;
+                    delayMs = Convert.ToInt32(retouchSpeed.ms + 150 * (startPos - retouchSpeed.pos) / delayBpm);
                     testIndex[1] = i;
                     break;
                 }
@@ -305,7 +342,7 @@ public class AutoTest : MonoBehaviour
         yield return NoteClasses.CalculateNoteMs();
         Test(startPos);
     }
-    private IEnumerator StartingTest(float delayMs)
+    private IEnumerator StartingTest(int delayMs)
     {
         testLoadingBlock[0].SetActive(false);
         testLoadingBlock[1].SetActive(true);
