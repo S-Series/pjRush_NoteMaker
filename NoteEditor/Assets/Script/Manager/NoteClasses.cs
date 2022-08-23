@@ -76,9 +76,8 @@ public class NoteClasses : MonoBehaviour
             editMs = calMs;
             editPos = editSpeed.pos;
             editBpm = editSpeed.bpm * editSpeed.multiply;
-            yield return null;
         }
-
+        yield return null;
         //* NormalNote ---------- //
         speedIndex = SpeedNote.speedNotes.Count - 1;
         for (int i = 0; i < NormalNote.normalNotes.Count; i++)
@@ -98,10 +97,8 @@ public class NoteClasses : MonoBehaviour
                     editBpm = SpeedNote.speedNotes[j].bpm * SpeedNote.speedNotes[j].multiply;
                     break;
                 }
-                yield return null;
             }
             editNormal.ms = editMs + (editNormal.pos - editPos) * 150 / editBpm;
-            yield return null;
         }
 
         //* EffectNote ---------- //
@@ -125,7 +122,6 @@ public class NoteClasses : MonoBehaviour
                 }
             }
             editEffect.ms = editMs + (editEffect.pos - editPos) * 150 / editBpm;
-            yield return null;
         }
         editEffect = null;
         editMs = 0;

@@ -15,6 +15,7 @@ public class AutoTest : MonoBehaviour
     public static int s_testMs = 0;
     public static float s_testBpm = 120.0f;
     public static bool s_isTest = false;
+    private static bool s_isPause = false;
     public static List<NormalNote> autoTestNormalNotes = new List<NormalNote>();
     public static List<SpeedNote> autoTestSpeedNotes = new List<SpeedNote>();
     public static List<EffectNote> autoTestEffectNotes = new List<EffectNote>();
@@ -33,6 +34,7 @@ public class AutoTest : MonoBehaviour
     [SerializeField] private GameObject GuideLine;
     [SerializeField] private Transform GuideLineBox;
     [SerializeField] private GameObject[] testLoadingBlock;
+    [SerializeField] private TMP_Dropdown testSpeedDropdown;
     
     //*Private -----------------------------------------------*//
     private Vector3 MovingPos = new Vector3(0, 0, 0);
@@ -41,6 +43,7 @@ public class AutoTest : MonoBehaviour
     private int[] testIndex = new int[3]{0, 0, 0};
     private bool[] isTesting = new bool[3]{true, true, true};
     private bool isOnEffect = false;
+    private bool isPauseAble = false;
     private float autoTestMultiply = 1.0f;
     private float SpeedMs = 0.0f;
     private float SpeedPos = 0.0f;
@@ -60,15 +63,28 @@ public class AutoTest : MonoBehaviour
     private void FixedUpdate()
     {
         if (!s_isTest) return;
+        if (s_isPause) return;
         s_testMs ++;
     }
     private void Update()
     {
         if (!s_isTest) return;
+        if (Input.GetKeyDown(KeyCode.Space) && isPauseAble)
+        {
+            if (s_isPause) 
+            {
+                autoMusic.time 
+                    = ((s_testMs * autoTestMultiply) - EffectMs - ValueManager.delay) / 1000.0f;
+                autoMusic.Play();
+            }
+            else { autoMusic.Pause(); }
+            s_isPause = !s_isPause;
+        }
+        if (s_isPause) return;
         //* NormalNote
         if (isTesting[0])
         {
-            if (autoTestNormal.ms <= s_testMs / autoTestMultiply)
+            if (autoTestNormal.ms <= s_testMs * autoTestMultiply)
             {
                 if (autoTestNormal == null) {autoTestNormal = autoTestNormalNotes[testIndex[0]];}
 
@@ -84,7 +100,7 @@ public class AutoTest : MonoBehaviour
         //* SppedNote
         if (isTesting[1])
         {
-            if (autoTestSpeed.ms <= s_testMs / autoTestMultiply)
+            if (autoTestSpeed.ms <= s_testMs * autoTestMultiply)
             {
                 if (autoTestSpeed == null) {autoTestSpeed = autoTestSpeedNotes[testIndex[1]];}
 
@@ -102,10 +118,8 @@ public class AutoTest : MonoBehaviour
         //* EffectNote
         if (isTesting[2])
         {
-            print("testing");
-            if (autoTestEffect.ms <= s_testMs / autoTestMultiply)
+            if (autoTestEffect.ms <= s_testMs * autoTestMultiply)
             {
-                print("test Run");
                 if (autoTestEffect == null) {autoTestEffect = autoTestEffectNotes[testIndex[2]];}
 
                 StartCoroutine(EffectNoteStart(autoTestEffect.pos, autoTestEffect.ms, autoTestEffect.value, autoTestEffectBpm[testIndex[2]], autoTestEffect.isPause));
@@ -117,13 +131,14 @@ public class AutoTest : MonoBehaviour
         }
 
         if (isOnEffect) {MovingPos.y = autoTestEffectPos;}
-        else {MovingPos.y = EffectPos + SpeedPos + (((s_testMs / autoTestMultiply) - SpeedMs - EffectMs) * s_testBpm) / 150;}
+        else { MovingPos.y = EffectPos + SpeedPos + (((s_testMs * autoTestMultiply) - SpeedMs - EffectMs) * s_testBpm) / 150; }
 
         MovingField[0].localPosition = - MovingPos;
         MovingField[1].localPosition = -3.0f * MovingPos * testSpeed;
     }
     private void Test(float startPos)
     {
+        isPauseAble = false;
         s_testBpm = ValueManager.bpm;
         autoTestViewObject[0].SetActive(true);
         autoTestViewObject[1].SetActive(false);
@@ -221,7 +236,7 @@ public class AutoTest : MonoBehaviour
                 if (autoEffectNote.isPause) { startEffectMs += Convert.ToInt32(150 * autoEffectNote.value / effectBpm); }
             }
             autoTestEffectBpm.Add(effectBpm);
-            foreach(GameObject guide in GuideLines)
+            /*foreach(GameObject guide in GuideLines)
             {
 
                 if (guide.transform.localPosition.y > autoEffectNote.pos)
@@ -236,11 +251,13 @@ public class AutoTest : MonoBehaviour
                     else { _pos.y += autoEffectNote.pos * testSpeed; }
                     guide.transform.localPosition = _pos;
                 }
-            }
+            }*/
         }
         testIndex = new int[3]{0, 0, 0};
         float delayBpm = ValueManager.bpm;
-        int delayMs = Convert.ToInt32(150 * startPos / delayBpm);
+        float calculateMs;
+        calculateMs = (150.0f * startPos / delayBpm) / autoTestMultiply;
+        int delayMs = Convert.ToInt32(calculateMs);
         EffectMs = startEffectMs;
         if (!Mathf.Approximately(startPos, 0.0f))
         {
@@ -274,7 +291,7 @@ public class AutoTest : MonoBehaviour
                 {
                     SpeedNote retouchSpeed = autoTestSpeedNotes[i];
                     delayBpm = retouchSpeed.bpm;
-                    delayMs = Convert.ToInt32(retouchSpeed.ms + 150 * (startPos - retouchSpeed.pos) / delayBpm);
+                    delayMs = Convert.ToInt32(retouchSpeed.ms + 150 * (startPos - retouchSpeed.pos) / delayBpm / autoTestMultiply);
                     testIndex[1] = i;
                     break;
                 }
@@ -299,6 +316,8 @@ public class AutoTest : MonoBehaviour
         else {autoTestEffect = autoTestEffectNotes[testIndex[2]];}
         
         print(delayMs);
+        print(autoTestMultiply);
+        print(delayMs / autoTestMultiply);
         StartCoroutine(StartingTest(delayMs));
     }
     private void TestEnd()
@@ -325,10 +344,20 @@ public class AutoTest : MonoBehaviour
     }
     
     //*Public -----------------------------------------------*//
-
+    public void testSpeedDropDownChange()
+    {
+        s_testMs = Convert.ToInt32(s_testMs * autoTestMultiply);
+        // EffectMs = Convert.ToInt32(EffectMs * autoTestMultiply);
+        autoTestMultiply = Convert.ToSingle(testSpeedDropdown.options[testSpeedDropdown.value].text);
+        s_testMs = Convert.ToInt32(s_testMs / autoTestMultiply);
+        // EffectMs = Convert.ToInt32(EffectMs / autoTestMultiply);
+        autoMusic.pitch = autoTestMultiply;
+        autoMusic.time = ((s_testMs * autoTestMultiply) - ValueManager.delay) / 1000.0f;
+    }
     //*IEnumerator -----------------------------------------------*//
     private IEnumerator StartTest(float startPos)
     {
+        testSpeedDropdown.interactable = false;
         testLoadingBlock[0].SetActive(true);
         testIndex = new int[3]{0, 0, 0};
         isTesting = new bool[3]{true,true,true};
@@ -348,37 +377,41 @@ public class AutoTest : MonoBehaviour
         testLoadingBlock[1].SetActive(true);
         yield return new WaitForSeconds(1.0f);
         s_isTest = true;
+        s_isPause = false;
         s_testMs = delayMs;
         float waitMs = ValueManager.delay / 1000.0f;
-        try { autoMusic.time = delayMs / 1000.0f; }
+        try { autoMusic.time = ((s_testMs + 0) * autoTestMultiply - ValueManager.delay) / 1000.0f; }
         catch { TestEnd(); }
         autoMusic.pitch = autoTestMultiply;
-        yield return new WaitForSeconds(autoTestMultiply * waitMs);
+        yield return new WaitForSeconds(waitMs / autoTestMultiply);
+        autoMusic.time = ((s_testMs + 0) * autoTestMultiply - ValueManager.delay) / 1000.0f;
         autoMusic.Play();
+        testSpeedDropdown.interactable = true;
+        isPauseAble = true;
     }
     private IEnumerator LongNoteEffect(int line, int legnth, GameObject note)
     {
         note.GetComponent<Animator>().SetTrigger("Catch");
         for (int i = 0; i < legnth; i ++)
         {
+            while(s_isPause) { yield return null; }
             autoTestAnimator[line - 1].SetTrigger(AnimateTrigger);
             autoTestPreviewAnimator[line - 1].SetTrigger(AnimateTrigger);
             autoTestJudgeSound[1].Play();
             ScoreManager.scoreManager.AutoTestComboAdd();
-            yield return new WaitForSeconds(15 / s_testBpm);
+            yield return new WaitForSeconds(15 / s_testBpm / autoTestMultiply);
         }
         note.GetComponent<Animator>().SetTrigger("Exit");
     }
     private IEnumerator EffectNoteStart(float startPos, float startMs, float value,  float bpm, bool isPause)
     {
-        print("run effect");
         //* Pause Effect
         if (isPause)
         {
             isOnEffect = true;
             autoTestEffectPos = startPos;
             yield return new WaitForSeconds( (3.0f * value) / (bpm * 20.0f));
-            EffectMs += 150 * value / bpm; 
+            EffectMs += 150 * value / bpm;
             isOnEffect = false;
         }
         //* Teleport Effect

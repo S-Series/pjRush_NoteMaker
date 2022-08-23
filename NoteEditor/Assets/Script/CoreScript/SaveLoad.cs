@@ -11,7 +11,7 @@ public class SaveLoad : MonoBehaviour
     public static bool s_isWorking = false;
 
     static NoteSavedData noteSaved = new NoteSavedData();
-    private const string editorVersion = "0.9.11.hotfix_B";
+    private const string editorVersion = "0.9.11.hotfix_D";
     private float bpm;
     private static bool isSaving = false;
     private static bool isLoading = false;
@@ -331,7 +331,7 @@ public class SaveLoad : MonoBehaviour
                 speedNote = SpeedNote.speedNotes[i];
                 copyObject = Instantiate(PrefabObject[4], NoteField.transform);
                 copyObject.GetComponentInChildren<TextMeshPro>().text
-                    = speedNote.bpm.ToString() + "\nx" + speedNote.multiply.ToString();
+                    = string.Format("{0:F2}", speedNote.bpm) + "  x  " + string.Format("{0:F1}", speedNote.multiply);
                 copyObject.transform.localPosition = new Vector3(0, speedNote.pos, 0);
 
                 speedNote.noteObject = copyObject;
