@@ -38,7 +38,7 @@ public class AutoTest : MonoBehaviour
     //*Private -----------------------------------------------*//
     private Vector3 MovingPos = new Vector3(0, 0, 0);
     private Button[] autoTestButton;
-    private int testStartPage = 1;
+    private int testStartPage = 1, firstLine = 1;
     private int[] testIndex = new int[3]{0, 0, 0};
     private bool[] isTesting = new bool[3]{true, true, true};
     private bool isOnEffect = false;
@@ -190,6 +190,21 @@ public class AutoTest : MonoBehaviour
             }
 
             Vector3 pos = autoNormalNote.noteObject.transform.localPosition;
+            if (autoNormalNote.line < 5)
+            {
+                pos.x = ((firstLine - 1) * -200.0f) + ((autoNormalNote.line * 200.0f) - 500.0f); 
+                if (pos.x < -350.0f) { pos.x += 600.0f; }
+            }
+            else 
+            {
+                if (autoNormalNote.isPowered)
+                {
+                    if (autoNormalNote.line == 5) { firstLine++; }
+                    else { firstLine--; }
+                    if (firstLine < 1) { firstLine += 4; }
+                    else if (firstLine > 4) { firstLine -= 4; }
+                } 
+            }
             pos.y *= testSpeed;
             autoNormalNote.noteObject.transform.localPosition = pos;
 
@@ -336,7 +351,10 @@ public class AutoTest : MonoBehaviour
         else if (isPowered) { autoTestJudgeSound[2].Play(); }
         else { autoTestJudgeSound[0].Play(); }
     }
-    
+    private void BottomPowered(bool _isLeft)
+    {
+
+    }
     //*Public -----------------------------------------------*//
     public void testSpeedDropDownChange()
     {

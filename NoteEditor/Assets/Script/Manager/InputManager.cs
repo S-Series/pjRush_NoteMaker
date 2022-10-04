@@ -43,6 +43,7 @@ public class InputManager : MonoBehaviour
     }
     private void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Tab)) { ToggleChange(true); }
         if (s_isNoteInputAble == true)
         {
             if (Input.GetKeyDown(KeyCode.Escape))
@@ -61,9 +62,6 @@ public class InputManager : MonoBehaviour
         {
             InputObject = NullObject;
             inputCollider.SetActive(false);
-
-            if (Input.GetKeyDown(KeyCode.Tab)) 
-                { s_isInputLong = !s_isInputLong; ToggleChange(); }
         }
     }
     public void NoteLegnthChange()
@@ -74,33 +72,29 @@ public class InputManager : MonoBehaviour
         }
         catch { noteLegnthInput.text = s_noteInputLegnth.ToString(); return; }
 
-        NoteOption _option;
-        if (s_noteInputLegnth < 0)
+        if (!s_isInputLong) { return; }
+        for (int i = 0; i < 3; i++)
         {
-            Vector3 _pos;
-            Vector3 _scale;
+            PreviewNote[i].GetComponent<NoteOption>().ToLongNote(s_noteInputLegnth);
+        }
+    }
+    public void ToggleChange(bool _isKeyboard = false)
+    {
+        if (_isKeyboard) { toggleLong.isOn = !toggleLong.isOn; }
+        s_isInputLong = toggleLong.isOn;
+        if (!s_isInputLong)
+        {
             for (int i = 0; i < 3; i++)
             {
-                _option = PreviewNote[i].GetComponent<NoteOption>();
+                PreviewNote[i].GetComponent<NoteOption>().ToLongNote(0);
             }
         }
         else
         {
-            Vector3 _pos;
-            Vector3 _scale;
             for (int i = 0; i < 3; i++)
             {
-                _option = PreviewNote[i].GetComponent<NoteOption>();
+                PreviewNote[i].GetComponent<NoteOption>().ToLongNote(s_noteInputLegnth);
             }
-        }
-    }
-    public void ToggleChange()
-    {
-        NoteOption _option;
-        s_isInputLong = toggleLong.isOn;
-        for (int i = 0; i < 3; i++)
-        {
-            _option = PreviewNote[i].GetComponent<NoteOption>();
         }
     }
     public void NoteGenerate()
@@ -152,27 +146,12 @@ public class InputManager : MonoBehaviour
             inputNormalNote.ms = 0.0f;
             inputNormalNote.pos = generatePos.y;
 
-            if (s_isInputLong)
-            { 
-                inputNormalNote.legnth = s_noteInputLegnth;
-
-                Vector3 _scale;
-                _scale = copyObject.transform.GetChild(0).localScale;
-                _scale.y = s_noteInputLegnth / 4.0f;
-                copyObject.transform.GetChild(0).localScale = _scale;
-            }
-            else
-            {
-                inputNormalNote.legnth = s_noteInputLegnth;
-
-                Vector3 _scale;
-                _scale = copyObject.transform.GetChild(0).localScale;
-                _scale.y = 0.0f;
-                copyObject.transform.GetChild(0).localScale = _scale;
-            }
-
             if (inputIndexValue == 6) { inputNormalNote.isPowered = true; }
             else { inputNormalNote.isPowered = false; }
+
+            copyObject.GetComponent<NoteOption>().ToLongNote(s_noteInputLegnth);
+            copyObject.GetComponent<NoteOption>().ToPoweredNote(inputNormalNote.isPowered);
+
             inputNormalNote.noteObject = copyObject;
             NormalNote.normalNotes.Add(inputNormalNote);
         }
@@ -187,18 +166,12 @@ public class InputManager : MonoBehaviour
         inputCollider.SetActive(true);
         for (int i = 0; i < 5; i++)
         {
-            if (i == _prefabIndex) 
+            if (i == _prefabIndex)
             {
                 PreviewNote[i].SetActive(true);
                 InputObject = PreviewNote[i];
             }
             else PreviewNote[i].SetActive(false);
-        }
-    
-        if (!_isEffect)
-        {
-            Vector3 _scale;
-            _scale = PreviewNote[_prefabIndex].transform.GetChild(0).localScale;
         }
     }
 }

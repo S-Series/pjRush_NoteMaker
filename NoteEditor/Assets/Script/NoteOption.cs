@@ -43,6 +43,15 @@ public class NoteOption : MonoBehaviour
     {
         NoteObject[0].SetActive(!_isPowered);
         NoteObject[1].SetActive(_isPowered);
+        if (CompareTag("Bottom"))
+        {
+            ArrowRenderer[0].enabled = _isPowered;
+            ArrowRenderer[1].enabled = _isPowered;
+            if (EndRenderer[0].transform.localPosition.y == 0)
+            {
+                ArrowRenderer[1].enabled = false;
+            }
+        }
     }
     public void ToGameMode(bool _isGameMode)
     {

@@ -188,6 +188,7 @@ public class NoteEdit : MonoBehaviour
         else { _legnth--; }
         if (_legnth < 0) { _legnth = 0; }
         _noteOption.ToLongNote(_legnth);
+        SelectedNormal.legnth = _legnth;
     }
     private void MoveNote(bool Up = false, bool Down = false, bool Left = false, bool Right = false)
     {
@@ -651,12 +652,9 @@ public class NoteEdit : MonoBehaviour
     public void btnPowered(bool byToggle)
     {
         if (selectedType != SelectedType.Normal) { return; }
-        if (SelectedNormal.legnth != 0) { return; }
-        if (SelectedNormal.line > 4) { return; }
         bool _isOn;
         _isOn = toggleNormalPowered.isOn;
         if (!byToggle) { toggleNormalPowered.isOn = !_isOn; }
-        Selected.transform.GetChild(0).gameObject.SetActive(_isOn);
         SelectedNormal.isPowered = _isOn;
         SelectedNormal.noteObject.GetComponent<NoteOption>().ToPoweredNote(_isOn);
         DisplayNoteInfo();
