@@ -42,7 +42,13 @@ public class NoteClasses : MonoBehaviour
     {
         foreach(NormalNote note in NormalNote.normalNotes)
         {
-            note.noteObject.GetComponent<BoxCollider2D>().enabled = isActive;
+            for (int i = 0; i < 3; i++)
+            {
+                note.noteObject.transform.GetChild(0).GetChild(i)
+                    .GetComponent<BoxCollider2D>().enabled = isActive;
+                note.noteObject.transform.GetChild(1).GetChild(i)
+                    .GetComponent<BoxCollider2D>().enabled = isActive;
+            }
         }
         foreach(SpeedNote note in SpeedNote.speedNotes)
         {
@@ -188,10 +194,8 @@ public class NormalNote
 {
     public static List<NormalNote> normalNotes = new List<NormalNote>();
     public GameObject noteObject;
-    public int line;
-    public int legnth;
-    public float ms;
-    public float pos;
+    public int line, legnth;
+    public float ms, pos;
     public bool isPowered;
     public static void Sorting()
     {

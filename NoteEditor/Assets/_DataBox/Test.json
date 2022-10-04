@@ -1,0 +1,38 @@
+{
+    "Version": "1.0",
+    "bpm": 120.0,
+    "startDelayMs": 0,
+    "NoteLegnth": [
+        16,
+        16,
+        16
+    ],
+    "NoteMs": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "NotePos": [
+        11200.0,
+        11200.0,
+        11200.0
+    ],
+    "NoteLine": [
+        1,
+        2,
+        3
+    ],
+    "NotePowered": [
+        false,
+        false,
+        false
+    ],
+    "EffectMs": [],
+    "EffectPos": [],
+    "EffectForce": [],
+    "EffectIsPause": [],
+    "SpeedMs": [],
+    "SpeedPos": [],
+    "SpeedBpm": [],
+    "SpeedNum": []
+}

@@ -12,26 +12,37 @@ public class NoteClick : MonoBehaviour
     private void OnMouseDown()
     {
         if (AutoTest.s_isTest) return;
-        if (InputManager.isNoteInputAble) return;
+        if (InputManager.s_isNoteInputAble) return;
+
+        GameObject _noteObject;
+        _noteObject = this.transform.parent.parent.gameObject;
 
         NoteEdit.CheckSelect();
         NoteEdit.isNoteEdit = true;
-        NoteEdit.Selected = this.gameObject;
-        if (tag == NormalNoteTag || tag == BottomNoteTag)
+        NoteEdit.Selected = _noteObject;
+        if (_noteObject.tag == NormalNoteTag || _noteObject.tag == BottomNoteTag)
         {
-            NoteEdit.SelectedNormal = NormalNote.GetClass(this.gameObject);
+            NoteEdit.SelectedNormal = NormalNote.GetClass(_noteObject);
             NoteEdit.selectedType = NoteEdit.SelectedType.Normal;
+            for (int i = 0; i < 3; i++)
+            {
+                _noteObject.transform.GetChild(0).GetChild(i)
+                    .GetComponent<Collider2D>().enabled = false;
+                _noteObject.transform.GetChild(1).GetChild(i)
+                    .GetComponent<Collider2D>().enabled = false;
+            }
         }
         else if (tag == SpeedNoteTag)
         {
-            NoteEdit.SelectedSpeed = SpeedNote.GetClass(this.gameObject);
+            NoteEdit.SelectedSpeed = SpeedNote.GetClass(_noteObject);
             NoteEdit.selectedType = NoteEdit.SelectedType.Speed;
         }
         else if (tag == EffectNoteTag)
         {
-            NoteEdit.SelectedEffect = EffectNote.GetClass(this.gameObject);
+            NoteEdit.SelectedEffect = EffectNote.GetClass(_noteObject);
             NoteEdit.selectedType = NoteEdit.SelectedType.Effect;
         }
+        
         NoteEdit.noteEdit.DisplayNoteInfo();
     }
 }

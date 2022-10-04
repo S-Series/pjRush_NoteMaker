@@ -1,14 +1,18 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 
 public class InputManager : MonoBehaviour
 {
     public static InputManager input;
-    public static bool isNoteInputAble;
-    public static bool isNoteBottom;
-    public static bool isNoteOther;
+    private static int s_noteInputLegnth = 4;
+    private static bool s_isInputLong = false;
+    public static bool s_isNoteInputAble;
+    public static bool s_isNoteBottom;
+    public static bool s_isNoteOther;
     public static Vector3 inputPosValue = new Vector3(0, 0, 0);
     [SerializeField] GameObject NoteField;
     [SerializeField] GameObject EffectField;
@@ -17,6 +21,8 @@ public class InputManager : MonoBehaviour
     [SerializeField] GameObject[] NotePrefab;
     [SerializeField] GameObject NullObject;
     [SerializeField] GameObject inputCollider;
+    [SerializeField] TMP_InputField noteLegnthInput;
+    [SerializeField] Toggle toggleLong;
     public GameObject InputObject;
     private int inputIndexValue = 0;
     public float posY;
@@ -27,22 +33,24 @@ public class InputManager : MonoBehaviour
         {
             gameObject.SetActive(false);
         }
+        ToggleChange();
+        NoteLegnthChange();
     }
     private void Start()
     {
-        isNoteInputAble = false;
-        isNoteBottom = false;
+        s_isNoteInputAble = false;
+        s_isNoteBottom = false;
     }
     private void Update()
     {
-        if (isNoteInputAble == true)
+        if (s_isNoteInputAble == true)
         {
             if (Input.GetKeyDown(KeyCode.Escape))
             {
-                isNoteInputAble = false;
+                s_isNoteInputAble = false;
                 NoteTool.disableFrame();
                 NoteEdit.noteEdit.SectorSetOriginal();
-                for (int i = 0; i < 7; i++)
+                for (int i = 0; i < 5; i++)
                 {
                     PreviewNote[i].SetActive(false);
                 }
@@ -53,6 +61,46 @@ public class InputManager : MonoBehaviour
         {
             InputObject = NullObject;
             inputCollider.SetActive(false);
+
+            if (Input.GetKeyDown(KeyCode.Tab)) 
+                { s_isInputLong = !s_isInputLong; ToggleChange(); }
+        }
+    }
+    public void NoteLegnthChange()
+    {
+        try
+        {
+            s_noteInputLegnth = Convert.ToInt32(noteLegnthInput.text);
+        }
+        catch { noteLegnthInput.text = s_noteInputLegnth.ToString(); return; }
+
+        NoteOption _option;
+        if (s_noteInputLegnth < 0)
+        {
+            Vector3 _pos;
+            Vector3 _scale;
+            for (int i = 0; i < 3; i++)
+            {
+                _option = PreviewNote[i].GetComponent<NoteOption>();
+            }
+        }
+        else
+        {
+            Vector3 _pos;
+            Vector3 _scale;
+            for (int i = 0; i < 3; i++)
+            {
+                _option = PreviewNote[i].GetComponent<NoteOption>();
+            }
+        }
+    }
+    public void ToggleChange()
+    {
+        NoteOption _option;
+        s_isInputLong = toggleLong.isOn;
+        for (int i = 0; i < 3; i++)
+        {
+            _option = PreviewNote[i].GetComponent<NoteOption>();
         }
     }
     public void NoteGenerate()
@@ -103,8 +151,26 @@ public class InputManager : MonoBehaviour
 
             inputNormalNote.ms = 0.0f;
             inputNormalNote.pos = generatePos.y;
-            if (inputIndexValue == 1 || inputIndexValue == 3) {inputNormalNote.legnth = 4;}
-            else inputNormalNote.legnth = 0;
+
+            if (s_isInputLong)
+            { 
+                inputNormalNote.legnth = s_noteInputLegnth;
+
+                Vector3 _scale;
+                _scale = copyObject.transform.GetChild(0).localScale;
+                _scale.y = s_noteInputLegnth / 4.0f;
+                copyObject.transform.GetChild(0).localScale = _scale;
+            }
+            else
+            {
+                inputNormalNote.legnth = s_noteInputLegnth;
+
+                Vector3 _scale;
+                _scale = copyObject.transform.GetChild(0).localScale;
+                _scale.y = 0.0f;
+                copyObject.transform.GetChild(0).localScale = _scale;
+            }
+
             if (inputIndexValue == 6) { inputNormalNote.isPowered = true; }
             else { inputNormalNote.isPowered = false; }
             inputNormalNote.noteObject = copyObject;
@@ -112,21 +178,27 @@ public class InputManager : MonoBehaviour
         }
         NoteEdit.noteEdit.DisplayNoteInfo();
     }
-    public void PreviewActivate(int previewIndex, bool isBottom, bool isOthers)
+    public void PreviewActivate(int _prefabIndex, bool _isBottom = false, bool _isEffect = false)
     {
-        inputIndexValue = previewIndex;
-        isNoteInputAble = true;
-        isNoteBottom = isBottom;
-        isNoteOther = isOthers;
+        inputIndexValue = _prefabIndex;
+        s_isNoteInputAble = true;
+        s_isNoteBottom = _isBottom;
+        s_isNoteOther = _isEffect;
         inputCollider.SetActive(true);
-        for (int i = 0; i < 7; i++)
+        for (int i = 0; i < 5; i++)
         {
-            if (i == previewIndex) 
+            if (i == _prefabIndex) 
             {
                 PreviewNote[i].SetActive(true);
                 InputObject = PreviewNote[i];
             }
             else PreviewNote[i].SetActive(false);
+        }
+    
+        if (!_isEffect)
+        {
+            Vector3 _scale;
+            _scale = PreviewNote[_prefabIndex].transform.GetChild(0).localScale;
         }
     }
 }

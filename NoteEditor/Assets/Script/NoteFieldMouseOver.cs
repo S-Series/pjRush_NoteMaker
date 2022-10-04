@@ -6,20 +6,20 @@ public class NoteFieldMouseOver : MonoBehaviour
 {
     private void OnMouseOver()
     {
-        if (!InputManager.isNoteInputAble) return;
+        if (!InputManager.s_isNoteInputAble) return;
 
         Vector3 previewPos;
         previewPos = this.transform.localPosition;
         previewPos.y = this.transform.parent.localPosition.y;
         
         //* Bottom Note
-        if (InputManager.isNoteBottom)
+        if (InputManager.s_isNoteBottom)
         {
             if (previewPos.x < 0.0f) previewPos.x = -200.0f;
             else previewPos.x = +200.0f;
         }
         //* Effect Note, Speed Note
-        else if (InputManager.isNoteOther)
+        else if (InputManager.s_isNoteOther)
         {
             previewPos.x = 0.0f;
         }
@@ -42,6 +42,6 @@ public class NoteFieldMouseOver : MonoBehaviour
 
     private void OnMouseDown()
     {
-        if (InputManager.isNoteInputAble) { InputManager.input.NoteGenerate(); }
+        if (InputManager.s_isNoteInputAble) { InputManager.input.NoteGenerate(); }
     }
 }

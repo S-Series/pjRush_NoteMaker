@@ -11,7 +11,7 @@ public class SaveLoad : MonoBehaviour
     public static bool s_isWorking = false;
 
     static NoteSavedData noteSaved = new NoteSavedData();
-    private const string editorVersion = "0.9.11.hotfix_D";
+    private const string editorVersion = "1.0";
     private float bpm;
     private static bool isSaving = false;
     private static bool isLoading = false;
@@ -188,8 +188,7 @@ public class SaveLoad : MonoBehaviour
             }
         }
 
-        try
-        {
+        //try {
             ValueManager.bpm = noteSaved.bpm;
             ValueManager.delay = noteSaved.startDelayMs;
             ValueManager.DisplayValue();
@@ -255,36 +254,18 @@ public class SaveLoad : MonoBehaviour
                 normalNote = NormalNote.normalNotes[i];
                 if (normalNote.line >= 5)
                 {
-                    if (normalNote.legnth == 0)
-                    {
-                        copyObject = Instantiate(PrefabObject[2], NoteField.transform);
-                    }
-                    else
-                    {
-                        copyObject = Instantiate(PrefabObject[3], NoteField.transform);
-                        Vector3 scale;
-                        scale = copyObject.transform.localScale;
-                        scale.y = 100.0f * normalNote.legnth;
-                        copyObject.transform.localScale = scale;
-                    }
+                    copyObject = Instantiate(PrefabObject[1], NoteField.transform);
                 }
                 else
                 {
-                    if (normalNote.legnth == 0)
-                    {
-                        copyObject = Instantiate(PrefabObject[0], NoteField.transform);
-                        copyObject.transform.GetChild(0).gameObject.SetActive(normalNote.isPowered);
-                        //copyObject.GetComponent<SpriteRenderer>().enabled = !normalNote.isPowered;
-                    }
-                    else
-                    {
-                        copyObject = Instantiate(PrefabObject[1], NoteField.transform);
-                        Vector3 scale;
-                        scale = copyObject.transform.localScale;
-                        scale.y = 100.0f * normalNote.legnth;
-                        copyObject.transform.localScale = scale;
-                    }
+                    if (normalNote.isPowered) 
+                        { copyObject = Instantiate(PrefabObject[2], NoteField.transform); }
+                    else { copyObject = Instantiate(PrefabObject[0], NoteField.transform); }
                 }
+
+                NoteOption _noteOption;
+                _noteOption = copyObject.GetComponent<NoteOption>();
+                _noteOption.ToLongNote(normalNote.legnth);
 
                 switch (normalNote.line)
                 {
@@ -329,7 +310,7 @@ public class SaveLoad : MonoBehaviour
                 GameObject copyObject;
 
                 speedNote = SpeedNote.speedNotes[i];
-                copyObject = Instantiate(PrefabObject[4], NoteField.transform);
+                copyObject = Instantiate(PrefabObject[3], NoteField.transform);
                 copyObject.GetComponentInChildren<TextMeshPro>().text
                     = string.Format("{0:F2}", speedNote.bpm) + "  x  " + string.Format("{0:F1}", speedNote.multiply);
                 copyObject.transform.localPosition = new Vector3(0, speedNote.pos, 0);
@@ -342,7 +323,7 @@ public class SaveLoad : MonoBehaviour
                 GameObject copyObject;
 
                 effectNote = EffectNote.effectNotes[i];
-                copyObject = Instantiate(PrefabObject[5], NoteField.transform);
+                copyObject = Instantiate(PrefabObject[4], NoteField.transform);
                 copyObject.transform.localPosition = new Vector3(0, effectNote.pos, 0);
                 copyObject.transform.GetChild(0).GetChild(0).localScale
                     = new Vector3(3.25f, effectNote.value, 1.0f);
@@ -355,14 +336,14 @@ public class SaveLoad : MonoBehaviour
             PlayerPrefs.SetString("NoteFileName", inputFileName.text);
             s_isWorking = false;
             BlockObject[1].SetActive(false);
-        }
+        /*}
         catch
         {
             ResetSavedData();
             s_isWorking = false;
             BlockObject[1].SetActive(false);
             Debug.Log("파일 오류");
-        }
+        }*/
     }
     IEnumerator CreateNewJsonData()
     {

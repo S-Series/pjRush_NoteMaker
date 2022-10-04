@@ -8,14 +8,13 @@ using TMPro;
 public class AutoTest : MonoBehaviour
 {
     private const string AnimateTrigger = "Play";
-    private const float testSpeed = 3.0f;
+    public const float testSpeed = 3.0f;
 
     //*Static -----------------------------------------------*//
     public static AutoTest autoTest;
     public static int s_testMs = 0;
     public static float s_testBpm = 120.0f;
-    public static bool s_isTest = false;
-    private static bool s_isPause = false;
+    public static bool s_isTest = false, s_isPause = false;
     public static List<NormalNote> autoTestNormalNotes = new List<NormalNote>();
     public static List<SpeedNote> autoTestSpeedNotes = new List<SpeedNote>();
     public static List<EffectNote> autoTestEffectNotes = new List<EffectNote>();
@@ -45,14 +44,13 @@ public class AutoTest : MonoBehaviour
     private bool isOnEffect = false;
     private bool isPauseAble = false;
     private float autoTestMultiply = 1.0f;
-    private float SpeedMs = 0.0f;
-    private float SpeedPos = 0.0f;
-    private float EffectMs = 0.0f;
-    private float EffectPos = 0.0f;
+    private float SpeedMs = 0.0f, SpeedPos = 0.0f;
+    private float EffectMs = 0.0f, EffectPos = 0.0f;
     private float autoTestEffectPos = 0.0f;
     private NormalNote autoTestNormal;
     private SpeedNote autoTestSpeed;
     private EffectNote autoTestEffect;
+    private NoteOption noteOption;
     private List<GameObject> GuideLines = new List<GameObject>();
     
     //*Private -----------------------------------------------*//
@@ -88,7 +86,8 @@ public class AutoTest : MonoBehaviour
             {
                 if (autoTestNormal == null) {autoTestNormal = autoTestNormalNotes[testIndex[0]];}
 
-                if (autoTestNormal.legnth == 0) {autoJudgeEffect(autoTestNormal.line);}
+                if (autoTestNormal.legnth == 0) 
+                    {autoJudgeEffect(autoTestNormal.line, isPowered:autoTestNormal.isPowered);}
                 else {StartCoroutine(LongNoteEffect(autoTestNormal.line, autoTestNormal.legnth, autoTestNormal.noteObject));}
 
                 testIndex[0]++;
@@ -168,35 +167,32 @@ public class AutoTest : MonoBehaviour
         {
             NormalNote normalNote = NormalNote.normalNotes[i];
             NormalNote autoNormalNote = new NormalNote();
+
+            GameObject _copyObject;
+            _copyObject = Instantiate(normalNote.noteObject, autoNoteField.transform);
+            NoteOption _noteOption;
+            _noteOption = _copyObject.GetComponent<NoteOption>();
+
             autoNormalNote.ms = normalNote.ms;
             autoNormalNote.pos = normalNote.pos;
             autoNormalNote.line = normalNote.line;
             autoNormalNote.isPowered = normalNote.isPowered;
             autoNormalNote.legnth = normalNote.legnth;
-            autoNormalNote.noteObject = Instantiate(normalNote.noteObject, autoNoteField.transform);
-            autoNormalNote.noteObject.GetComponent<BoxCollider2D>().enabled = false;
+            autoNormalNote.noteObject = _copyObject;
+            _copyObject.transform.GetComponent<NoteOption>().ToLongNote(autoNormalNote.legnth, true);
+
+            for (int j = 0; j < 3; j++)
+            {
+                autoNormalNote.noteObject.transform.GetChild(0).GetChild(j)
+                    .GetComponent<BoxCollider2D>().enabled = false;
+                autoNormalNote.noteObject.transform.GetChild(1).GetChild(j)
+                    .GetComponent<BoxCollider2D>().enabled = false;
+            }
+
             Vector3 pos = autoNormalNote.noteObject.transform.localPosition;
             pos.y *= testSpeed;
             autoNormalNote.noteObject.transform.localPosition = pos;
-            if (autoNormalNote.legnth != 0)
-            {
-                Vector3 scale = autoNormalNote.noteObject.transform.localScale;
-                scale.y *= testSpeed;
-                autoNormalNote.noteObject.transform.localScale = scale;
-            }
-            else 
-            {
-                Vector3 scale = autoNormalNote.noteObject.transform.localScale;
-                scale.y /= testSpeed;
-                autoNormalNote.noteObject.transform.localScale = scale;
-                /*if (autoNormalNote.isPowered)
-                {
-                    Vector3 guideScale = autoNormalNote.noteObject.
-                        transform.GetChild(0).GetChild(0).localScale;
-                    guideScale.y *= testSpeed * 2.0f;
-                    autoNormalNote.noteObject.transform.GetChild(0).GetChild(0).localScale = guideScale;
-                }*/
-            }
+
             autoTestNormalNotes.Add(autoNormalNote);
         }
         for (int i = 0; i < SpeedNote.speedNotes.Count; i++)
@@ -315,9 +311,6 @@ public class AutoTest : MonoBehaviour
         if (autoTestEffectNotes.Count == 0) {isTesting[2] = false;}
         else {autoTestEffect = autoTestEffectNotes[testIndex[2]];}
         
-        print(delayMs);
-        print(autoTestMultiply);
-        print(delayMs / autoTestMultiply);
         StartCoroutine(StartingTest(delayMs));
     }
     private void TestEnd()
@@ -335,12 +328,13 @@ public class AutoTest : MonoBehaviour
         ScoreManager.scoreManager.AutoTestComboReset();
         NoteClasses.EnableCollider(true);
     }
-    private void autoJudgeEffect(int line, bool isLong = false)
+    private void autoJudgeEffect(int line, bool isPowered = false, bool isLong = false)
     {
         autoTestAnimator[line - 1].SetTrigger(AnimateTrigger);
         autoTestPreviewAnimator[line - 1].SetTrigger(AnimateTrigger);
-        if (!isLong) {autoTestJudgeSound[0].Play();}
-        else {autoTestJudgeSound[1].Play();}
+        if (isLong) { autoTestJudgeSound[1].Play(); }
+        else if (isPowered) { autoTestJudgeSound[2].Play(); }
+        else { autoTestJudgeSound[0].Play(); }
     }
     
     //*Public -----------------------------------------------*//

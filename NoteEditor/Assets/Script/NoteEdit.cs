@@ -86,25 +86,21 @@ public class NoteEdit : MonoBehaviour
 
                 selectedType = SelectedType.Null;
                 isNoteEdit = false;
-                switch (Selected.gameObject.tag)
+                if (Selected.gameObject.CompareTag("Normal") 
+                    || Selected.gameObject.CompareTag("Bottom"))
                 {
-                    case "chip":
-                    case "long":
-                        NoteEdit.Selected.GetComponentInChildren<SpriteRenderer>()
-                            .color = new Color32(230, 230, 230, 255);
-                        break;
-
-                    case "btChip":
-                        NoteEdit.Selected.GetComponentInChildren<SpriteRenderer>()
-                            .color = new Color32(255, 255, 255, 255);
-                        break;
-
-                    case "btLong":
-                        NoteEdit.Selected.GetComponentInChildren<SpriteRenderer>()
-                            .color = new Color32(255, 255, 255, 150);
-                        break;
+                    for(int i = 0; i < 3; i++)
+                    {
+                        Selected.transform.GetChild(0).GetChild(i).
+                            GetComponent<SpriteRenderer>().color = Color.white;
+                        Selected.transform.GetChild(1).GetChild(i).
+                            GetComponent<SpriteRenderer>().color = Color.white;
+                    }
                 }
-                Selected.GetComponentInChildren<SpriteRenderer>().color = new Color32(255, 255, 255, 255);
+                else
+                { 
+                    Selected.GetComponentInChildren<SpriteRenderer>().color = Color.white;
+                }
                 Selected = null;
                 SelectedNormal = null;
                 SelectedSpeed = null;
@@ -135,8 +131,12 @@ public class NoteEdit : MonoBehaviour
                     {
                         if (selectedType == SelectedType.Normal)
                         {
-                            if (SelectedNormal.legnth == 0) { MoveNote(Up: true); }
-                            else { LengthNote(SelectedNormal.legnth + 1); }
+                            LengthNote(_isUp:true);
+                        }
+                        else if (selectedType == SelectedType.Effect
+                        && !SelectedEffect.isPause)
+                        {
+
                         }
                         else { MoveNote(Up: true); }
                     }
@@ -152,8 +152,12 @@ public class NoteEdit : MonoBehaviour
                     {
                         if (selectedType == SelectedType.Normal)
                         {
-                            if (SelectedNormal.legnth == 0) { MoveNote(Down: true); }
-                            else { LengthNote(SelectedNormal.legnth - 1); }
+                            LengthNote(_isDown:true);
+                        }
+                        else if (selectedType == SelectedType.Effect
+                        && !SelectedEffect.isPause)
+                        {
+
                         }
                         else { MoveNote(Down: true); }
                     }
@@ -167,22 +171,23 @@ public class NoteEdit : MonoBehaviour
             isNoteEdit = false;
         }
     }
-    private void LengthNote(int length)
+    private void LengthNote(bool _isUp = false, bool _isDown = false)
     {
         if (Selected == null) return;
         if (SelectedNormal == null) return;
         if (SelectedNormal.noteObject != Selected) return;
         if (!NormalNote.normalNotes.Contains(SelectedNormal)) return;
 
-        if (length <= 1) length = 2;
+        NoteOption _noteOption;
+        _noteOption = Selected.GetComponent<NoteOption>();
 
-        Vector3 editScale;
-        editScale = Selected.transform.localScale;
+        int _legnth;
+        _legnth = SelectedNormal.legnth;
 
-        editScale.y = length * 100.0f;
-        SelectedNormal.legnth = length;
-
-        Selected.transform.localScale = editScale;
+        if (_isUp) { _legnth++; }
+        else { _legnth--; }
+        if (_legnth < 0) { _legnth = 0; }
+        _noteOption.ToLongNote(_legnth);
     }
     private void MoveNote(bool Up = false, bool Down = false, bool Left = false, bool Right = false)
     {
@@ -402,14 +407,30 @@ public class NoteEdit : MonoBehaviour
                 Debug.LogError("NoteType Out Of Range");
                 return;
         }
-        Selected.GetComponentInChildren<SpriteRenderer>().color = new Color32(0, 255, 0, 255);
+        for (int i = 0; i < Selected.transform.childCount; i++)
+        {
+            Selected.transform.GetChild(0).GetChild(i)
+                .GetComponent<SpriteRenderer>().color = new Color32(0, 255, 0, 255);
+            Selected.transform.GetChild(0).GetChild(i)
+                .GetComponent<SpriteRenderer>().color = new Color32(0, 255, 0, 255);
+        }
     }
     public static void CheckSelect()
     {
         if (Selected != null)
         {
-            Selected.GetComponentInChildren<SpriteRenderer>().color
-            = new Color32(255, 255, 255, 255);
+            if (selectedType != SelectedType.Normal) { return; }
+            for (int i = 0; i < 3; i++)
+            {
+                Selected.transform.GetChild(0).GetChild(i)
+                    .GetComponent<BoxCollider2D>().enabled = true;
+                Selected.transform.GetChild(1).GetChild(i)
+                    .GetComponent<BoxCollider2D>().enabled = true;
+                Selected.transform.GetChild(0).GetChild(i)
+                    .GetComponent<SpriteRenderer>().color = new Color32(255, 255, 255, 255);
+                Selected.transform.GetChild(1).GetChild(i)
+                    .GetComponent<SpriteRenderer>().color = new Color32(255, 255, 255, 255);
+            }
         }
     }
     //*input Field && Button ---------------------------------------------
@@ -615,27 +636,16 @@ public class NoteEdit : MonoBehaviour
     public void inputValueLegnth()
     {
         int legnth;
-        try
-        {
-            legnth = Convert.ToInt32(inputNormalLegnth.text);
-        }
+        try { legnth = Convert.ToInt32(inputNormalLegnth.text); }
         catch
         {
             inputNormalLegnth.text = SelectedNormal.legnth.ToString();
             return;
         }
-        if (legnth <= 0)
-        {
-            inputNormalLegnth.text = SelectedNormal.legnth.ToString();
-            return;
-        }
+        if (legnth < 0) { legnth = 0; }
 
-        int line = SelectedNormal.line;
-        float[] range = new float[2] { SelectedNormal.pos, SelectedNormal.pos + 100.0f * legnth };
-        Vector3 noteScale;
-        SelectedNormal.legnth = legnth;
-        noteScale = Selected.transform.localScale;
-        noteScale.y = 100.0f * legnth;
+        SelectedNormal.noteObject.GetComponent<NoteOption>().ToLongNote(legnth);
+        
         DisplayNoteInfo();
     }
     public void btnPowered(bool byToggle)
@@ -643,10 +653,12 @@ public class NoteEdit : MonoBehaviour
         if (selectedType != SelectedType.Normal) { return; }
         if (SelectedNormal.legnth != 0) { return; }
         if (SelectedNormal.line > 4) { return; }
-        if (!byToggle) { toggleNormalPowered.isOn = !toggleNormalPowered.isOn; }
-        Selected.transform.GetChild(0).gameObject.SetActive(toggleNormalPowered.isOn);
-        SelectedNormal.isPowered = toggleNormalPowered.isOn;
-        print(SelectedNormal.isPowered);
+        bool _isOn;
+        _isOn = toggleNormalPowered.isOn;
+        if (!byToggle) { toggleNormalPowered.isOn = !_isOn; }
+        Selected.transform.GetChild(0).gameObject.SetActive(_isOn);
+        SelectedNormal.isPowered = _isOn;
+        SelectedNormal.noteObject.GetComponent<NoteOption>().ToPoweredNote(_isOn);
         DisplayNoteInfo();
     }
     // SpeedNote
