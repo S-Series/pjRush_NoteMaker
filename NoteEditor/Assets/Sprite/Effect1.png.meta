@@ -1,19 +1,7 @@
 fileFormatVersion: 2
-guid: 646299b8de6f98d41800ffd31c0755a4
+guid: 6aa049de7532d164fb08a75703a0c38b
 TextureImporter:
-  internalIDToNameTable:
-  - first:
-      213: -2676857397611778320
-    second: P_Long_0
-  - first:
-      213: -5342316793325872584
-    second: P_Long_1
-  - first:
-      213: 7081756234106118673
-    second: P_Long_2
-  - first:
-      213: 6609480538667891790
-    second: P_Long_3
+  internalIDToNameTable: []
   externalObjects: {}
   serializedVersion: 11
   mipmaps:
@@ -52,10 +40,10 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
-  alignment: 0
+  alignment: 7
   spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 100
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
@@ -109,91 +97,7 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
-    sprites:
-    - serializedVersion: 2
-      name: P_Long_0
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 0
-        width: 433
-        height: 1000
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 0fe29f42164e9dad0800000000000000
-      internalID: -2676857397611778320
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: P_Long_1
-      rect:
-        serializedVersion: 2
-        x: 1048
-        y: 0
-        width: 433
-        height: 1000
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 83a15386e274cd5b0800000000000000
-      internalID: -5342316793325872584
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: P_Long_2
-      rect:
-        serializedVersion: 2
-        x: 2100
-        y: 0
-        width: 434
-        height: 1000
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 112adcf26c3774260800000000000000
-      internalID: 7081756234106118673
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: P_Long_3
-      rect:
-        serializedVersion: 2
-        x: 3148
-        y: 0
-        width: 432
-        height: 1000
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: e4c3829088799bb50800000000000000
-      internalID: 6609480538667891790
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
+    sprites: []
     outline: []
     physicsShape: []
     bones: []

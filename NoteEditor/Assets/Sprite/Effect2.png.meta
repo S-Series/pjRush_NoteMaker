@@ -1,19 +1,7 @@
 fileFormatVersion: 2
-guid: 7322410d6d4e06944ab5820f444e50b5
+guid: 136edcc5017072a4ca266ba42a94b8cd
 TextureImporter:
-  internalIDToNameTable:
-  - first:
-      213: -6867975766359003588
-    second: BottomLong_0
-  - first:
-      213: -6485954057531907935
-    second: BottomLong_1
-  - first:
-      213: 515410064345787494
-    second: BottomLong_2
-  - first:
-      213: 5242180168808759586
-    second: BottomLong_3
+  internalIDToNameTable: []
   externalObjects: {}
   serializedVersion: 11
   mipmaps:
@@ -52,10 +40,10 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
-  alignment: 0
+  alignment: 7
   spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 100
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
@@ -109,91 +97,7 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
-    sprites:
-    - serializedVersion: 2
-      name: BottomLong_0
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 0
-        width: 1002
-        height: 1000
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: c3e2e28bd6c00b0a0800000000000000
-      internalID: -6867975766359003588
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: BottomLong_1
-      rect:
-        serializedVersion: 2
-        x: 1047
-        y: 0
-        width: 1005
-        height: 1000
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 1a0ae4316234df5a0800000000000000
-      internalID: -6485954057531907935
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: BottomLong_2
-      rect:
-        serializedVersion: 2
-        x: 2100
-        y: 0
-        width: 1005
-        height: 1000
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 66cedf609ba172700800000000000000
-      internalID: 515410064345787494
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: BottomLong_3
-      rect:
-        serializedVersion: 2
-        x: 3148
-        y: 0
-        width: 1002
-        height: 1000
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 221817ad617ffb840800000000000000
-      internalID: 5242180168808759586
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
+    sprites: []
     outline: []
     physicsShape: []
     bones: []

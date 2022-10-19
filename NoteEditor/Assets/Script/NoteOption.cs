@@ -5,13 +5,32 @@ using UnityEngine;
 public class NoteOption : MonoBehaviour
 {
     [SerializeField] private GameObject[] NoteObject;
+    [SerializeField] private SpriteRenderer[] StartRenderer;
     [SerializeField] private SpriteRenderer[] LongRenderer;
     [SerializeField] private SpriteRenderer[] EndRenderer;
     [SerializeField] private SpriteRenderer[] ArrowRenderer;
-    public void ToLongNote(int _Legnth, bool _isGame = false)
+    public void VisibleSetting(int _type, bool _isVisible)
+    {
+        if (_type == 0)
+        {
+            StartRenderer[0].enabled = _isVisible;
+            StartRenderer[1].enabled = _isVisible;
+        }
+        else if (_type == 1)
+        {
+            LongRenderer[0].enabled = _isVisible;
+            LongRenderer[1].enabled = _isVisible;
+        }
+        else if (_type == 2)
+        {
+            EndRenderer[0].enabled = _isVisible;
+            EndRenderer[1].enabled = _isVisible;
+        }
+    }
+    public void ToLongNote(int _legnth, int _gameSpeed = 100)
     {
         bool _isLong;
-        if (_Legnth == 0) { _isLong = false; }
+        if (_legnth == 0) { _isLong = false; }
         else { _isLong = true; }
 
         LongRenderer[0].enabled = _isLong;
@@ -23,8 +42,7 @@ public class NoteOption : MonoBehaviour
         foreach(SpriteRenderer _renderer in EndRenderer)
         {
             _pos = _renderer.transform.localPosition;
-            if (_isGame) { _pos.y = (_Legnth * 5) / 2.0f * AutoTest.testSpeed; }
-            else { _pos.y = (_Legnth * 5) / 2.0f; }
+            _pos.y = (_legnth * 5) / 2.0f * (_gameSpeed / 100.0f);
             _renderer.transform.localPosition = _pos;
         }
 
@@ -32,11 +50,19 @@ public class NoteOption : MonoBehaviour
         foreach(SpriteRenderer _renderer in LongRenderer)
         {
             _scale = _renderer.transform.localScale;
-            if (_isGame) { _scale.y = _Legnth / 4.0f * AutoTest.testSpeed; }
-            else { _scale.y = _Legnth / 4.0f; }
+            _scale.y = _legnth / 4.0f * 0.9975f * (_gameSpeed / 100.0f);
             _renderer.transform.localScale = _scale;
         }
 
+        /*
+        if (_isGame)
+        {
+            NoteObject[0].transform.GetChild(0).localScale
+                = new Vector3(1, 1.0f / AutoTest.testSpeed, 1);
+            NoteObject[1].transform.GetChild(0).localScale
+                = new Vector3(1, 1.0f / AutoTest.testSpeed, 1);
+        }
+        */
         if (CompareTag("Bottom")) { ArrowRenderer[1].enabled = _isLong; }
     }
     public void ToPoweredNote(bool _isPowered)
@@ -73,5 +99,14 @@ public class NoteOption : MonoBehaviour
                 renderer.transform.localRotation = Quaternion.Euler(0, 0, 0);
             }
         }
+    }
+    public void EnableCollider(bool _isEnable)
+    {
+        foreach (SpriteRenderer renderer in StartRenderer)
+            { renderer.transform.GetComponent<Collider2D>().enabled = _isEnable; }
+        foreach (SpriteRenderer renderer in LongRenderer)
+            { renderer.transform.GetComponent<Collider2D>().enabled = _isEnable; }
+        foreach (SpriteRenderer renderer in EndRenderer)
+            { renderer.transform.GetComponent<Collider2D>().enabled = _isEnable; }
     }
 }

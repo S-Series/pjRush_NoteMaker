@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -64,19 +65,19 @@ public class NoteClasses : MonoBehaviour
         NormalNote editNormal;
         SpeedNote editSpeed;
         EffectNote editEffect;
-        int speedIndex;
-        float editMs, editPos, editBpm;
+        int speedIndex, editMs;
+        float editPos, editBpm;
 
         //* SpeedNote ---------- //
-        editMs = 0.0f;
+        editMs = 0;
         editPos = 0.0f;
         editBpm = ValueManager.bpm;
         for (int i = 0; i < SpeedNote.speedNotes.Count; i++)
         {
             editSpeed = SpeedNote.speedNotes[i];
 
-            float calMs;
-            calMs = editMs + (150 * (editSpeed.pos - editPos) / editBpm);
+            int calMs;
+            calMs = Convert.ToInt32(editMs + (150 * (editSpeed.pos - editPos) / editBpm));
 
             editSpeed.ms = calMs;
             editMs = calMs;
@@ -90,7 +91,7 @@ public class NoteClasses : MonoBehaviour
         {
             editNormal = NormalNote.normalNotes[i];
 
-            editMs = 0.0f;
+            editMs = 0;
             editPos = 0.0f;
             editBpm = ValueManager.bpm;
 
@@ -98,17 +99,17 @@ public class NoteClasses : MonoBehaviour
             {
                 if (SpeedNote.speedNotes[j].pos <= editNormal.pos)
                 {
-                    editMs = SpeedNote.speedNotes[j].ms;
+                    editMs = Convert.ToInt32(SpeedNote.speedNotes[j].ms);
                     editPos = SpeedNote.speedNotes[j].pos;
                     editBpm = SpeedNote.speedNotes[j].bpm * SpeedNote.speedNotes[j].multiply;
                     break;
                 }
             }
-            editNormal.ms = editMs + (editNormal.pos - editPos) * 150 / editBpm;
+            editNormal.ms = Convert.ToInt32(editMs + (editNormal.pos - editPos) * 150 / editBpm);
         }
 
         //* EffectNote ---------- //
-        editMs = 0.0f;
+        editMs = 0;
         editPos = 0.0f;
         editBpm = ValueManager.bpm;
         for (int i = 0; i < EffectNote.effectNotes.Count; i++)
@@ -116,18 +117,18 @@ public class NoteClasses : MonoBehaviour
             editEffect = EffectNote.effectNotes[i];
             for (int j = SpeedNote.speedNotes.Count - 1; j > -1; j--)
             {
-                editMs = 0.0f;
+                editMs = 0;
                 editPos = 0.0f;
                 editBpm = ValueManager.bpm;
                 if (SpeedNote.speedNotes[j].pos <= editEffect.pos)
                 {
-                    editMs = SpeedNote.speedNotes[j].ms;
+                    editMs = Convert.ToInt32(SpeedNote.speedNotes[j].ms);
                     editPos = SpeedNote.speedNotes[j].pos;
                     editBpm = SpeedNote.speedNotes[j].bpm * SpeedNote.speedNotes[j].multiply;
                     break;
                 }
             }
-            editEffect.ms = editMs + (editEffect.pos - editPos) * 150 / editBpm;
+            editEffect.ms = editMs + Mathf.RoundToInt((editEffect.pos - editPos) * 150 / editBpm);
         }
         editEffect = null;
         editMs = 0;
@@ -137,20 +138,20 @@ public class NoteClasses : MonoBehaviour
         for (int i = 0; i < EffectNote.effectNotes.Count; i++)
         {
             editEffect = EffectNote.effectNotes[i];
-            editMs = 0.0f;
+            editMs = 0;
             editBpm = ValueManager.bpm;
             for (int j = speedIndex; j > -1; j--)
             {
                 if (SpeedNote.speedNotes[j].pos <= editEffect.pos)
                 {
-                    editMs = SpeedNote.speedNotes[j].ms;
+                    editMs = Convert.ToInt32(SpeedNote.speedNotes[j].ms);
                     editBpm = SpeedNote.speedNotes[j].bpm * SpeedNote.speedNotes[j].multiply;
                     break;
                 }
             }
             editPos = editEffect.pos;
-            editMs = editEffect.value * 150.0f / editBpm;
-            if (!editEffect.isPause) editMs *= -1.0f;
+            editMs = Convert.ToInt32(editEffect.value * 150.0f / editBpm);
+            if (!editEffect.isPause) editMs *= -1;
 
             foreach (NormalNote _normalNote in NormalNote.normalNotes)
             {
@@ -194,9 +195,10 @@ public class NormalNote
 {
     public static List<NormalNote> normalNotes = new List<NormalNote>();
     public GameObject noteObject;
-    public int line, legnth;
-    public float ms, pos;
+    public int ms, line, legnth;
+    public float pos;
     public bool isPowered;
+    
     public static void Sorting()
     {
         normalNotes.Sort(delegate (NormalNote A, NormalNote B)
@@ -220,6 +222,21 @@ public class NormalNote
     {
         return normalNotes.Find(item => item.noteObject == _noteObject);
     }
+    public static NormalNote copyData(NormalNote _data, bool _isCopyObject = false)
+    {
+        if (_data == null) { return null; }
+        
+        NormalNote _newData = new NormalNote();
+        _newData.line = _data.line;
+        _newData.legnth = _data.legnth;
+        _newData.ms = _data.ms;
+        _newData.pos = _data.pos;
+        _newData.isPowered = _data.isPowered;
+        if (!_isCopyObject) { _newData.noteObject = null; }
+        else { _newData.noteObject = _data.noteObject; }
+
+        return _newData;
+    }
     public static bool CheckNote(GameObject _noteObject)
     {
         return normalNotes.Contains(GetClass(_noteObject));
@@ -234,9 +251,9 @@ public class SpeedNote
 {
     public static List<SpeedNote> speedNotes = new List<SpeedNote>();
     public GameObject noteObject;
+    public int ms;
     public float bpm;
     public float multiply;
-    public float ms;
     public float pos;
     public static void Sorting()
     {
@@ -265,9 +282,9 @@ public class EffectNote
 {
     public static List<EffectNote> effectNotes = new List<EffectNote>();
     public GameObject noteObject;
+    public int ms;
     public bool isPause;
     public float value;
-    public float ms;
     public float pos;
     public static void Sorting()
     {

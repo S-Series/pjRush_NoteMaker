@@ -40,8 +40,6 @@ public class SaveLoad : MonoBehaviour
     #region New Save Data ----------------------------------
     #endregion
     [SerializeField] GameObject[] PrefabObject;
-    [SerializeField] TMP_InputField inputBpm;
-    [SerializeField] TMP_InputField inputStartDelayMs;
     [SerializeField] TMP_InputField inputFileName;
     [SerializeField] GameObject NoteField;
     [SerializeField] TextMeshPro SaveCompleteMessage;
@@ -49,6 +47,12 @@ public class SaveLoad : MonoBehaviour
     private void Awake()
     {
         saveLoad = this;
+
+        if (!Directory.Exists(Application.dataPath + "/_DataBox/"))
+            { Directory.CreateDirectory(Application.dataPath + "/_DataBox/"); }
+        
+        if (!Directory.Exists(Application.dataPath + "/_DataBox/_MusicFile/"))
+            { Directory.CreateDirectory(Application.dataPath + "/_DataBox/_MusicFile/"); }
     }
     private void Start()
     {
@@ -127,11 +131,23 @@ public class SaveLoad : MonoBehaviour
 
         yield return wait;
 
+        if (!Directory.Exists(Application.dataPath + "/_DataBox/"))
+            { Directory.CreateDirectory(Application.dataPath + "/_DataBox/"); }
+        
+        if (!Directory.Exists(Application.dataPath + "/_DataBox/_MusicFile/"))
+            { Directory.CreateDirectory(Application.dataPath + "/_DataBox/_MusicFile"); }
+
         try
         {
             string jsonData = JsonUtility.ToJson(noteSaved, true);
             string path = Application.dataPath + "/_DataBox/" + inputFileName.text + ".json";
-            print(path);
+            for (int i = 0; true; i++)
+            {
+                if (!File.Exists(path)) { break; }
+
+                path = Application.dataPath + "/_DataBox/"
+                    + inputFileName.text + "(" + i.ToString() + ").json";
+            }
             File.WriteAllText(path, jsonData);
             PlayerPrefs.SetString("NoteFileName", inputFileName.text);
             StartCoroutine(DisplaySaveCompleteMessage(true));
@@ -267,39 +283,35 @@ public class SaveLoad : MonoBehaviour
                 _noteOption = copyObject.GetComponent<NoteOption>();
                 _noteOption.ToLongNote(normalNote.legnth);
 
+                //** autoPos.x
                 switch (normalNote.line)
                 {
                     case 1:
                         autoPos.x = -300;
-                        autoPos.z = 0;
                         break;
 
                     case 2:
                         autoPos.x = -100;
-                        autoPos.z = 0;
                         break;
 
                     case 3:
                         autoPos.x = +100;
-                        autoPos.z = 0;
                         break;
 
                     case 4:
                         autoPos.x = +300;
-                        autoPos.z = 0;
                         break;
 
                     case 5:
                         autoPos.x = -200;
-                        autoPos.z = -.01f;
                         break;
 
                     case 6:
                         autoPos.x = +200;
-                        autoPos.z = -.01f;
                         break;
                 }
                 autoPos.y = normalNote.pos;
+                autoPos.z = 0;
                 copyObject.transform.localPosition = autoPos;
 
                 normalNote.noteObject = copyObject;
@@ -492,17 +504,17 @@ public class NoteSavedData
     public int startDelayMs;
 
     public List<int> NoteLegnth = new List<int>();
-    public List<float> NoteMs = new List<float>();
+    public List<int> NoteMs = new List<int>();
     public List<float> NotePos = new List<float>();
     public List<int> NoteLine = new List<int>();
     public List<bool> NotePowered = new List<bool>();
 
-    public List<float> EffectMs = new List<float>();
+    public List<int> EffectMs = new List<int>();
     public List<float> EffectPos = new List<float>();
     public List<float> EffectForce = new List<float>();
     public List<bool> EffectIsPause = new List<bool>();
 
-    public List<float> SpeedMs = new List<float>();
+    public List<int> SpeedMs = new List<int>();
     public List<float> SpeedPos = new List<float>();
     public List<float> SpeedBpm = new List<float>();
     public List<float> SpeedNum = new List<float>();

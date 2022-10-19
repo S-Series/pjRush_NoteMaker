@@ -95,6 +95,11 @@ public class NoteEdit : MonoBehaviour
                             GetComponent<SpriteRenderer>().color = Color.white;
                         Selected.transform.GetChild(1).GetChild(i).
                             GetComponent<SpriteRenderer>().color = Color.white;
+
+                        Selected.transform.GetChild(0).GetChild(i).
+                            GetComponent<Collider2D>().enabled = true;
+                        Selected.transform.GetChild(1).GetChild(i).
+                            GetComponent<Collider2D>().enabled = true;
                     }
                 }
                 else
@@ -408,12 +413,19 @@ public class NoteEdit : MonoBehaviour
                 Debug.LogError("NoteType Out Of Range");
                 return;
         }
-        for (int i = 0; i < Selected.transform.childCount; i++)
+        if (selectedType == SelectedType.Normal)
         {
-            Selected.transform.GetChild(0).GetChild(i)
-                .GetComponent<SpriteRenderer>().color = new Color32(0, 255, 0, 255);
-            Selected.transform.GetChild(0).GetChild(i)
-                .GetComponent<SpriteRenderer>().color = new Color32(0, 255, 0, 255);
+            for (int i = 0; i < Selected.transform.childCount; i++)
+            {
+                Selected.transform.GetChild(0).GetChild(i)
+                    .GetComponent<SpriteRenderer>().color = new Color32(0, 255, 0, 255);
+                Selected.transform.GetChild(1).GetChild(i)
+                    .GetComponent<SpriteRenderer>().color = new Color32(0, 255, 0, 255);
+            }
+        }
+        else
+        {
+            Selected.transform.GetComponent<SpriteRenderer>().color = new Color32(0, 255, 0, 255);
         }
     }
     public static void CheckSelect()
@@ -421,17 +433,7 @@ public class NoteEdit : MonoBehaviour
         if (Selected != null)
         {
             if (selectedType != SelectedType.Normal) { return; }
-            for (int i = 0; i < 3; i++)
-            {
-                Selected.transform.GetChild(0).GetChild(i)
-                    .GetComponent<BoxCollider2D>().enabled = true;
-                Selected.transform.GetChild(1).GetChild(i)
-                    .GetComponent<BoxCollider2D>().enabled = true;
-                Selected.transform.GetChild(0).GetChild(i)
-                    .GetComponent<SpriteRenderer>().color = new Color32(255, 255, 255, 255);
-                Selected.transform.GetChild(1).GetChild(i)
-                    .GetComponent<SpriteRenderer>().color = new Color32(255, 255, 255, 255);
-            }
+            Selected.GetComponent<NoteOption>().EnableCollider(true);
         }
     }
     //*input Field && Button ---------------------------------------------
@@ -652,9 +654,10 @@ public class NoteEdit : MonoBehaviour
     public void btnPowered(bool byToggle)
     {
         if (selectedType != SelectedType.Normal) { return; }
+        if (!byToggle) { toggleNormalPowered.isOn = !toggleNormalPowered.isOn; }
+
         bool _isOn;
         _isOn = toggleNormalPowered.isOn;
-        if (!byToggle) { toggleNormalPowered.isOn = !_isOn; }
         SelectedNormal.isPowered = _isOn;
         SelectedNormal.noteObject.GetComponent<NoteOption>().ToPoweredNote(_isOn);
         DisplayNoteInfo();

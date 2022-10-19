@@ -28,7 +28,7 @@ public class PageSystem : MonoBehaviour
 
     private void Update(){
         if (AutoTest.s_isTest) { NoteField.transform.localPosition = new Vector3(0, 0, 0); }
-        if (!AutoTest.s_isTest && !TestPlay.isPlay && !TestPlay.isPlayReady){
+        if (!AutoTest.s_isTest && !PlayMode.s_isPlay){
             if (Input.GetAxis("Mouse ScrollWheel") > 0)
             {
                 nowOnPage++;
@@ -60,7 +60,7 @@ public class PageSystem : MonoBehaviour
 
     public void InputPage()
     {
-        if (AutoTest.s_isTest || TestPlay.isPlay) return;
+        if (AutoTest.s_isTest || PlayMode.s_isPlay) return;
         try {nowOnPage = Convert.ToInt32(PageInput.text);}
         catch {PageInput.text = nowOnPage.ToString();}
         DisplayPage();

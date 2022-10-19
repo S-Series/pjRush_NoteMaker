@@ -91,7 +91,8 @@ public class AutoTest : MonoBehaviour
                 else {StartCoroutine(LongNoteEffect(autoTestNormal.line, autoTestNormal.legnth, autoTestNormal.noteObject));}
 
                 testIndex[0]++;
-                ScoreManager.scoreManager.AutoTestComboAdd();
+                ScoreManager.ApplyJudge(0);
+                ScoreManager.ApplyCombo(true);
                 if (testIndex[0] >= autoTestNormalNotes.Count) {isTesting[0] = false;}
                 else {autoTestNormal = autoTestNormalNotes[testIndex[0]];}
             }
@@ -145,6 +146,7 @@ public class AutoTest : MonoBehaviour
         autoTestSpeedNotes = new List<SpeedNote>();
         autoTestEffectNotes = new List<EffectNote>();
         autoTestEffectBpm = new List<float>();
+        ScoreManager.ResetGamePlay();
         for (int i = 0; i < autoNoteField.transform.childCount; i++)
         {
             Destroy(autoNoteField.transform.GetChild(i).gameObject);
@@ -163,6 +165,7 @@ public class AutoTest : MonoBehaviour
             GuideLines.Add(copyObject);
         }
         //*-------------------------------------------------------------------
+        int _fullCombo = 0;
         for (int i = 0; i < NormalNote.normalNotes.Count; i++)
         {
             NormalNote normalNote = NormalNote.normalNotes[i];
@@ -179,7 +182,10 @@ public class AutoTest : MonoBehaviour
             autoNormalNote.isPowered = normalNote.isPowered;
             autoNormalNote.legnth = normalNote.legnth;
             autoNormalNote.noteObject = _copyObject;
-            _copyObject.transform.GetComponent<NoteOption>().ToLongNote(autoNormalNote.legnth, true);
+            _copyObject.transform.GetComponent<NoteOption>().ToLongNote(autoNormalNote.legnth, 300);
+
+            if (normalNote.legnth == 0) { _fullCombo++; }
+            else { _fullCombo += normalNote.legnth; }
 
             for (int j = 0; j < 3; j++)
             {
@@ -210,6 +216,7 @@ public class AutoTest : MonoBehaviour
 
             autoTestNormalNotes.Add(autoNormalNote);
         }
+        ScoreManager.SetGameInfo(_fullCombo);
         for (int i = 0; i < SpeedNote.speedNotes.Count; i++)
         {
             SpeedNote speedNote = SpeedNote.speedNotes[i];
@@ -340,7 +347,7 @@ public class AutoTest : MonoBehaviour
         MovingPos = new Vector3(0, 1600 * PageSystem.nowOnPage, 0);
         MovingField[0].transform.localPosition = new Vector3(0, 0, 0);
         MovingField[1].localPosition = MovingPos;
-        ScoreManager.scoreManager.AutoTestComboReset();
+        ScoreManager.ResetGamePlay();
         NoteClasses.EnableCollider(true);
     }
     private void autoJudgeEffect(int line, bool isPowered = false, bool isLong = false)
@@ -403,17 +410,20 @@ public class AutoTest : MonoBehaviour
     }
     private IEnumerator LongNoteEffect(int line, int legnth, GameObject note)
     {
+        note.GetComponent<Animator>().enabled = true;
         note.GetComponent<Animator>().SetTrigger("Catch");
-        for (int i = 0; i < legnth; i ++)
+        for (int i = 0; i < legnth - 1; i ++)
         {
             while(s_isPause) { yield return null; }
             autoTestAnimator[line - 1].SetTrigger(AnimateTrigger);
             autoTestPreviewAnimator[line - 1].SetTrigger(AnimateTrigger);
             autoTestJudgeSound[1].Play();
-            ScoreManager.scoreManager.AutoTestComboAdd();
+            ScoreManager.ApplyJudge(0);
+                ScoreManager.ApplyCombo(true);
             yield return new WaitForSeconds(15 / s_testBpm / autoTestMultiply);
         }
         note.GetComponent<Animator>().SetTrigger("Exit");
+        note.GetComponent<Animator>().enabled = false;
     }
     private IEnumerator EffectNoteStart(float startPos, float startMs, float value,  float bpm, bool isPause)
     {

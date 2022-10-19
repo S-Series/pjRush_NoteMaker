@@ -112,7 +112,7 @@ public class InputManager : MonoBehaviour
         {
             SpeedNote inputSpeedNote;
             inputSpeedNote = new SpeedNote();
-            inputSpeedNote.ms = 0.0f;
+            inputSpeedNote.ms = 0;
             inputSpeedNote.pos = generatePos.y;
             inputSpeedNote.bpm = ValueManager.bpm;
             inputSpeedNote.multiply = 1.00f;
@@ -124,7 +124,7 @@ public class InputManager : MonoBehaviour
         {
             EffectNote inputEffectNote;
             inputEffectNote = new EffectNote();
-            inputEffectNote.ms = 0.0f;
+            inputEffectNote.ms = 0;
             inputEffectNote.pos = generatePos.y;
             inputEffectNote.isPause = false;
             inputEffectNote.value = 400.0f;
@@ -143,7 +143,8 @@ public class InputManager : MonoBehaviour
             else if (Mathf.Approximately(generatePos.x, -100.0f)) inputNormalNote.line = 2;
             else inputNormalNote.line = 1;
 
-            inputNormalNote.ms = 0.0f;
+            inputNormalNote.ms = 0;
+            inputNormalNote.legnth = s_noteInputLegnth;
             inputNormalNote.pos = generatePos.y;
 
             if (inputIndexValue == 6) { inputNormalNote.isPowered = true; }

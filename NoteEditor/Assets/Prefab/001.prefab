@@ -255,5 +255,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_renderer: {fileID: 4336387985895140626}
   m_maskType: 0
+  _SortingLayer: 0
   _SortingLayerID: -716386527
   _SortingOrder: 2

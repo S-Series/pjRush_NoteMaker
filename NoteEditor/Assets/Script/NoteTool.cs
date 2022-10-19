@@ -25,7 +25,7 @@ public class NoteTool : MonoBehaviour
     {
             if (AutoTest.s_isTest) return;
             if (NoteEdit.isNoteEdit) return;
-            if (TestPlay.isPlay || TestPlay.isPlayReady) return;
+            if (PlayMode.s_isPlay) return;
 
             if (Input.GetKeyDown(KeyCode.Alpha1)) { ButtonNormal(); }
             if (Input.GetKeyDown(KeyCode.Alpha2)) { ButtonBottom(); }

@@ -4,15 +4,10 @@ using UnityEngine;
 
 public class BottomJudgeSystem : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    public static int s_playMs;
+    public static int s_SpeedMs;
+    public static int s_EffectMs;
+    public static bool s_isNowOnPlay;
+    public KeyCode[] inputKey = new KeyCode[2]{KeyCode.None, KeyCode.None};
+    public List<NormalNote> gameNotes = new List<NormalNote>();
 }

@@ -7,8 +7,8 @@ using TMPro;
 
 public class MusicLoad : MonoBehaviour
 {
+    public static AudioClip MusicClip;
     AudioSource audioSource;
-    AudioClip MusicClip;
 
     [SerializeField]
     TMP_InputField songName;
