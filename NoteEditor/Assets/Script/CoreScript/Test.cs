@@ -4,11 +4,26 @@ using UnityEngine;
 
 public class Test : MonoBehaviour
 {
-    /*private void Update()
+    private IEnumerator LongCoroutine;
+    private void Start()
     {
-        if (!Input.GetKey(KeyCode.None))
+        LongCoroutine = ITest();
+    }
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.D))
         {
-            print("A");
+            StopCoroutine(LongCoroutine);
         }
-    }*/
+        if (Input.GetKeyUp(KeyCode.S) || Input.GetKeyUp(KeyCode.D))
+        {
+            LongCoroutine = ITest();
+            StartCoroutine(LongCoroutine);
+        }
+    }
+    IEnumerator ITest()
+    {
+        yield return new WaitForSeconds(1.0f);
+        print("2");
+    }
 }

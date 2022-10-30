@@ -89,18 +89,8 @@ public class NoteEdit : MonoBehaviour
                 if (Selected.gameObject.CompareTag("Normal") 
                     || Selected.gameObject.CompareTag("Bottom"))
                 {
-                    for(int i = 0; i < 3; i++)
-                    {
-                        Selected.transform.GetChild(0).GetChild(i).
-                            GetComponent<SpriteRenderer>().color = Color.white;
-                        Selected.transform.GetChild(1).GetChild(i).
-                            GetComponent<SpriteRenderer>().color = Color.white;
-
-                        Selected.transform.GetChild(0).GetChild(i).
-                            GetComponent<Collider2D>().enabled = true;
-                        Selected.transform.GetChild(1).GetChild(i).
-                            GetComponent<Collider2D>().enabled = true;
-                    }
+                    Selected.GetComponent<NoteOption>().ToSelected(false);
+                    Selected.GetComponent<NoteOption>().EnableCollider(true);
                 }
                 else
                 { 
@@ -415,13 +405,7 @@ public class NoteEdit : MonoBehaviour
         }
         if (selectedType == SelectedType.Normal)
         {
-            for (int i = 0; i < Selected.transform.childCount; i++)
-            {
-                Selected.transform.GetChild(0).GetChild(i)
-                    .GetComponent<SpriteRenderer>().color = new Color32(0, 255, 0, 255);
-                Selected.transform.GetChild(1).GetChild(i)
-                    .GetComponent<SpriteRenderer>().color = new Color32(0, 255, 0, 255);
-            }
+            Selected.GetComponent<NoteOption>().ToSelected(true);
         }
         else
         {
@@ -433,7 +417,11 @@ public class NoteEdit : MonoBehaviour
         if (Selected != null)
         {
             if (selectedType != SelectedType.Normal) { return; }
-            Selected.GetComponent<NoteOption>().EnableCollider(true);
+
+            NoteOption _option;
+            _option = Selected.GetComponent<NoteOption>();
+            _option.ToSelected(false);
+            _option.EnableCollider(true);
         }
     }
     //*input Field && Button ---------------------------------------------

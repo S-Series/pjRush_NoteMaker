@@ -32,6 +32,7 @@ public class NoteClasses : MonoBehaviour
         NormalNote.normalNotes = new List<NormalNote>();
         SpeedNote.speedNotes = new List<SpeedNote>();
         EffectNote.effectNotes = new List<EffectNote>();
+        LineNote.lineNotes = new List<LineNote>();
     }
     public static void SortingNotes()
     {
@@ -313,5 +314,22 @@ public class EffectNote
     public static void DeleteNote(EffectNote _effectNote)
     {
         effectNotes.RemoveAll(item => item == _effectNote);
+    }
+}
+
+public class LineNote
+{
+    public static List<LineNote> lineNotes = new List<LineNote>();
+    public int noteMs;
+    public float pos, power, duration;
+    public bool isHasDuration = false;
+    public static void Sorting()
+    {
+        lineNotes.Sort(delegate (LineNote A, LineNote B)    
+        {
+            if (A.pos > B.pos) return +1;
+            else if (A.pos < B.pos) return -1;
+            else {Debug.LogError("Note Overlap"); return 0;}
+        });
     }
 }

@@ -8,6 +8,7 @@ TagManager:
   - Bpm
   - Normal
   - Bottom
+  - Power
   layers:
   - Default
   - TransparentFX

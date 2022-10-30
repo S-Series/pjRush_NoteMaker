@@ -31,7 +31,7 @@ public class NoteTool : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Alpha2)) { ButtonBottom(); }
             if (Input.GetKeyDown(KeyCode.Alpha3)) { ButtonPowered(); }
             if (Input.GetKeyDown(KeyCode.Alpha4)) { ButtonSpeed(); }
-            if (Input.GetKeyDown(KeyCode.Alpha4)) { ButtonEffect(); }
+            //if (Input.GetKeyDown(KeyCode.Alpha5)) { ButtonEffect(); }
     }
     public static void disableFrame()
     {

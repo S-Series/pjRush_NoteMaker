@@ -96,6 +96,7 @@ public class InputManager : MonoBehaviour
                 PreviewNote[i].GetComponent<NoteOption>().ToLongNote(s_noteInputLegnth);
             }
         }
+        print(s_isInputLong);
     }
     public void NoteGenerate()
     {
@@ -144,13 +145,17 @@ public class InputManager : MonoBehaviour
             else inputNormalNote.line = 1;
 
             inputNormalNote.ms = 0;
-            inputNormalNote.legnth = s_noteInputLegnth;
+            if (s_isInputLong)
+            {
+                inputNormalNote.legnth = s_noteInputLegnth;
+            }
+            else { inputNormalNote.legnth = 0; }
             inputNormalNote.pos = generatePos.y;
 
-            if (inputIndexValue == 6) { inputNormalNote.isPowered = true; }
+            if (inputIndexValue == 2) { inputNormalNote.isPowered = true; }
             else { inputNormalNote.isPowered = false; }
 
-            copyObject.GetComponent<NoteOption>().ToLongNote(s_noteInputLegnth);
+            copyObject.GetComponent<NoteOption>().ToLongNote(inputNormalNote.legnth);
             copyObject.GetComponent<NoteOption>().ToPoweredNote(inputNormalNote.isPowered);
 
             inputNormalNote.noteObject = copyObject;

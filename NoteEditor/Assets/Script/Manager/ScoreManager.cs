@@ -41,7 +41,6 @@ public class ScoreManager : MonoBehaviour
     
     public static void ApplyJudge(int _judgeIndex, bool _isFast = false)
     {
-
         int _FastLateIndex;
         if (_isFast) { _FastLateIndex = 0; }
         else { _FastLateIndex = 1; }

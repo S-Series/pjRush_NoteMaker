@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class PlayMode : MonoBehaviour
 {
@@ -10,7 +11,7 @@ public class PlayMode : MonoBehaviour
     public static bool s_isPlay;
     public static int s_noteCount;
     public static int s_maxComboCount;
-    public static int s_playModeSpeed = 400;
+    public static int s_playModeSpeed = 100;
     public static KeyCode[][] s_keyCodes = new KeyCode[6][];
     private static List<SpeedNote> playSpeedNotes = new List<SpeedNote>();
     private static List<EffectNote> playEffectNotes = new List<EffectNote>();
@@ -39,12 +40,15 @@ public class PlayMode : MonoBehaviour
     [SerializeField] private Transform noteMovingField;
     [SerializeField] private Transform[] noteGenerateField;
     [SerializeField] private Sprite[] lineEffectSprite;
+    [SerializeField] private TextMeshPro speedText;
     
     //** Unity Actions ---------------------------
     private void Awake()
     {
         playMode = this;
         playAudio = GetComponent<AudioSource>();
+        toPlayMode(false);
+        btn_changeSpeed(PlayerPrefs.GetInt("playSpeed") - s_playModeSpeed);
 
         for (int i = 0; i < 6; i++)
         {
@@ -55,16 +59,18 @@ public class PlayMode : MonoBehaviour
         //Todo : KeyBinding 시스템 업데이트 전 임시 코드
         // /*
         s_keyCodes[0][0] = KeyCode.S;
-        s_keyCodes[0][1] = KeyCode.J;
         s_keyCodes[1][0] = KeyCode.D;
-        s_keyCodes[1][1] = KeyCode.K;
         s_keyCodes[2][0] = KeyCode.F;
-        s_keyCodes[2][1] = KeyCode.L;
         s_keyCodes[3][0] = KeyCode.G;
+
+        s_keyCodes[0][1] = KeyCode.J;
+        s_keyCodes[1][1] = KeyCode.K;
+        s_keyCodes[2][1] = KeyCode.L;
         s_keyCodes[3][1] = KeyCode.Semicolon;
 
         s_keyCodes[4][0] = KeyCode.A;
         s_keyCodes[4][1] = KeyCode.None;
+
         s_keyCodes[5][0] = KeyCode.Quote;
         s_keyCodes[5][1] = KeyCode.None;
         // */
@@ -122,7 +128,7 @@ public class PlayMode : MonoBehaviour
                 JudgeSystem.s_isNowOnPlay = false;
                 playAudio.Stop();
                 noteMovingField.localPosition = new Vector3(0, 0, 0);
-                GenerateNote();
+                GenerateNote(false);
                 ResetPlayData();
             }
         }
@@ -136,18 +142,22 @@ public class PlayMode : MonoBehaviour
     //** Static void ---------------------------
     public static void toPlayMode(bool _isPlayMode)
     {
+        playMode.playAudio.Stop();
+        AutoTest.autoTest.CelarNoteField();
+        JudgeSystem.s_isNowOnPlay = false;
+        s_isPlay = _isPlayMode;
         playMode.playCamera.gameObject.SetActive(_isPlayMode);
         playMode.modeObject[0].SetActive(!_isPlayMode);
         playMode.modeObject[1].SetActive(_isPlayMode);
-        s_isPlay = _isPlayMode;
-        playMode.GenerateNote();
+
         playMode.ResetPlayData();
+        playMode.GenerateNote(!_isPlayMode);
     }
     
     //** public void ---------------------------
     
     //** private void ---------------------------
-    private void GenerateNote()
+    private void GenerateNote(bool _isGameEnd)
     {
         isLoaded = false;
         for (int i = 0; i < 6; i++)
@@ -159,6 +169,16 @@ public class PlayMode : MonoBehaviour
                 Destroy(noteGenerateField[i].transform.GetChild(0).gameObject);
             }
         }
+        foreach (Transform field in noteGenerateField)
+        {
+            for (int i = 0; i < field.childCount; i++)
+            {
+                Destroy(field.GetChild(i).gameObject);
+            }
+        }
+
+        if (_isGameEnd) { return; }
+        
         NoteClasses.SortingNotes();
         NoteClasses.CalculateNoteMs();
 
@@ -212,6 +232,7 @@ public class PlayMode : MonoBehaviour
         foreach (JudgeSystem _judge in judgeSystems)
         {
             _judge.ResetSystem();
+            _judge.StopAllCoroutines();
         }
         playSpeedMs = 0;
         playSpeedPos = 0;
@@ -223,6 +244,19 @@ public class PlayMode : MonoBehaviour
 
         ScoreManager.ResetGamePlay();
     }
+    private void ApplySpeed()
+    {
+        foreach (JudgeSystem judge in judgeSystems)
+        {
+            foreach (NormalNote normal in judge.gameNotes)
+            {
+                normal.noteObject.transform.localPosition
+                    = new Vector3(0, normal.pos * (s_playModeSpeed / 100.0f), 0);
+                normal.noteObject.GetComponent<NoteOption>().ToLongNote(normal.legnth, s_playModeSpeed);
+            }
+        }
+    }
+    
     //** private Value ---------------------------
     private bool isKeyCodeAvailable(KeyCode _kc)
     {
@@ -244,7 +278,6 @@ public class PlayMode : MonoBehaviour
         foreach(JudgeSystem judgeSystem in judgeSystems) 
         {
             judgeSystem.StartGamePlay();
-            print(judgeSystem.gameObject.name);
         }
         yield return new WaitForSeconds(1.0f);
         JudgeSystem.s_isNowOnPlay = true;
@@ -256,14 +289,20 @@ public class PlayMode : MonoBehaviour
     //** UI Interactions ---------------------------
     public void btn_toPlayMode(bool _isPlay)
     {
+        if (AutoTest.s_isTest) { return; }
         toPlayMode(_isPlay);
     }
     public void btn_bindKey(int _firstIndex, int _secondIndex)
     {
 
     }
-    public void btn_doSomething()
+    public void btn_changeSpeed(int _value)
     {
-
+        s_playModeSpeed += _value;
+        if (s_playModeSpeed < 50) { s_playModeSpeed = 50; }
+        if (s_playModeSpeed > 1000) { s_playModeSpeed = 1000; }
+        PlayerPrefs.SetInt("playSpeed", s_playModeSpeed);
+        speedText.text = String.Format("{0:F2}", s_playModeSpeed / 100.0f);
+        ApplySpeed();
     }
 }

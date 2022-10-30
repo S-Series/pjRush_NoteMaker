@@ -9,6 +9,17 @@ public class NoteOption : MonoBehaviour
     [SerializeField] private SpriteRenderer[] LongRenderer;
     [SerializeField] private SpriteRenderer[] EndRenderer;
     [SerializeField] private SpriteRenderer[] ArrowRenderer;
+    public void ToSelected(bool _isSelected)
+    {
+        Color32 _color;
+        if (_isSelected) { _color = new Color32(0, 255, 0, 255); }
+        else { _color = new Color32(255, 255, 255, 255); }
+
+        foreach (SpriteRenderer _renderer in StartRenderer) { _renderer.color = _color; }
+        foreach (SpriteRenderer _renderer in LongRenderer) { _renderer.color = _color; }
+        foreach (SpriteRenderer _renderer in EndRenderer) { _renderer.color = _color; }
+        foreach (SpriteRenderer _renderer in ArrowRenderer) { _renderer.color = _color; }
+    }
     public void VisibleSetting(int _type, bool _isVisible)
     {
         if (_type == 0)

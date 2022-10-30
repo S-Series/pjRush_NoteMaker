@@ -23,6 +23,11 @@ public class MusicLoad : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
         loadSuccessCheck.SetActive(false);
 
+        if (!Directory.Exists(Application.dataPath + "/_DataBox/_MusicFile/"))
+        {
+            Directory.CreateDirectory(Application.dataPath + "/_DataBox/_MusicFile/");
+        }
+
         try
         {
             SavedSongName = PlayerPrefs.GetString("SongName");
@@ -39,7 +44,7 @@ public class MusicLoad : MonoBehaviour
     {
         loadSuccessCheck.SetActive(false);
         string path;
-        path = Application.dataPath + "/_DataBox/" + songName.text + ".mp3";
+        path = Application.dataPath + "/_DataBox/_MusicFile/" + songName.text + ".mp3";
         // Debug.Log(path);
         using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(path, AudioType.MPEG))
         {

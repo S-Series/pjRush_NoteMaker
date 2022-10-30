@@ -11,7 +11,7 @@ public class SaveLoad : MonoBehaviour
     public static bool s_isWorking = false;
 
     static NoteSavedData noteSaved = new NoteSavedData();
-    private const string editorVersion = "1.0";
+    private const double editorVersion = 1.02;
     private float bpm;
     private static bool isSaving = false;
     private static bool isLoading = false;
@@ -50,9 +50,6 @@ public class SaveLoad : MonoBehaviour
 
         if (!Directory.Exists(Application.dataPath + "/_DataBox/"))
             { Directory.CreateDirectory(Application.dataPath + "/_DataBox/"); }
-        
-        if (!Directory.Exists(Application.dataPath + "/_DataBox/_MusicFile/"))
-            { Directory.CreateDirectory(Application.dataPath + "/_DataBox/_MusicFile/"); }
     }
     private void Start()
     {
@@ -90,7 +87,10 @@ public class SaveLoad : MonoBehaviour
         NormalNote.Sorting();
         SpeedNote.Sorting();
         EffectNote.Sorting();
+        LineNote.Sorting();
+
         yield return wait;
+
         NoteClasses.CalculateNoteMs();
 
         noteSaved.Version = editorVersion;
@@ -99,34 +99,41 @@ public class SaveLoad : MonoBehaviour
 
         for (int i = 0; i < NormalNote.normalNotes.Count; i++)
         {
-            NormalNote savingNotes;
-            savingNotes = NormalNote.normalNotes[i];
-            noteSaved.NoteMs.Add(savingNotes.ms);
-            noteSaved.NotePos.Add(savingNotes.pos);
-            noteSaved.NoteLine.Add(savingNotes.line);
-            noteSaved.NoteLegnth.Add(savingNotes.legnth);
-            noteSaved.NotePowered.Add(savingNotes.isPowered);
-            yield return null;
+            NormalNote savingNote;
+            savingNote = NormalNote.normalNotes[i];
+            noteSaved.NoteMs.Add(savingNote.ms);
+            noteSaved.NotePos.Add(savingNote.pos);
+            noteSaved.NoteLine.Add(savingNote.line);
+            noteSaved.NoteLegnth.Add(savingNote.legnth);
+            noteSaved.NotePowered.Add(savingNote.isPowered);
         }
         for (int i = 0; i < SpeedNote.speedNotes.Count; i++)
         {
-            SpeedNote savingNotes;
-            savingNotes = SpeedNote.speedNotes[i];
-            noteSaved.SpeedMs.Add(savingNotes.ms);
-            noteSaved.SpeedPos.Add(savingNotes.pos);
-            noteSaved.SpeedBpm.Add(savingNotes.bpm);
-            noteSaved.SpeedNum.Add(savingNotes.multiply);
-            yield return null;
+            SpeedNote savingNote;
+            savingNote = SpeedNote.speedNotes[i];
+            noteSaved.SpeedMs.Add(savingNote.ms);
+            noteSaved.SpeedPos.Add(savingNote.pos);
+            noteSaved.SpeedBpm.Add(savingNote.bpm);
+            noteSaved.SpeedNum.Add(savingNote.multiply);
         }
         for (int i = 0; i < EffectNote.effectNotes.Count; i++)
         {
-            EffectNote savingNotes;
-            savingNotes = EffectNote.effectNotes[i];
-            noteSaved.EffectMs.Add(savingNotes.ms);
-            noteSaved.EffectPos.Add(savingNotes.pos);
-            noteSaved.EffectForce.Add(savingNotes.value);
-            noteSaved.EffectIsPause.Add(savingNotes.isPause);
-            yield return null;
+            EffectNote savingNote;
+            savingNote = EffectNote.effectNotes[i];
+            noteSaved.EffectMs.Add(savingNote.ms);
+            noteSaved.EffectPos.Add(savingNote.pos);
+            noteSaved.EffectForce.Add(savingNote.value);
+            noteSaved.EffectIsPause.Add(savingNote.isPause);
+        }
+        for (int i = 0; i < LineNote.lineNotes.Count; i++)
+        {
+            LineNote savingNote;
+            savingNote = LineNote.lineNotes[i];
+            noteSaved.LineMs.Add(savingNote.noteMs);
+            noteSaved.LinePos.Add(savingNote.pos);
+            noteSaved.LinePower.Add(savingNote.power);
+            noteSaved.LineDuration.Add(savingNote.duration);
+            noteSaved.isLineHasDuration.Add(savingNote.isHasDuration);
         }
 
         yield return wait;
@@ -141,20 +148,20 @@ public class SaveLoad : MonoBehaviour
         {
             string jsonData = JsonUtility.ToJson(noteSaved, true);
             string path = Application.dataPath + "/_DataBox/" + inputFileName.text + ".json";
-            for (int i = 0; true; i++)
+            /*for (int i = 0; true; i++)
             {
                 if (!File.Exists(path)) { break; }
 
                 path = Application.dataPath + "/_DataBox/"
                     + inputFileName.text + "(" + i.ToString() + ").json";
-            }
+            }*/
             File.WriteAllText(path, jsonData);
             PlayerPrefs.SetString("NoteFileName", inputFileName.text);
-            StartCoroutine(DisplaySaveCompleteMessage(true));
+            StartCoroutine(MusicFileMessage("Save Complete", new Color32(0, 255, 0, 255)));
         }
         catch
         {
-            StartCoroutine(DisplaySaveCompleteMessage(false));
+            StartCoroutine(MusicFileMessage("Save Failed", new Color32(255, 0, 0, 255)));
         }
         s_isWorking = false;
         BlockObject[0].SetActive(false);
@@ -182,7 +189,8 @@ public class SaveLoad : MonoBehaviour
             yield break;
         }
 
-        if (noteSaved.Version != editorVersion)
+        if (noteSaved.Version > editorVersion) { MusicFileMessage("상위버전 파일"); yield break; }
+        if (noteSaved.Version < editorVersion)
         {
             BlockObject[1].SetActive(false);
             BlockObject[2].SetActive(true);
@@ -253,6 +261,16 @@ public class SaveLoad : MonoBehaviour
                 effectNote.isPause = noteSaved.EffectIsPause[i];
                 effectNote.value = noteSaved.EffectForce[i];
                 EffectNote.effectNotes.Add(effectNote);
+            }
+            for (int i = 0; i < noteSaved.LineMs.Count; i++)
+            {
+                LineNote lineNote = new LineNote();
+                lineNote.noteMs = noteSaved.LineMs[i];
+                lineNote.pos = noteSaved.LinePos[i];
+                lineNote.power = noteSaved.LinePower[i];
+                lineNote.duration = noteSaved.LineDuration[i];
+                lineNote.isHasDuration = noteSaved.isLineHasDuration[i];
+                LineNote.lineNotes.Add(lineNote);
             }
             //*--------------------------------------
             NormalNote.Sorting();
@@ -365,7 +383,8 @@ public class SaveLoad : MonoBehaviour
         ResetSavedData();
         try
         {
-            string path = Path.Combine(Application.dataPath, inputFileName.text + ".json");
+            string path;
+            path = Application.dataPath + "/_DataBox/" + inputFileName.text + ".json";
             string jsonData = File.ReadAllText(path);
             noteSaved = JsonUtility.FromJson<NoteSavedData>(jsonData);
             isFileExist = true;
@@ -401,11 +420,11 @@ public class SaveLoad : MonoBehaviour
             string path = Path.Combine(Application.dataPath, inputFileName.text + ".json");
             File.WriteAllText(path, jsonData);
             PlayerPrefs.SetString("NoteFileName", inputFileName.text);
-            StartCoroutine(DisplaySaveCompleteMessage(true));
+            StartCoroutine(MusicFileMessage("Save Complete", new Color32(0, 255, 0, 255)));
         }
         catch
         {
-            StartCoroutine(DisplaySaveCompleteMessage(false));
+            StartCoroutine(MusicFileMessage("Save Failed", new Color32(255, 0, 0, 255)));
         }
         BlockObject[3].SetActive(false);
         yield return SaveDataToJson();
@@ -439,6 +458,7 @@ public class SaveLoad : MonoBehaviour
         noteSaved = new NoteSavedData();
         NoteField = PageSystem.pageSystem.NoteField;
 
+        #region OldData --------------------------
         note = new List<GameObject>();
         effect = new List<GameObject>();
         speed = new List<GameObject>();
@@ -462,6 +482,7 @@ public class SaveLoad : MonoBehaviour
         SpeedMs = new List<float>();
         SpeedBpm = new List<float>();
         SpeedPos = new List<float>();
+        #endregion
     }
     public void ButtonSave()
     {
@@ -475,47 +496,50 @@ public class SaveLoad : MonoBehaviour
     {
         StartCoroutine(CreateNewJsonData());
     }
-    private IEnumerator DisplaySaveCompleteMessage(bool success)
+    private IEnumerator MusicFileMessage(string _message, Color32? _color = null)
     {
-        if (success)
-        {
-            SaveCompleteMessage.text = "Save Completed";
-            SaveCompleteMessage.color = new Color32(0, 255, 0, 255);
-            yield return new WaitForSeconds(3.0f);
-            SaveCompleteMessage.text = "Music File Name";
-            SaveCompleteMessage.color = new Color32(255, 255, 255, 255);
-        }
-        else
-        {
-            SaveCompleteMessage.text = "Save Failed";
-            SaveCompleteMessage.color = new Color32(255, 0, 0, 255);
-            yield return new WaitForSeconds(3.0f);
-            SaveCompleteMessage.text = "Music File Name";
-            SaveCompleteMessage.color = new Color32(255, 255, 255, 255);
-        }
+        Color32 _textColor;
+        if (!_color.HasValue) { _textColor = new Color32(255, 255, 255, 255); }
+        else { _textColor = _color.Value; }
+
+        SaveCompleteMessage.text = _message;
+        SaveCompleteMessage.color = _textColor;
+        yield return new WaitForSeconds(3.0f);
+        SaveCompleteMessage.text = "Music File Name";
+        SaveCompleteMessage.color = new Color32(255, 255, 255, 255);
     }
 }
 
 [System.Serializable]
 public class NoteSavedData
 {
-    public string Version;
+    public double Version;
     public float bpm;
     public int startDelayMs;
 
+    //** Normal Note -------------------------
     public List<int> NoteLegnth = new List<int>();
     public List<int> NoteMs = new List<int>();
     public List<float> NotePos = new List<float>();
     public List<int> NoteLine = new List<int>();
     public List<bool> NotePowered = new List<bool>();
 
+    //** Speed Note -------------------------
+    public List<int> SpeedMs = new List<int>();
+    public List<float> SpeedPos = new List<float>();
+    public List<float> SpeedBpm = new List<float>();
+    public List<float> SpeedNum = new List<float>();
+
+    //** Effect Note -------------------------
     public List<int> EffectMs = new List<int>();
     public List<float> EffectPos = new List<float>();
     public List<float> EffectForce = new List<float>();
     public List<bool> EffectIsPause = new List<bool>();
 
-    public List<int> SpeedMs = new List<int>();
-    public List<float> SpeedPos = new List<float>();
-    public List<float> SpeedBpm = new List<float>();
-    public List<float> SpeedNum = new List<float>();
+    //** Line Note -------------------------
+    public List<int> LineMs = new List<int>();
+    public List<float> LinePos = new List<float>();
+    public List<float> LinePower = new List<float>();
+    public List<float> LineDuration = new List<float>();
+    public List<bool> isLineHasDuration = new List<bool>();
 }

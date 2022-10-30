@@ -87,7 +87,10 @@ public class AutoTest : MonoBehaviour
                 if (autoTestNormal == null) {autoTestNormal = autoTestNormalNotes[testIndex[0]];}
 
                 if (autoTestNormal.legnth == 0) 
-                    {autoJudgeEffect(autoTestNormal.line, isPowered:autoTestNormal.isPowered);}
+                {
+                    autoTestNormal.noteObject.SetActive(false);
+                    autoJudgeEffect(autoTestNormal.line, isPowered:autoTestNormal.isPowered);
+                }
                 else {StartCoroutine(LongNoteEffect(autoTestNormal.line, autoTestNormal.legnth, autoTestNormal.noteObject));}
 
                 testIndex[0]++;
@@ -349,6 +352,7 @@ public class AutoTest : MonoBehaviour
         MovingField[1].localPosition = MovingPos;
         ScoreManager.ResetGamePlay();
         NoteClasses.EnableCollider(true);
+        StopAllCoroutines();
     }
     private void autoJudgeEffect(int line, bool isPowered = false, bool isLong = false)
     {
@@ -372,6 +376,13 @@ public class AutoTest : MonoBehaviour
         // EffectMs = Convert.ToInt32(EffectMs / autoTestMultiply);
         autoMusic.pitch = autoTestMultiply;
         autoMusic.time = ((s_testMs * autoTestMultiply) - ValueManager.delay) / 1000.0f;
+    }
+    public void CelarNoteField()
+    {
+        for (int i = 0; i < autoNoteField.transform.childCount; i++)
+        {
+            Destroy(autoNoteField.transform.GetChild(i).gameObject);
+        }
     }
     //*IEnumerator -----------------------------------------------*//
     private IEnumerator StartTest(float startPos)

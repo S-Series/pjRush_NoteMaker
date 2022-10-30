@@ -26,16 +26,12 @@ public class JudgeSystem : MonoBehaviour
     private int longIndex, targetLongMs = 0;
     private bool isLongJudge = false;
     private bool isJudgeAlive = false, isLongJudgeAlive = false;
-    private IEnumerator longCoroutine, longKeepCoroutine;
+    private IEnumerator longKeepCoroutine;
     private NormalNote targetNote = null, targetLongNote = null;
     [SerializeField] private Animator judgeEffect;
     [SerializeField] private SpriteRenderer lineEffect;
 
     //** Unity Actions ---------------------------
-    private void Awake()
-    {
-        longCoroutine = ILongCoroutine(null);
-    }
     private void Update()
     {
         if (!s_isNowOnPlay) { return; }
@@ -63,32 +59,14 @@ public class JudgeSystem : MonoBehaviour
 
         if (Input.GetKeyDown(inputKey[0]) || Input.GetKeyDown(inputKey[1]))
         {
-            StopCoroutine(longCoroutine);
+            CheckJudge();
             isLongJudge = true;
-            
-            if (playJudgeMs < judgeRange[3] && playJudgeMs > -judgeRange[2])
-            {
-                noteIndex++;
-                if (playJudgeMs >= 0) { ApplyJudge(targetNote, playJudgeMs, true); }
-                else { ApplyJudge(targetNote, playJudgeMs, false); }
-
-                if (noteIndex == gameNotes.Count) { isJudgeAlive = false; return; }
-
-                targetNote = gameNotes[noteIndex];
-                targetNoteMs = targetNote.ms;
-            }
-            else
-            {
-                lineEffect.sprite = lineEffectSprite[0];
-                lineEffect.enabled = true;
-            }
         }
         if (Input.GetKeyUp(inputKey[0]) || Input.GetKeyUp(inputKey[1]))
         {
-            if (!(Input.GetKey(inputKey[0]) || Input.GetKey(inputKey[1])))
+            if (!Input.GetKey(inputKey[0]) && !Input.GetKey(inputKey[1]))
             {
-                longCoroutine = IKeepLong();
-                StartCoroutine(longCoroutine);
+                isLongJudge = false;
                 lineEffect.enabled = false;
             }
         }
@@ -96,12 +74,11 @@ public class JudgeSystem : MonoBehaviour
         if (playJudgeMs <= -judgeRange[2])
         {
             noteIndex++;
-            if (noteIndex != gameNotes.Count)
-            {
-                ApplyJudge(targetNote, -100, false);
-                targetNote = gameNotes[noteIndex];
-                targetNoteMs = targetNote.ms;
-            }
+            ApplyJudge(targetNote, -100, false);
+
+            if (noteIndex == gameNotes.Count) { isJudgeAlive = false; return; }
+            targetNote = gameNotes[noteIndex];
+            targetNoteMs = targetNote.ms;
         }
     }
 
@@ -115,6 +92,8 @@ public class JudgeSystem : MonoBehaviour
         longIndex = 0;
         targetLongMs = 0;
         playJudgeMs = 0;
+        StopAllCoroutines();
+        lineEffect.enabled = false;
     }
     public void SystemSetting(KeyCode[] _kc, int _line)
     {
@@ -134,12 +113,31 @@ public class JudgeSystem : MonoBehaviour
     }
 
     //** private void ---------------------------
+    private void CheckJudge()
+    {
+        if (playJudgeMs < judgeRange[3] && playJudgeMs > -judgeRange[2])
+        {
+            noteIndex++;
+            if (playJudgeMs >= 0) { ApplyJudge(targetNote, playJudgeMs, true); }
+            else { ApplyJudge(targetNote, playJudgeMs, false); }
+
+            if (noteIndex == gameNotes.Count) { isJudgeAlive = false; return; }
+
+            targetNote = gameNotes[noteIndex];
+            targetNoteMs = targetNote.ms;
+        }
+        else
+        {
+            lineEffect.sprite = lineEffectSprite[0];
+            lineEffect.enabled = true;
+        }
+    }
     private void ApplyJudge(NormalNote _note, int _judgeMs, bool _isFast, bool _isFromLong = false)
     {
         //** S-Perfect
         if (_judgeMs < judgeRange[0] && _judgeMs > -judgeRange[0])
         {
-            JudegPass(_isFromLong, _note.isPowered);
+            JudgePass(_isFromLong, _note.isPowered);
             lineEffect.sprite = lineEffectSprite[1];
             ScoreManager.ApplyJudge(0, _isFast);
             ScoreManager.ApplyCombo(true);
@@ -148,7 +146,7 @@ public class JudgeSystem : MonoBehaviour
         //** Perfect
         else if (_judgeMs < judgeRange[1] && _judgeMs > -judgeRange[1])
         {
-            JudegPass(_isFromLong, _note.isPowered);
+            JudgePass(_isFromLong, _note.isPowered);
             lineEffect.sprite = lineEffectSprite[1];
             ScoreManager.ApplyJudge(1, _isFast);
             ScoreManager.ApplyCombo(true);
@@ -157,7 +155,7 @@ public class JudgeSystem : MonoBehaviour
         //** Near
         else if (_judgeMs < judgeRange[2] && _judgeMs > -judgeRange[2])
         {
-            JudegPass(_isFromLong, _note.isPowered);
+            JudgePass(_isFromLong, _note.isPowered);
             lineEffect.sprite = lineEffectSprite[2];
             ScoreManager.ApplyJudge(2, _isFast);
             ScoreManager.ApplyCombo(true);
@@ -174,11 +172,11 @@ public class JudgeSystem : MonoBehaviour
 
         if (_note.legnth == 0) { _note.noteObject.SetActive(false); }
         else { _note.noteObject.GetComponent<NoteOption>().VisibleSetting(0, false); }
+        
         if (_isFromLong) { return; }
-
         lineEffect.enabled = true;
     }
-    private void JudegPass(bool _isLong, bool _isPowered)
+    private void JudgePass(bool _isLong, bool _isPowered)
     {
         if (_isLong)
         {
@@ -198,53 +196,58 @@ public class JudgeSystem : MonoBehaviour
     //** private others ---------------------------
     private IEnumerator ILongCoroutine(NormalNote _note)
     {
-        var _wait = new WaitForSeconds(15 / s_playBpm);
+        isBpmChanged = false;
 
+        bool _isPassed = false;
         bool _isAnimating = false;
+        float _delay = 15 / s_playBpm;
+        var _wait = new WaitForSeconds(_delay);
+
         Animator _animate;
         _animate = _note.noteObject.GetComponent<Animator>();
         _animate.enabled = true;
-        _animate.SetTrigger("Catch");
 
-        for (int i = 0; i < _note.legnth - 1; i++)
+        if (isLongJudge) { _animate.SetTrigger("Catch"); }
+
+        yield return _wait;
+        
+        for (int i = 0; i < _note.legnth - 2; i++)
         {
             if (isBpmChanged)
             {
-                _wait = new WaitForSeconds(15 / s_playBpm);
+                _delay = 15 / s_playBpm;
                 isBpmChanged = false;
             }
-            yield return _wait;
 
             if (isLongJudge)
             {
-                ApplyJudge(_note, 0, true);
+                ApplyJudge(_note, 0, true, true);
                 if (!_isAnimating)
                 {
                     _isAnimating = true;
                     _animate.SetTrigger("Catch");
                 }
+                _isPassed = true;
             }
             else
             {
-                ApplyJudge(_note, -100, true);
+                ApplyJudge(_note, -100, true, true);
                 if (_isAnimating)
                 {
                     _isAnimating = false;
                     _animate.SetTrigger("Lost");
                 }
+                _isPassed = false;
             }
+            yield return _wait;
         }
+        if (_isPassed || isLongJudge) { ApplyJudge(_note, 0, true, true); }
+        else { ApplyJudge(_note, -100, true, true); }
 
-        yield return _wait;
         yield return _wait;
 
         _animate.SetTrigger("Exit");
         _animate.enabled = false;
         _note.noteObject.SetActive(false);
-    }
-    private IEnumerator IKeepLong()
-    {
-        yield return new WaitForSeconds(30 / s_playBpm / (PlayMode.s_playModeSpeed / 100.0f));
-        isLongJudge = false;
     }
 }
