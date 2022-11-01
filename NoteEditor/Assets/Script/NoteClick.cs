@@ -38,6 +38,7 @@ public class NoteClick : MonoBehaviour
             NoteEdit.selectedType = NoteEdit.SelectedType.Effect;
         }
         
+        LineEdit.DeselectNote();
         NoteEdit.noteEdit.DisplayNoteInfo();
     }
 }

@@ -95,8 +95,8 @@ public class LineMove : MonoBehaviour
 
             if (_target.isHasDuration)
             {
-                if (i == LineNote.lineNotes.Count - 1 || Mathf.Approximately
-                    (LineNote.lineNotes[i + 1].pos, _target.pos + _target.duration))
+                if (Mathf.Approximately
+                    (LineNote.lineNotes[i + 1].pos,_target.pos + _target.duration))
                 {
 
                 }

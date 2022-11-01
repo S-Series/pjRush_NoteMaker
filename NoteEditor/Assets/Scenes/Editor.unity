@@ -6279,6 +6279,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 732fd92945422a845ae48c661a46a29e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  prefabObject: {fileID: 0}
 --- !u!4 &294824909
 Transform:
   m_ObjectHideFlags: 0
@@ -9480,12 +9481,14 @@ MonoBehaviour:
   - {fileID: 2274755088970494175}
   - {fileID: 1230722594}
   - {fileID: 2044429582}
+  - {fileID: 1101018719}
   NotePrefab:
   - {fileID: 7357962505565034067, guid: fc49654762a1199479707e066d9fcc00, type: 3}
   - {fileID: 7150978867207296860, guid: 4728ac8a3870d7d4f8f445684c033d93, type: 3}
   - {fileID: 7394171222528179868, guid: 23e2f41f3d08f54429afa09c505a8b0c, type: 3}
   - {fileID: 1004753243126431499, guid: 529774f08d52c0249ade531f07a2505c, type: 3}
   - {fileID: 3617032322042537539, guid: 811784ae9f524214d9913f464bf791d2, type: 3}
+  - {fileID: 1528656452234131839, guid: ce7bf339af709b046961202656933f5c, type: 3}
   NullObject: {fileID: 553954229}
   inputCollider: {fileID: 63710234}
   noteLegnthInput: {fileID: 1530281025}
@@ -45841,6 +45844,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1823845197}
     m_Modifications:
+    - target: {fileID: 1528656451926906572, guid: ce7bf339af709b046961202656933f5c,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1528656452234131776, guid: ce7bf339af709b046961202656933f5c,
         type: 3}
       propertyPath: m_RootOrder
@@ -45906,10 +45914,20 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1528656453015815358, guid: ce7bf339af709b046961202656933f5c,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1528656453041264277, guid: ce7bf339af709b046961202656933f5c,
         type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1528656453041264279, guid: ce7bf339af709b046961202656933f5c,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ce7bf339af709b046961202656933f5c, type: 3}

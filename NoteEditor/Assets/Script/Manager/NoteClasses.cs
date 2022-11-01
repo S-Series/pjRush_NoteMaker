@@ -320,6 +320,7 @@ public class EffectNote
 public class LineNote
 {
     public static List<LineNote> lineNotes = new List<LineNote>();
+    public GameObject noteObject;
     public int noteMs;
     public float pos, power, duration;
     public bool isHasDuration = false;
@@ -331,5 +332,32 @@ public class LineNote
             else if (A.pos < B.pos) return -1;
             else {Debug.LogError("Note Overlap"); return 0;}
         });
+    }
+    public static bool IsNoteOverlap(float _pos)
+    {
+        if (lineNotes.Exists(item => item.pos == _pos)) { return true; }
+        else { return false; }
+    }
+    public static LineNote GetLineNote(GameObject _object)
+    {
+        return lineNotes.Find(item => item.noteObject == _object);
+    }
+    public static LineNote CopyLineNoteDate(LineNote _targetNote, bool _isCopyNoteObject)
+    {
+        LineNote _newNote = new LineNote();
+
+        if (!_isCopyNoteObject) { _newNote.noteObject = null; }
+        else { _newNote.noteObject = _targetNote.noteObject; }
+        _newNote.noteMs = _targetNote.noteMs;
+        _newNote.pos = _targetNote.pos;
+        _newNote.power = _targetNote.power;
+        _newNote.duration = _targetNote.duration;
+        _newNote.isHasDuration = _targetNote.isHasDuration;
+
+        return _newNote;
+    }
+    public static void DeleteNote(GameObject _object)
+    {
+        lineNotes.RemoveAll(item => item.noteObject == _object);
     }
 }

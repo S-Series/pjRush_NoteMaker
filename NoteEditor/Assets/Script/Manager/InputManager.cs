@@ -44,14 +44,14 @@ public class InputManager : MonoBehaviour
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Tab)) { ToggleChange(true); }
-        if (s_isNoteInputAble == true)
+        if (s_isNoteInputAble)
         {
             if (Input.GetKeyDown(KeyCode.Escape))
             {
                 s_isNoteInputAble = false;
                 NoteTool.disableFrame();
                 NoteEdit.noteEdit.SectorSetOriginal();
-                for (int i = 0; i < 5; i++)
+                for (int i = 0; i < 6; i++)
                 {
                     PreviewNote[i].SetActive(false);
                 }
@@ -132,6 +132,18 @@ public class InputManager : MonoBehaviour
             inputEffectNote.noteObject = copyObject;
             EffectNote.effectNotes.Add(inputEffectNote);
         }
+        else if (inputIndexValue == 6)
+        {
+            LineNote inputLineNote;
+            inputLineNote = new LineNote();
+            inputLineNote.noteMs = 0;
+            inputLineNote.pos = generatePos.y;
+            inputLineNote.power = 0;
+            inputLineNote.duration = 0.0f;
+            inputLineNote.isHasDuration = false;
+            LineNote.lineNotes.Add(inputLineNote);
+            LineNote.Sorting();
+        }
         else
         {
             NormalNote inputNormalNote;
@@ -163,14 +175,14 @@ public class InputManager : MonoBehaviour
         }
         NoteEdit.noteEdit.DisplayNoteInfo();
     }
-    public void PreviewActivate(int _prefabIndex, bool _isBottom = false, bool _isEffect = false)
+    public void PreviewActivate(int _prefabIndex, bool _isBottom = false, bool _isMiddle = false)
     {
         inputIndexValue = _prefabIndex;
         s_isNoteInputAble = true;
         s_isNoteBottom = _isBottom;
-        s_isNoteOther = _isEffect;
+        s_isNoteOther = _isMiddle;
         inputCollider.SetActive(true);
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < 6; i++)
         {
             if (i == _prefabIndex)
             {
