@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 
 public class SaveLoad : MonoBehaviour
@@ -133,6 +134,7 @@ public class SaveLoad : MonoBehaviour
             noteSaved.LinePos.Add(savingNote.pos);
             noteSaved.LinePower.Add(savingNote.power);
             noteSaved.LineDuration.Add(savingNote.duration);
+            noteSaved.LineDurationPower.Add(savingNote.durationPower);
             noteSaved.isLineHasDuration.Add(savingNote.isHasDuration);
         }
 
@@ -175,6 +177,7 @@ public class SaveLoad : MonoBehaviour
 
         ResetSavedData();
         NoteClasses.ResetNotes();
+        LineEdit.DeselectNote();
         try
         {
             string path = Application.dataPath + "/_DataBox/" + inputFileName.text + ".json";
@@ -269,6 +272,7 @@ public class SaveLoad : MonoBehaviour
                 lineNote.pos = noteSaved.LinePos[i];
                 lineNote.power = noteSaved.LinePower[i];
                 lineNote.duration = noteSaved.LineDuration[i];
+                lineNote.durationPower = noteSaved.LineDurationPower[i];
                 lineNote.isHasDuration = noteSaved.isLineHasDuration[i];
                 LineNote.lineNotes.Add(lineNote);
             }
@@ -363,6 +367,26 @@ public class SaveLoad : MonoBehaviour
 
                 effectNote.noteObject = copyObject;
             }
+            for (int i = 0; i < LineNote.lineNotes.Count; i++)
+            {
+                LineNote targetNote;
+                GameObject copyObject;
+
+                targetNote = LineNote.lineNotes[i];
+                copyObject = Instantiate(PrefabObject[5], NoteField.transform);
+                copyObject.transform.localPosition = new Vector3(0, targetNote.pos, 0);
+                
+                for (int j = 0; j < copyObject.transform.childCount; j++) 
+                    { copyObject.transform.GetChild(j).gameObject.SetActive(true); }
+                copyObject.transform.GetComponentInChildren<Canvas>()
+                    .GetComponentInChildren<Slider>().value = targetNote.power;
+                copyObject.transform.GetComponentInChildren<Canvas>().gameObject.SetActive(false);
+
+                copyObject.GetComponent<LineOption>().Selected(false, targetNote);
+
+                targetNote.noteObject = copyObject;
+            }
+            LineMove.ReDrewLine();
             PlayerPrefs.SetString("NoteFileName", inputFileName.text);
             s_isWorking = false;
             BlockObject[1].SetActive(false);
@@ -539,7 +563,8 @@ public class NoteSavedData
     //** Line Note -------------------------
     public List<int> LineMs = new List<int>();
     public List<float> LinePos = new List<float>();
-    public List<float> LinePower = new List<float>();
     public List<float> LineDuration = new List<float>();
+    public List<int> LinePower = new List<int>();
+    public List<int> LineDurationPower = new List<int>();
     public List<bool> isLineHasDuration = new List<bool>();
 }

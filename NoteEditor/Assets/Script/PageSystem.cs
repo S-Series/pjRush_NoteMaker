@@ -8,7 +8,7 @@ public class PageSystem : MonoBehaviour
 {
     public static PageSystem pageSystem;
     public static int nowOnPage = 0;
-    const int maxPage = 985;
+    const int maxPage = 988;
     readonly float[] posX = new float[4] {925.926f, 1851.852f, 2777.778f, 3703.704f };
 
     [SerializeField] public GameObject NoteField;
@@ -26,19 +26,22 @@ public class PageSystem : MonoBehaviour
         DisplayPage();
     }
 
-    private void Update(){
-        if (AutoTest.s_isTest) { NoteField.transform.localPosition = new Vector3(0, 0, 0); }
-        if (!AutoTest.s_isTest && !PlayMode.s_isPlay){
-            if (Input.GetAxis("Mouse ScrollWheel") > 0)
-            {
-                nowOnPage++;
-                DisplayPage();
-            }
-            else if (Input.GetAxis("Mouse ScrollWheel") < 0)
-            {
-                nowOnPage--;
-                DisplayPage();
-            }
+    private void Update()
+    {
+        if (AutoTest.s_isTest) { NoteField.transform.localPosition = new Vector3(0, 0, 0); return; }
+        if (PlayMode.s_isPlay) { return; }
+        if (NoteEdit.isNoteEdit) { return; }
+        if (LineEdit.s_isLineEdit) { return; }
+
+        if (Input.GetAxis("Mouse ScrollWheel") > 0)
+        {
+            nowOnPage++;
+            DisplayPage();
+        }
+        else if (Input.GetAxis("Mouse ScrollWheel") < 0)
+        {
+            nowOnPage--;
+            DisplayPage();
         }
     }
 
@@ -50,6 +53,7 @@ public class PageSystem : MonoBehaviour
         float posy;
         posy = nowOnPage * 1600;
         NoteField.transform.localPosition = new Vector3(0.0f, -posy, 0.0f);
+        LineMove.PositionLine(posy);
 
         for (int i = 0; i < 15; i++)
         {

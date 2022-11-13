@@ -1,25 +1,34 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class LineOption : MonoBehaviour
 {
-    public Canvas canvas;
+    [SerializeField] PowerOption powerOption;
     [SerializeField] SpriteRenderer[] noteRenderer;
     
-    public void ChangeLegnth(int _legnth)
+    public void ChangeLegnth(float _posY)
     {
-        if (_legnth == 0)
+        if (_posY == 0)
         {
-            noteRenderer[1].enabled = false;
-            noteRenderer[2].enabled = false;
+            foreach(SpriteRenderer _renderer in noteRenderer) { _renderer.enabled = false; }
+        }
+        else
+        {
+            foreach(SpriteRenderer _renderer in noteRenderer) { _renderer.enabled = true; }
+            noteRenderer[0].transform.localScale = new Vector3(48.5f, _posY / 1600.0f * 159.25f, 1);
+            noteRenderer[1].transform.localPosition = new Vector3(0, _posY, 0);
+            powerOption.ChangePosition(_posY);
         }
     }
-    public void Selected(bool _isSelected)
+    public void Selected(bool _isSelected, LineNote _note)
     {
-        foreach(SpriteRenderer renderer in noteRenderer)
-        {
-            renderer.enabled = _isSelected;
-        }
+        powerOption.ActivateSlider(_isSelected, _note);
+        if (!_isSelected) { ChangeLegnth(0); }
+    }
+    public void DurationAvailable(bool _isAvailable, float _value = 0)
+    {
+        powerOption.DurationAvailable(_isAvailable, Convert.ToInt32(_value));
     }
 }

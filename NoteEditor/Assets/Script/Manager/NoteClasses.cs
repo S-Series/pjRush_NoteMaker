@@ -29,6 +29,10 @@ public class NoteClasses : MonoBehaviour
         {
             Destroy(effectNote.noteObject);
         }
+        foreach(LineNote lineNote in LineNote.lineNotes)
+        {
+            Destroy(lineNote.noteObject);
+        }
         NormalNote.normalNotes = new List<NormalNote>();
         SpeedNote.speedNotes = new List<SpeedNote>();
         EffectNote.effectNotes = new List<EffectNote>();
@@ -321,8 +325,8 @@ public class LineNote
 {
     public static List<LineNote> lineNotes = new List<LineNote>();
     public GameObject noteObject;
-    public int noteMs;
-    public float pos, power, duration;
+    public int power, noteMs, durationPower;
+    public float pos, duration;
     public bool isHasDuration = false;
     public static void Sorting()
     {
@@ -356,8 +360,8 @@ public class LineNote
 
         return _newNote;
     }
-    public static void DeleteNote(GameObject _object)
+    public static void DeleteNote(LineNote _note)
     {
-        lineNotes.RemoveAll(item => item.noteObject == _object);
+        lineNotes.RemoveAll(item => item == _note);
     }
 }

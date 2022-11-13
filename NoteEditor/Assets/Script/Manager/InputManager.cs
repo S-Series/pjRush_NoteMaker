@@ -109,7 +109,7 @@ public class InputManager : MonoBehaviour
         generatePos.y += PageSystem.nowOnPage * 1600.0f;
         copyObject.transform.localPosition = generatePos;
 
-        if (inputIndexValue == 4)
+        if (inputIndexValue == 3)
         {
             SpeedNote inputSpeedNote;
             inputSpeedNote = new SpeedNote();
@@ -121,7 +121,7 @@ public class InputManager : MonoBehaviour
             NoteEdit.noteEdit.DisplaySpeedText(inputSpeedNote);
             SpeedNote.speedNotes.Add(inputSpeedNote);
         }
-        else if (inputIndexValue == 5)
+        else if (inputIndexValue == 4)
         {
             EffectNote inputEffectNote;
             inputEffectNote = new EffectNote();
@@ -132,7 +132,7 @@ public class InputManager : MonoBehaviour
             inputEffectNote.noteObject = copyObject;
             EffectNote.effectNotes.Add(inputEffectNote);
         }
-        else if (inputIndexValue == 6)
+        else if (inputIndexValue == 5)
         {
             LineNote inputLineNote;
             inputLineNote = new LineNote();
@@ -140,9 +140,15 @@ public class InputManager : MonoBehaviour
             inputLineNote.pos = generatePos.y;
             inputLineNote.power = 0;
             inputLineNote.duration = 0.0f;
+            inputLineNote.durationPower = 666;
             inputLineNote.isHasDuration = false;
+            inputLineNote.noteObject = copyObject;
+            for (int i = 0; i < copyObject.transform.childCount; i++) 
+                { copyObject.transform.GetChild(i).gameObject.SetActive(true); }
+            copyObject.transform.GetComponentInChildren<Canvas>().gameObject.SetActive(false);
             LineNote.lineNotes.Add(inputLineNote);
             LineNote.Sorting();
+            LineMove.ReDrewLine();
         }
         else
         {

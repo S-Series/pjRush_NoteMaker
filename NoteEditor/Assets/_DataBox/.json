@@ -16,21 +16,38 @@
     "EffectForce": [],
     "EffectIsPause": [],
     "LineMs": [
+        0,
+        0,
+        0,
+        0,
         0
     ],
     "LinePos": [
-        11200.0
+        11200.0,
+        11600.0,
+        12000.0,
+        12400.0,
+        12800.0
     ],
     "LineDuration": [
-        1600.0
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
     ],
     "LinePower": [
-        311
-    ],
-    "LineDurationPower": [
-        180
+        -300,
+        -100,
+        100,
+        300,
+        0
     ],
     "isLineHasDuration": [
-        true
+        false,
+        false,
+        false,
+        false,
+        false
     ]
 }

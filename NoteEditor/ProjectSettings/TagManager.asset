@@ -49,6 +49,9 @@ TagManager:
   - name: BackGround
     uniqueID: 332485017
     locked: 0
+  - name: ToolBox
+    uniqueID: 2422727105
+    locked: 0
   - name: NoteBox
     uniqueID: 3578580769
     locked: 0

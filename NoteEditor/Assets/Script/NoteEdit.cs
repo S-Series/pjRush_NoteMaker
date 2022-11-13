@@ -82,26 +82,7 @@ public class NoteEdit : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Escape))
             {
-                if (Selected == null) return;
-
-                selectedType = SelectedType.Null;
-                isNoteEdit = false;
-                if (Selected.gameObject.CompareTag("Normal") 
-                    || Selected.gameObject.CompareTag("Bottom"))
-                {
-                    Selected.GetComponent<NoteOption>().ToSelected(false);
-                    Selected.GetComponent<NoteOption>().EnableCollider(true);
-                }
-                else
-                { 
-                    Selected.GetComponentInChildren<SpriteRenderer>().color = Color.white;
-                }
-                Selected = null;
-                SelectedNormal = null;
-                SelectedSpeed = null;
-                SelectedEffect = null;
-                toggleNormalPowered.interactable = false;
-                SectorSetOriginal();
+                DeselectNote();
             }
 
             if (Input.GetKeyDown(KeyCode.F))
@@ -424,6 +405,30 @@ public class NoteEdit : MonoBehaviour
             _option.EnableCollider(true);
         }
     }
+    public static void DeselectNote()
+    {
+        if (Selected == null) return;
+
+        selectedType = SelectedType.Null;
+        isNoteEdit = false;
+        if (Selected.gameObject.CompareTag("Normal")
+            || Selected.gameObject.CompareTag("Bottom"))
+        {
+            Selected.GetComponent<NoteOption>().ToSelected(false);
+            Selected.GetComponent<NoteOption>().EnableCollider(true);
+        }
+        else
+        {
+            Selected.GetComponentInChildren<SpriteRenderer>().color = Color.white;
+        }
+        Selected = null;
+        SelectedNormal = null;
+        SelectedSpeed = null;
+        SelectedEffect = null;
+        noteEdit.toggleNormalPowered.interactable = false;
+        noteEdit.SectorSetOriginal();
+    }
+    
     //*input Field && Button ---------------------------------------------
     // For All Note
     public void inputValuePos()
