@@ -12,6 +12,7 @@ public class PlayMode : MonoBehaviour
     public static int s_noteCount;
     public static int s_maxComboCount;
     public static int s_playModeSpeed = 100;
+    public static float nowPos;
     public static KeyCode[][] s_keyCodes = new KeyCode[6][];
     private static List<SpeedNote> playSpeedNotes = new List<SpeedNote>();
     private static List<EffectNote> playEffectNotes = new List<EffectNote>();
@@ -119,9 +120,8 @@ public class PlayMode : MonoBehaviour
                     if (playEffectIndex == playEffectNotes.Count) { isPlayTest[1] = false; }
                 }
             }
-            float pos;
-            pos = playSpeedPos + playEffectPos + (((JudgeSystem.s_playMs - playSpeedMs - playEffectMs) * JudgeSystem.s_playBpm) / 150);
-            noteMovingField.localPosition = new Vector3(0, -pos * (3 * s_playModeSpeed / 100.0f), 0);
+            nowPos = playSpeedPos + playEffectPos + (((JudgeSystem.s_playMs - playSpeedMs - playEffectMs) * JudgeSystem.s_playBpm) / 150);
+            noteMovingField.localPosition = new Vector3(0, -nowPos * (3 * s_playModeSpeed / 100.0f), 0);
 
             if (Input.GetKeyDown(KeyCode.Escape))
             {
@@ -137,6 +137,7 @@ public class PlayMode : MonoBehaviour
     {
         if (!JudgeSystem.s_isNowOnPlay) { return; }
         JudgeSystem.s_playMs++;
+        LineMove.s_nowMs = JudgeSystem.s_playMs;
     }
     
     //** Static void ---------------------------
@@ -229,6 +230,7 @@ public class PlayMode : MonoBehaviour
     }
     private void ResetPlayData()
     {
+        nowPos = 0;
         foreach (JudgeSystem _judge in judgeSystems)
         {
             _judge.ResetSystem();

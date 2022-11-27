@@ -1,6 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class LineEdit : MonoBehaviour
 {
@@ -11,9 +14,16 @@ public class LineEdit : MonoBehaviour
     private LineOption selectLineOption;
     [SerializeField] private GameObject prefabObject;
 
+    #region Side Sector Objects
+    [SerializeField] private GameObject editSector;
+    [SerializeField] private TMP_InputField[] inputFields;
+    [SerializeField] private Toggle toggle;
+    #endregion
+
     void Awake()
     {
         s_lineEdit = this;
+        SectorActivate(false);
     }
     void Update()
     {
@@ -22,7 +32,7 @@ public class LineEdit : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Escape)) { DeselectNote(); return; }
         if (Input.GetKeyDown(KeyCode.UpArrow)) { MoveNote(_isUp: true); }
         if (Input.GetKeyDown(KeyCode.DownArrow)) { MoveNote(_isUp: false); }
-        if (Input.GetKeyDown(KeyCode.Tab) || Input.GetKeyDown(KeyCode.F)) { ChangeDuration(); }
+        if (Input.GetKeyDown(KeyCode.Tab) || Input.GetKeyDown(KeyCode.F)) { ChangeSingle(); }
         if (Input.GetKeyDown(KeyCode.Delete)) { DeleteNote(); return; }
     }
 
@@ -31,10 +41,10 @@ public class LineEdit : MonoBehaviour
         if (!s_isLineEdit) { return; }
         s_selectLineNote.noteObject.GetComponentInChildren<BoxCollider2D>().enabled = true;
         s_isLineEdit = false;
-        s_lineEdit.selectLineOption.Selected(false, s_selectLineNote);
+        s_lineEdit.selectLineOption.Selected(false);
         s_selectLineNote = null;
         s_lineEdit.selectLineOption = null;
-
+        NoteClasses.EnableCollider(true);
     }
     public static void SelectLineNote(GameObject _object)
     {
@@ -42,32 +52,31 @@ public class LineEdit : MonoBehaviour
 
         s_selectLineNote = LineNote.GetLineNote(_object);
         s_lineEdit.selectLineOption = _object.GetComponent<LineOption>();
-        s_lineEdit.selectLineOption.Selected(true, s_selectLineNote);
-        s_lineEdit.selectLineOption
-            .DurationAvailable(s_selectLineNote.isHasDuration, s_selectLineNote.duration);
-        if (!s_selectLineNote.isHasDuration) 
-            { s_lineEdit.selectLineOption.ChangeLegnth(0); }
-        else 
-            { s_lineEdit.selectLineOption.ChangeLegnth(s_selectLineNote.duration);}
+        s_lineEdit.selectLineOption.Selected(true);
         s_isLineEdit = true;
         _object.GetComponentInChildren<BoxCollider2D>().enabled = false;
+
+        SectorActivate(true);
     }
-    public void PowerNote(bool _isStart, int _value)
+    public static void ChangePower(bool _isStart, int _value)
     {
         if (!s_isLineEdit) { return; }
         if (s_selectLineNote == null) { return; }
-        if (selectLineOption == null) { return; }
+        if (s_lineEdit.selectLineOption == null) { return; }
 
-        if (_isStart) { s_selectLineNote.power = _value; }
-        else { s_selectLineNote.durationPower = _value; }
+        if (_isStart) { s_selectLineNote.startPower = _value; }
+        else { s_selectLineNote.endPower = _value; }
+        LineMove.ReDrewLine();
+        s_lineEdit.selectLineOption.UpdateSliderInfo(s_selectLineNote);
     }
-    public void DurationNote(float _value)
+    public static void SectorActivate(bool _isActive)
     {
         if (!s_isLineEdit) { return; }
         if (s_selectLineNote == null) { return; }
-        if (selectLineOption == null) { return; }
+        if (s_lineEdit.selectLineOption == null) { return; }
 
-        s_selectLineNote.duration = _value;
+        s_lineEdit.editSector.SetActive(_isActive);
+        s_lineEdit.ActiveEndInput(s_selectLineNote.isSingle);
     }
     private void MoveNote(bool _isUp)
     {
@@ -75,50 +84,22 @@ public class LineEdit : MonoBehaviour
         if (s_selectLineNote == null) { return; }
         if (selectLineOption == null) { return; }
 
-        Vector3 pos;
-        pos = new Vector3(0, s_selectLineNote.pos, 0);
 
-        int count;
-        float inputPos;
 
-        if (_isUp)
-        {
-            count = Mathf.FloorToInt(pos.y / (1600.0f / GuideGenerate.GuideCount)) + 1;
-            inputPos = Mathf.Floor(1600.0f / GuideGenerate.GuideCount * 100) * count / 100;
-            if (inputPos >= 1600.0f * 999) inputPos = 1600.0f * 999;
-
-            while (LineNote.IsNoteOverlap(inputPos))
-            {
-                count = Mathf.FloorToInt(pos.y / (1600.0f / GuideGenerate.GuideCount)) + 1;
-                inputPos = Mathf.Floor(1600.0f / GuideGenerate.GuideCount * 100) * count / 100;
-                if (inputPos >= 1600.0f * 999) inputPos = 1600.0f * 999;
-            }
-        }
-        else
-        {
-            count = Mathf.CeilToInt(pos.y / (1600.0f / GuideGenerate.GuideCount)) - 1;
-            inputPos = Mathf.Ceil(1600.0f / GuideGenerate.GuideCount * 100) * count / 100;
-            if (inputPos < 0.0f) inputPos = 0.0f;
-
-            while (LineNote.IsNoteOverlap(inputPos))
-            {
-                count = Mathf.CeilToInt(pos.y / (1600.0f / GuideGenerate.GuideCount)) - 1;
-                inputPos = Mathf.Ceil(1600.0f / GuideGenerate.GuideCount * 100) * count / 100;
-                if (inputPos < 0.0f) inputPos = 0.0f;
-            }
-        }
-        pos.y = inputPos;
-        s_selectLineNote.pos = inputPos;
-        s_selectLineNote.noteObject.transform.localPosition = pos;
+        LineMove.ReDrewLine();
     }
-    private void ChangeDuration()
+    private void ChangeSingle()
     {
         if (!s_isLineEdit) { return; }
         if (s_selectLineNote == null) { return; }
         if (selectLineOption == null) { return; }
 
-        s_selectLineNote.isHasDuration = !s_selectLineNote.isHasDuration;
-        selectLineOption.DurationAvailable(s_selectLineNote.isHasDuration, s_selectLineNote.duration);
+        bool _reversed;
+        _reversed = !s_selectLineNote.isSingle;
+        s_selectLineNote.isSingle = _reversed;
+        selectLineOption.UpdateSliderInfo(s_selectLineNote);
+
+        ActiveEndInput(s_selectLineNote.isSingle);
         LineMove.ReDrewLine();
     }
     private void DeleteNote()
@@ -127,5 +108,75 @@ public class LineEdit : MonoBehaviour
         LineNote.DeleteNote(s_selectLineNote);
         DeselectNote();
         LineMove.ReDrewLine();
+    }
+    private void ActiveEndInput(bool _isSingle)
+    {
+        if (_isSingle) { inputFields[3].interactable = false; }
+        else { inputFields[3].interactable = true; }
+    }
+    private void UpdateSectorInfo()
+    {
+        if (s_selectLineNote == null) { return; }
+
+        inputFields[0].text = (s_selectLineNote.pos % 1600).ToString();
+        inputFields[1].text = (Mathf.FloorToInt(s_selectLineNote.pos / 1600.0f)).ToString();
+        inputFields[2].text = s_selectLineNote.startPower.ToString();
+        if (!s_selectLineNote.isSingle) { inputFields[3].text = "---"; }
+        else { inputFields[3].text = s_selectLineNote.endPower.ToString();}
+    }
+
+    //* Sector Action
+    public void ToggleSingle() //$ Along to toggle
+    {
+        if (s_selectLineNote == null) { return; }
+        ChangeSingle();
+        toggle.isOn = s_selectLineNote.isSingle;
+    }
+    public void InputPos() //$ Along to inputFields[0]
+    {
+        if (s_selectLineNote == null) { return; }
+
+        int _inputPos;
+
+        try { _inputPos = Convert.ToInt32(inputFields[0].text); }
+        catch { _inputPos = s_selectLineNote.pos; }
+
+        s_selectLineNote.pos = _inputPos;
+        inputFields[0].text = _inputPos.ToString();
+    }
+    public void InputPage() //$ Along to inputFields[1]
+    {
+        if (s_selectLineNote == null) { return; }
+
+        int _inputPos;
+
+        try { _inputPos = Convert.ToInt32(inputFields[0].text); }
+        catch { _inputPos = s_selectLineNote.pos; }
+
+        s_selectLineNote.pos = _inputPos;
+        inputFields[0].text = _inputPos.ToString();
+    }
+    public void InputPower(bool _isStart) //$ Along to inputFields[2] & inputFields[3]
+    {
+        if (s_selectLineNote == null) { return; }
+
+        int _inputPower;
+
+        if (_isStart)
+        {
+            try { _inputPower = Convert.ToInt32(inputFields[1].text); }
+            catch { _inputPower = s_selectLineNote.startPower; }
+
+            inputFields[1].text = _inputPower.ToString();
+        }
+        else
+        {
+            try { _inputPower = Convert.ToInt32(inputFields[2].text); }
+            catch { _inputPower = s_selectLineNote.endPower; }
+
+            inputFields[2].text = _inputPower.ToString();
+        }
+
+        ChangePower(_isStart, _inputPower);
     }
 }

@@ -11,26 +11,48 @@
     "SpeedPos": [],
     "SpeedBpm": [],
     "SpeedNum": [],
+    "SpeedMultiple": [],
     "EffectMs": [],
     "EffectPos": [],
     "EffectForce": [],
     "EffectIsPause": [],
     "LineMs": [
+        0,
+        0,
+        0,
+        0,
         0
     ],
     "LinePos": [
-        11200.0
-    ],
-    "LineDuration": [
-        1600.0
+        11200,
+        11600,
+        12000,
+        12400,
+        12800
     ],
     "LinePower": [
-        311
+        0,
+        0,
+        0,
+        0,
+        0
     ],
-    "LineDurationPower": [
-        180
+    "LineEndPower": [
+        300,
+        300,
+        300,
+        300,
+        0
     ],
-    "isLineHasDuration": [
+    "isLineSingle": [
+        false,
+        false,
+        false,
+        false,
         true
-    ]
+    ],
+    "LineTriggerMs": [],
+    "LineTriggerEndMs": [],
+    "LineTriggerPos": [],
+    "LineTriggerLegnth": []
 }

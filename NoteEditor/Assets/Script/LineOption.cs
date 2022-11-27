@@ -2,33 +2,57 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class LineOption : MonoBehaviour
 {
-    [SerializeField] PowerOption powerOption;
-    [SerializeField] SpriteRenderer[] noteRenderer;
-    
-    public void ChangeLegnth(float _posY)
+    [SerializeField] Canvas canvas;
+    [SerializeField] GameObject[] SliderObject;
+
+    public void SliderChange(bool _isStart)
     {
-        if (_posY == 0)
-        {
-            foreach(SpriteRenderer _renderer in noteRenderer) { _renderer.enabled = false; }
-        }
-        else
-        {
-            foreach(SpriteRenderer _renderer in noteRenderer) { _renderer.enabled = true; }
-            noteRenderer[0].transform.localScale = new Vector3(48.5f, _posY / 1600.0f * 159.25f, 1);
-            noteRenderer[1].transform.localPosition = new Vector3(0, _posY, 0);
-            powerOption.ChangePosition(_posY);
-        }
+        int index, value;
+        if (_isStart) { index = 0; }
+        else { index = 1; }
+
+        value = Mathf.RoundToInt(SliderObject[index].GetComponent<Slider>().value);
+        SliderObject[index].GetComponentInChildren<TMP_InputField>().text = value.ToString();
+
+        LineEdit.ChangePower(_isStart, value);
     }
-    public void Selected(bool _isSelected, LineNote _note)
+    public void InputValueChange(bool _isStart)
     {
-        powerOption.ActivateSlider(_isSelected, _note);
-        if (!_isSelected) { ChangeLegnth(0); }
+        int index, value;
+        if (_isStart) { index = 0; }
+        else { index = 1; }
+
+        try
+        {
+            value = Convert.ToInt32(SliderObject[index].GetComponentInChildren<TMP_InputField>().text);
+        }
+        catch { value = Mathf.RoundToInt(SliderObject[index].GetComponent<Slider>().value); }
+
+        SliderObject[index].GetComponentInChildren<TMP_InputField>().text = value.ToString();
+
+        LineEdit.ChangePower(_isStart, value);
     }
-    public void DurationAvailable(bool _isAvailable, float _value = 0)
+    public void Selected(bool _isSelected)
     {
-        powerOption.DurationAvailable(_isAvailable, Convert.ToInt32(_value));
+        canvas.gameObject.SetActive(_isSelected);
+    }
+    public void UpdateSliderInfo(LineNote _note)
+    {
+        SliderObject[1].SetActive(!_note.isSingle);
+
+        SliderObject[0].GetComponent<Slider>().value = _note.startPower;
+        SliderObject[0].GetComponentInChildren<TMP_InputField>().text = _note.startPower.ToString();
+
+        SliderObject[1].GetComponent<Slider>().value = _note.endPower;
+        SliderObject[1].GetComponentInChildren<TMP_InputField>().text = _note.endPower.ToString();
+    }
+    public void EnableCollider(bool _isEnable)
+    {
+        GetComponent<BoxCollider2D>().enabled = _isEnable;
     }
 }

@@ -63,6 +63,12 @@ public class NoteEdit : MonoBehaviour
         EffectSector.SetActive(false);
         SpeedSector.SetActive(true);
     }
+    public static void SectorNull()
+    {
+        noteEdit.OriginalSector.SetActive(false);
+        noteEdit.EffectSector.SetActive(false);
+        noteEdit.SpeedSector.SetActive(false);
+    }
     //*private ---------------------------------------------
     private void Awake()
     {
@@ -73,7 +79,7 @@ public class NoteEdit : MonoBehaviour
         selectedType = SelectedType.Null;
         isNoteEdit = false;
         guidePosSector = 1;
-        SectorSetOriginal();
+        SectorNull();
     }
     private void Update()
     {
@@ -225,25 +231,24 @@ public class NoteEdit : MonoBehaviour
     }
     private void MovePage(bool isUp)
     {
-        int nowPage;
-        float nowPos;
+        int nowPage, nowPos;
         Vector3 nowVec;
         nowVec = Selected.transform.localPosition;
         switch (selectedType)
         {
             case SelectedType.Normal:
-                nowPos = SelectedNormal.pos % 1600.0f;
+                nowPos = SelectedNormal.pos % 1600;
                 nowPage = Mathf.FloorToInt(SelectedNormal.pos / 1600) + 1;
                 break;
 
             case SelectedType.Speed:
                 nowPage = Mathf.FloorToInt(SelectedSpeed.pos / 1600) + 1;
-                nowPos = SelectedSpeed.pos % 1600.0f;
+                nowPos = SelectedSpeed.pos % 1600;
                 break;
 
             case SelectedType.Effect:
                 nowPage = Mathf.FloorToInt(SelectedEffect.pos / 1600) + 1;
-                nowPos = SelectedEffect.pos % 1600.0f;
+                nowPos = SelectedEffect.pos % 1600;
                 break;
 
             case SelectedType.Null:
@@ -264,17 +269,17 @@ public class NoteEdit : MonoBehaviour
         switch (selectedType)
         {
             case SelectedType.Normal:
-                SelectedNormal.pos = (1600.0f * (nowPage - 1)) + nowPos;
+                SelectedNormal.pos = (1600 * (nowPage - 1)) + nowPos;
                 Selected.transform.localPosition = new Vector3(nowVec.x, SelectedNormal.pos, nowVec.z);
                 break;
 
             case SelectedType.Speed:
-                SelectedSpeed.pos = (1600.0f * (nowPage - 1)) + nowPos;
+                SelectedSpeed.pos = (1600 * (nowPage - 1)) + nowPos;
                 Selected.transform.localPosition = new Vector3(nowVec.x, SelectedSpeed.pos, nowVec.z);
                 break;
 
             case SelectedType.Effect:
-                SelectedEffect.pos = (1600.0f * (nowPage - 1)) + nowPos;
+                SelectedEffect.pos = (1600 * (nowPage - 1)) + nowPos;
                 Selected.transform.localPosition = new Vector3(nowVec.x, SelectedEffect.pos, nowVec.z);
                 break;
 
@@ -290,17 +295,17 @@ public class NoteEdit : MonoBehaviour
         if (Selected.CompareTag("Effect"))
         {
             if (SelectedEffect == null) SelectedEffect = EffectNote.GetClass(Selected);
-            SelectedEffect.pos = inputPos.y;
+            SelectedEffect.pos = Mathf.RoundToInt(inputPos.y);
         }
         else if (Selected.CompareTag("Bpm"))
         {
             if (SelectedSpeed == null) SelectedSpeed = SpeedNote.GetClass(Selected);
-            SelectedSpeed.pos = inputPos.y;
+            SelectedSpeed.pos = Mathf.RoundToInt(inputPos.y);
         }
         else
         {
             if (SelectedNormal == null) SelectedNormal = NormalNote.GetClass(Selected);
-            SelectedNormal.pos = inputPos.y;
+            SelectedNormal.pos = Mathf.RoundToInt(inputPos.y);
             if (Selected.CompareTag("Normal"))
             {
                 if (Mathf.Approximately(-300.0f, inputPos.x)) SelectedNormal.line = 1;
@@ -426,18 +431,18 @@ public class NoteEdit : MonoBehaviour
         SelectedSpeed = null;
         SelectedEffect = null;
         noteEdit.toggleNormalPowered.interactable = false;
-        noteEdit.SectorSetOriginal();
+        SectorNull();
     }
     
     //*input Field && Button ---------------------------------------------
     // For All Note
     public void inputValuePos()
     {
-        float pos;
+        int pos;
         try
         {
             Vector3 notePos;
-            pos = Convert.ToSingle(inputNotePos.text);
+            pos = Convert.ToInt32(inputNotePos.text);
             notePos = Selected.transform.localPosition;
             switch (selectedType)
             {
@@ -516,19 +521,19 @@ public class NoteEdit : MonoBehaviour
             case SelectedType.Normal:
                 notePos.y = SelectedNormal.pos;
                 notePos.y = (notePos.y % 1600) + (page * 1600.0f);
-                SelectedNormal.pos = notePos.y;
+                SelectedNormal.pos = Mathf.RoundToInt(notePos.y);
                 break;
 
             case SelectedType.Speed:
                 notePos.y = SelectedSpeed.pos;
                 notePos.y = (notePos.y % 1600) + (page * 1600.0f);
-                SelectedSpeed.pos = notePos.y;
+                SelectedSpeed.pos = Mathf.RoundToInt(notePos.y);
                 break;
 
             case SelectedType.Effect:
                 notePos.y = SelectedEffect.pos;
                 notePos.y = (notePos.y % 1600) + (page * 1600.0f);
-                SelectedEffect.pos = notePos.y;
+                SelectedEffect.pos = Mathf.RoundToInt(notePos.y);
                 break;
 
             default: return;
@@ -539,10 +544,10 @@ public class NoteEdit : MonoBehaviour
     }
     public void btnPos(bool isUp, bool isPage)
     {
-        float addPos;
-        if (isUp) addPos = 100.0f;
-        else addPos = -100.0f;
-        if (isPage) addPos *= 16.0f;
+        int addPos;
+        if (isUp) addPos = 100;
+        else addPos = -100;
+        if (isPage) addPos *= 16;
         switch (selectedType)
         {
             case SelectedType.Null:
@@ -551,19 +556,19 @@ public class NoteEdit : MonoBehaviour
             case SelectedType.Normal:
                 SelectedNormal.pos += addPos;
                 if (SelectedNormal.pos <= 0) SelectedNormal.pos = 0;
-                else if (SelectedNormal.pos >= 1600.0f * 999) SelectedNormal.pos = 1600.0f * 999;
+                else if (SelectedNormal.pos >= 1600.0f * 999) SelectedNormal.pos = 1600 * 999;
                 break;
 
             case SelectedType.Speed:
                 SelectedSpeed.pos += addPos;
                 if (SelectedSpeed.pos <= 0) SelectedSpeed.pos = 0;
-                else if (SelectedSpeed.pos >= 1600.0f * 999) SelectedSpeed.pos = 1600.0f * 999;
+                else if (SelectedSpeed.pos >= 1600.0f * 999) SelectedSpeed.pos = 1600 * 999;
                 break;
 
             case SelectedType.Effect:
                 SelectedEffect.pos += addPos;
                 if (SelectedEffect.pos <= 0) SelectedEffect.pos = 0;
-                else if (SelectedEffect.pos >= 1600.0f * 999) SelectedEffect.pos = 1600.0f * 999;
+                else if (SelectedEffect.pos >= 1600.0f * 999) SelectedEffect.pos = 1600 * 999;
                 break;
         }
         DisplayNoteInfo();
@@ -732,8 +737,8 @@ public class NoteEdit : MonoBehaviour
         if (selectedType != SelectedType.Effect) return;
 
 
-        float inputValue;
-        try { inputValue = Convert.ToSingle(inputEffectValue.text); }
+        int inputValue;
+        try { inputValue = Convert.ToInt32(inputEffectValue.text); }
         catch
         {
             inputEffectValue.text = SelectedEffect.value.ToString();

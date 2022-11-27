@@ -115,7 +115,7 @@ public class SaveLoad : MonoBehaviour
             noteSaved.SpeedMs.Add(savingNote.ms);
             noteSaved.SpeedPos.Add(savingNote.pos);
             noteSaved.SpeedBpm.Add(savingNote.bpm);
-            noteSaved.SpeedNum.Add(savingNote.multiply);
+            noteSaved.SpeedMultiple.Add(savingNote.multiply);
         }
         for (int i = 0; i < EffectNote.effectNotes.Count; i++)
         {
@@ -130,12 +130,20 @@ public class SaveLoad : MonoBehaviour
         {
             LineNote savingNote;
             savingNote = LineNote.lineNotes[i];
-            noteSaved.LineMs.Add(savingNote.noteMs);
+            noteSaved.LineMs.Add(savingNote.ms);
             noteSaved.LinePos.Add(savingNote.pos);
-            noteSaved.LinePower.Add(savingNote.power);
-            noteSaved.LineDuration.Add(savingNote.duration);
-            noteSaved.LineDurationPower.Add(savingNote.durationPower);
-            noteSaved.isLineHasDuration.Add(savingNote.isHasDuration);
+            noteSaved.LinePower.Add(savingNote.startPower);
+            noteSaved.LineEndPower.Add(savingNote.endPower);
+            noteSaved.isLineSingle.Add(savingNote.isSingle);
+        }
+        for (int i = 0; i < LineTriggerNote.triggerNotes.Count; i++)
+        {
+            LineTriggerNote _savingNote;
+            _savingNote = LineTriggerNote.triggerNotes[i];
+            noteSaved.LineTriggerMs.Add(_savingNote.startMs);
+            noteSaved.LineTriggerEndMs.Add(_savingNote.endMs);
+            noteSaved.LineTriggerPos.Add(_savingNote.pos);
+            noteSaved.LineTriggerLegnth.Add(_savingNote.legnth);
         }
 
         yield return wait;
@@ -232,7 +240,7 @@ public class SaveLoad : MonoBehaviour
                 normalNote.line = noteSaved.NoteLine[i];
                 normalNote.legnth = noteSaved.NoteLegnth[i];
                 try { normalNote.pos = noteSaved.NotePos[i]; }
-                catch { normalNote.pos = noteSaved.bpm * normalNote.ms / 150.0f; }
+                catch { normalNote.pos = Mathf.RoundToInt(noteSaved.bpm * normalNote.ms / 150.0f); }
                 try { normalNote.isPowered = noteSaved.NotePowered[i]; }
                 catch { normalNote.isPowered = false; }
                 NormalNote.normalNotes.Add(normalNote);
@@ -242,7 +250,7 @@ public class SaveLoad : MonoBehaviour
                 print(NormalNote.normalNotes[0].pos);
                 if (NormalNote.normalNotes[0].pos < 1600.0f)
                 {
-                    foreach(NormalNote _note in NormalNote.normalNotes) { _note.pos += 1600.0f; }
+                    foreach(NormalNote _note in NormalNote.normalNotes) { _note.pos += 1600; }
                 }
             }
             for (int i = 0; i < noteSaved.SpeedMs.Count; i++)
@@ -252,7 +260,9 @@ public class SaveLoad : MonoBehaviour
                 speedNote.ms = noteSaved.SpeedMs[i];
                 speedNote.pos = noteSaved.SpeedPos[i];
                 speedNote.bpm = noteSaved.SpeedBpm[i];
-                speedNote.multiply = noteSaved.SpeedNum[i];
+                if (noteSaved.SpeedMultiple.Count != 0) 
+                    { speedNote.multiply = noteSaved.SpeedMultiple[i]; }
+                else { speedNote.multiply = noteSaved.SpeedNum[i]; }
                 SpeedNote.speedNotes.Add(speedNote);
             }
             for (int i = 0; i < noteSaved.EffectMs.Count; i++)
@@ -268,18 +278,23 @@ public class SaveLoad : MonoBehaviour
             for (int i = 0; i < noteSaved.LineMs.Count; i++)
             {
                 LineNote lineNote = new LineNote();
-                lineNote.noteMs = noteSaved.LineMs[i];
+                lineNote.ms = noteSaved.LineMs[i];
                 lineNote.pos = noteSaved.LinePos[i];
-                lineNote.power = noteSaved.LinePower[i];
-                lineNote.duration = noteSaved.LineDuration[i];
-                lineNote.durationPower = noteSaved.LineDurationPower[i];
-                lineNote.isHasDuration = noteSaved.isLineHasDuration[i];
+                lineNote.startPower = noteSaved.LinePower[i];
+                lineNote.endPower = noteSaved.LineEndPower[i];
+                lineNote.isSingle = noteSaved.isLineSingle[i];
                 LineNote.lineNotes.Add(lineNote);
+            }
+            for (int i = 0; i < noteSaved.LineTriggerMs.Count; i++)
+            {
+
             }
             //*--------------------------------------
             NormalNote.Sorting();
             SpeedNote.Sorting();
             EffectNote.Sorting();
+            LineNote.Sorting();
+            LineTriggerNote.Sorting();
             //*--------------------------------------
             for (int i = 0; i < NormalNote.normalNotes.Count; i++)
             {
@@ -370,6 +385,7 @@ public class SaveLoad : MonoBehaviour
             for (int i = 0; i < LineNote.lineNotes.Count; i++)
             {
                 LineNote targetNote;
+                LineOption targetOption;
                 GameObject copyObject;
 
                 targetNote = LineNote.lineNotes[i];
@@ -378,11 +394,10 @@ public class SaveLoad : MonoBehaviour
                 
                 for (int j = 0; j < copyObject.transform.childCount; j++) 
                     { copyObject.transform.GetChild(j).gameObject.SetActive(true); }
-                copyObject.transform.GetComponentInChildren<Canvas>()
-                    .GetComponentInChildren<Slider>().value = targetNote.power;
-                copyObject.transform.GetComponentInChildren<Canvas>().gameObject.SetActive(false);
 
-                copyObject.GetComponent<LineOption>().Selected(false, targetNote);
+                targetOption = copyObject.GetComponent<LineOption>();
+                targetOption.Selected(false);
+                targetOption.UpdateSliderInfo(targetNote);
 
                 targetNote.noteObject = copyObject;
             }
@@ -544,27 +559,33 @@ public class NoteSavedData
     //** Normal Note -------------------------
     public List<int> NoteLegnth = new List<int>();
     public List<int> NoteMs = new List<int>();
-    public List<float> NotePos = new List<float>();
+    public List<int> NotePos = new List<int>();
     public List<int> NoteLine = new List<int>();
     public List<bool> NotePowered = new List<bool>();
 
     //** Speed Note -------------------------
     public List<int> SpeedMs = new List<int>();
-    public List<float> SpeedPos = new List<float>();
+    public List<int> SpeedPos = new List<int>();
     public List<float> SpeedBpm = new List<float>();
     public List<float> SpeedNum = new List<float>();
+    public List<float> SpeedMultiple = new List<float>();
 
     //** Effect Note -------------------------
     public List<int> EffectMs = new List<int>();
-    public List<float> EffectPos = new List<float>();
-    public List<float> EffectForce = new List<float>();
+    public List<int> EffectPos = new List<int>();
+    public List<int> EffectForce = new List<int>();
     public List<bool> EffectIsPause = new List<bool>();
 
     //** Line Note -------------------------
     public List<int> LineMs = new List<int>();
-    public List<float> LinePos = new List<float>();
-    public List<float> LineDuration = new List<float>();
+    public List<int> LinePos = new List<int>();
     public List<int> LinePower = new List<int>();
-    public List<int> LineDurationPower = new List<int>();
-    public List<bool> isLineHasDuration = new List<bool>();
+    public List<int> LineEndPower = new List<int>();
+    public List<bool> isLineSingle = new List<bool>();
+
+    //** Line Trigger Note -------------------------
+    public List<int> LineTriggerMs = new List<int>();
+    public List<int> LineTriggerEndMs = new List<int>();
+    public List<int> LineTriggerPos = new List<int>();
+    public List<int> LineTriggerLegnth = new List<int>();
 }

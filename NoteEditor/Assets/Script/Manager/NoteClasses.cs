@@ -70,6 +70,7 @@ public class NoteClasses : MonoBehaviour
         NormalNote editNormal;
         SpeedNote editSpeed;
         EffectNote editEffect;
+        LineNote editLine;
         int speedIndex, editMs;
         float editPos, editBpm;
 
@@ -104,13 +105,36 @@ public class NoteClasses : MonoBehaviour
             {
                 if (SpeedNote.speedNotes[j].pos <= editNormal.pos)
                 {
-                    editMs = Convert.ToInt32(SpeedNote.speedNotes[j].ms);
+                    editMs = SpeedNote.speedNotes[j].ms;
                     editPos = SpeedNote.speedNotes[j].pos;
                     editBpm = SpeedNote.speedNotes[j].bpm * SpeedNote.speedNotes[j].multiply;
                     break;
                 }
             }
-            editNormal.ms = Convert.ToInt32(editMs + (editNormal.pos - editPos) * 150 / editBpm);
+            editNormal.ms = Mathf.RoundToInt(editMs + (editNormal.pos - editPos) * 150 / editBpm);
+        }
+
+        //* LineNote ---------- //
+        speedIndex = SpeedNote.speedNotes.Count - 1;
+        for (int i = 0; i < LineNote.lineNotes.Count; i++)
+        {
+            editLine = LineNote.lineNotes[i];
+
+            editMs = 0;
+            editPos = 0.0f;
+            editBpm = ValueManager.bpm;
+
+            for (int j = speedIndex; j > -1; j--)
+            {
+                if (SpeedNote.speedNotes[j].pos <= editLine.pos)
+                {
+                    editMs = SpeedNote.speedNotes[j].ms;
+                    editPos = SpeedNote.speedNotes[j].pos;
+                    editBpm = SpeedNote.speedNotes[j].bpm * SpeedNote.speedNotes[j].multiply;
+                    break;
+                }
+            }
+            editLine.ms = Mathf.RoundToInt(editMs + (editLine.pos - editPos) * 150 / editBpm);
         }
 
         //* EffectNote ---------- //
@@ -200,8 +224,7 @@ public class NormalNote
 {
     public static List<NormalNote> normalNotes = new List<NormalNote>();
     public GameObject noteObject;
-    public int ms, line, legnth;
-    public float pos;
+    public int ms, pos, line, legnth;
     public bool isPowered;
     
     public static void Sorting()
@@ -256,10 +279,9 @@ public class SpeedNote
 {
     public static List<SpeedNote> speedNotes = new List<SpeedNote>();
     public GameObject noteObject;
-    public int ms;
+    public int ms, pos;
     public float bpm;
     public float multiply;
-    public float pos;
     public static void Sorting()
     {
         speedNotes.Sort(delegate (SpeedNote A, SpeedNote B)
@@ -287,10 +309,8 @@ public class EffectNote
 {
     public static List<EffectNote> effectNotes = new List<EffectNote>();
     public GameObject noteObject;
-    public int ms;
+    public int ms, pos, value;
     public bool isPause;
-    public float value;
-    public float pos;
     public static void Sorting()
     {
         effectNotes.Sort(delegate (EffectNote A, EffectNote B)
@@ -325,9 +345,8 @@ public class LineNote
 {
     public static List<LineNote> lineNotes = new List<LineNote>();
     public GameObject noteObject;
-    public int power, noteMs, durationPower;
-    public float pos, duration;
-    public bool isHasDuration = false;
+    public int ms, pos, startPower, endPower;
+    public bool isSingle = false;
     public static void Sorting()
     {
         lineNotes.Sort(delegate (LineNote A, LineNote B)    
@@ -352,16 +371,52 @@ public class LineNote
 
         if (!_isCopyNoteObject) { _newNote.noteObject = null; }
         else { _newNote.noteObject = _targetNote.noteObject; }
-        _newNote.noteMs = _targetNote.noteMs;
+        _newNote.ms = _targetNote.ms;
         _newNote.pos = _targetNote.pos;
-        _newNote.power = _targetNote.power;
-        _newNote.duration = _targetNote.duration;
-        _newNote.isHasDuration = _targetNote.isHasDuration;
+        _newNote.startPower = _targetNote.startPower;
+        _newNote.endPower = _targetNote.endPower;
+        _newNote.isSingle = _targetNote.isSingle;
 
         return _newNote;
     }
     public static void DeleteNote(LineNote _note)
     {
         lineNotes.RemoveAll(item => item == _note);
+    }
+}
+
+public class LineTriggerNote
+{
+    public static List<LineTriggerNote> triggerNotes = new List<LineTriggerNote>();
+    public GameObject noteObject;
+    public int startMs, endMs, pos, legnth;
+    public static void Sorting()
+    {
+        triggerNotes.Sort(delegate (LineTriggerNote A, LineTriggerNote B)    
+        {
+            if (A.pos > B.pos) return +1;
+            else if (A.pos < B.pos) return -1;
+            else {Debug.LogError("Note Overlap"); return 0;}
+        });
+    }
+    public static LineTriggerNote GetLineTriggerNote(GameObject _object)
+    {
+        return triggerNotes.Find(item => item.noteObject == _object);
+    }
+    public static LineTriggerNote CopyNoteData(LineTriggerNote _targetNote, bool _isCopyNoteObject)
+    {
+        LineTriggerNote _copyNote;
+        _copyNote = new LineTriggerNote();
+        if (_isCopyNoteObject) { _copyNote.noteObject = null; }
+        else { _copyNote.noteObject = _targetNote.noteObject; }
+        _copyNote.startMs = _targetNote.startMs;
+        _copyNote.endMs = _targetNote.endMs;
+        _copyNote.pos = _targetNote.pos;
+        _copyNote.legnth = _targetNote.legnth;
+        return _copyNote;
+    }
+    public static void DeleteNote(LineTriggerNote _note)
+    {
+        triggerNotes.RemoveAll(item => item == _note);
     }
 }

@@ -114,7 +114,7 @@ public class InputManager : MonoBehaviour
             SpeedNote inputSpeedNote;
             inputSpeedNote = new SpeedNote();
             inputSpeedNote.ms = 0;
-            inputSpeedNote.pos = generatePos.y;
+            inputSpeedNote.pos = Mathf.RoundToInt(generatePos.y);
             inputSpeedNote.bpm = ValueManager.bpm;
             inputSpeedNote.multiply = 1.00f;
             inputSpeedNote.noteObject = copyObject;
@@ -126,9 +126,9 @@ public class InputManager : MonoBehaviour
             EffectNote inputEffectNote;
             inputEffectNote = new EffectNote();
             inputEffectNote.ms = 0;
-            inputEffectNote.pos = generatePos.y;
+            inputEffectNote.pos = Mathf.RoundToInt(generatePos.y);
             inputEffectNote.isPause = false;
-            inputEffectNote.value = 400.0f;
+            inputEffectNote.value = 400;
             inputEffectNote.noteObject = copyObject;
             EffectNote.effectNotes.Add(inputEffectNote);
         }
@@ -136,16 +136,15 @@ public class InputManager : MonoBehaviour
         {
             LineNote inputLineNote;
             inputLineNote = new LineNote();
-            inputLineNote.noteMs = 0;
-            inputLineNote.pos = generatePos.y;
-            inputLineNote.power = 0;
-            inputLineNote.duration = 0.0f;
-            inputLineNote.durationPower = 666;
-            inputLineNote.isHasDuration = false;
+            inputLineNote.pos = Mathf.RoundToInt(generatePos.y);
+            inputLineNote.ms = 0;
+            inputLineNote.startPower = 0;
+            inputLineNote.endPower = 0;
+            inputLineNote.isSingle = true;
             inputLineNote.noteObject = copyObject;
             for (int i = 0; i < copyObject.transform.childCount; i++) 
                 { copyObject.transform.GetChild(i).gameObject.SetActive(true); }
-            copyObject.transform.GetComponentInChildren<Canvas>().gameObject.SetActive(false);
+            copyObject.transform.GetComponent<LineOption>().UpdateSliderInfo(inputLineNote);
             LineNote.lineNotes.Add(inputLineNote);
             LineNote.Sorting();
             LineMove.ReDrewLine();
@@ -168,7 +167,7 @@ public class InputManager : MonoBehaviour
                 inputNormalNote.legnth = s_noteInputLegnth;
             }
             else { inputNormalNote.legnth = 0; }
-            inputNormalNote.pos = generatePos.y;
+            inputNormalNote.pos = Mathf.RoundToInt(generatePos.y);
 
             if (inputIndexValue == 2) { inputNormalNote.isPowered = true; }
             else { inputNormalNote.isPowered = false; }

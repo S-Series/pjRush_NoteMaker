@@ -63,6 +63,7 @@ public class AutoTest : MonoBehaviour
         if (!s_isTest) return;
         if (s_isPause) return;
         s_testMs ++;
+        LineMove.s_nowMs = s_testMs;
     }
     private void Update()
     {
@@ -150,6 +151,7 @@ public class AutoTest : MonoBehaviour
         autoTestEffectNotes = new List<EffectNote>();
         autoTestEffectBpm = new List<float>();
         ScoreManager.ResetGamePlay();
+        LineMove.ReadyForPlay();
         for (int i = 0; i < autoNoteField.transform.childCount; i++)
         {
             Destroy(autoNoteField.transform.GetChild(i).gameObject);
@@ -352,6 +354,7 @@ public class AutoTest : MonoBehaviour
         MovingField[1].localPosition = MovingPos;
         ScoreManager.ResetGamePlay();
         NoteClasses.EnableCollider(true);
+        LineMove.s_isLineMoving = true;
         StopAllCoroutines();
     }
     private void autoJudgeEffect(int line, bool isPowered = false, bool isLong = false)
