@@ -13,7 +13,7 @@ public class PlayMode : MonoBehaviour
     public static int s_maxComboCount;
     public static int s_playModeSpeed = 100;
     public static float nowPos;
-    public static KeyCode[][] s_keyCodes = new KeyCode[6][];
+    public static KeyCode[] s_keyCodes = new KeyCode[11];
     private static List<SpeedNote> playSpeedNotes = new List<SpeedNote>();
     private static List<EffectNote> playEffectNotes = new List<EffectNote>();
 
@@ -51,29 +51,21 @@ public class PlayMode : MonoBehaviour
         toPlayMode(false);
         btn_changeSpeed(PlayerPrefs.GetInt("playSpeed") - s_playModeSpeed);
 
-        for (int i = 0; i < 6; i++)
-        {
-            s_keyCodes[i] = new KeyCode[2];
-            s_keyCodes[i][0] = KeyCode.None;
-            s_keyCodes[i][1] = KeyCode.None;
-        }
         //Todo : KeyBinding 시스템 업데이트 전 임시 코드
         // /*
-        s_keyCodes[0][0] = KeyCode.S;
-        s_keyCodes[1][0] = KeyCode.D;
-        s_keyCodes[2][0] = KeyCode.F;
-        s_keyCodes[3][0] = KeyCode.G;
+        s_keyCodes[0] = KeyCode.S;
+        s_keyCodes[1] = KeyCode.D;
+        s_keyCodes[2] = KeyCode.F;
+        s_keyCodes[3] = KeyCode.G;
 
-        s_keyCodes[0][1] = KeyCode.J;
-        s_keyCodes[1][1] = KeyCode.K;
-        s_keyCodes[2][1] = KeyCode.L;
-        s_keyCodes[3][1] = KeyCode.Semicolon;
+        s_keyCodes[4] = KeyCode.J;
+        s_keyCodes[5] = KeyCode.K;
+        s_keyCodes[6] = KeyCode.L;
+        s_keyCodes[7] = KeyCode.Semicolon;
 
-        s_keyCodes[4][0] = KeyCode.A;
-        s_keyCodes[4][1] = KeyCode.None;
+        s_keyCodes[4] = KeyCode.A;
 
-        s_keyCodes[5][0] = KeyCode.Quote;
-        s_keyCodes[5][1] = KeyCode.None;
+        s_keyCodes[5] = KeyCode.Quote;
         // */
     }
     private void Start()

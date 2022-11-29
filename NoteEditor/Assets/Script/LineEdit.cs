@@ -148,7 +148,7 @@ public class LineEdit : MonoBehaviour
         catch { _inputPos = s_selectLineNote.pos; }
         _inputPos = Mathf.Clamp(_inputPos, 0, 1600);
 
-        s_selectLineNote.pos = _inputPos;
+        s_selectLineNote.pos = _notePage * 1600 + _inputPos;
         UpdateSectorInfo();
     }
     public void InputPage() //$ Along to inputFields[1]
@@ -162,7 +162,7 @@ public class LineEdit : MonoBehaviour
         try { _inputPage = Convert.ToInt32(inputFields[1].text); }
         catch { _inputPage = s_selectLineNote.pos; }
 
-        s_selectLineNote.pos = _inputPage;
+        s_selectLineNote.pos = _inputPage * 1600 + _notePos;
         UpdateSectorInfo();
     }
     public void InputPower(bool _isStart) //$ Along to inputFields[2] & inputFields[3]
