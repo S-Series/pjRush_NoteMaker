@@ -190,7 +190,6 @@ public class SaveLoad : MonoBehaviour
         {
             string path = Application.dataPath + "/_DataBox/" + inputFileName.text + ".json";
             string jsonData = File.ReadAllText(path);
-            print(path);
             noteSaved = JsonUtility.FromJson<NoteSavedData>(jsonData);
         }
         catch
@@ -247,7 +246,6 @@ public class SaveLoad : MonoBehaviour
             }
             if (NormalNote.normalNotes.Count != 0)
             {
-                print(NormalNote.normalNotes[0].pos);
                 if (NormalNote.normalNotes[0].pos < 1600.0f)
                 {
                     foreach(NormalNote _note in NormalNote.normalNotes) { _note.pos += 1600; }

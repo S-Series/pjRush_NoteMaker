@@ -13,7 +13,7 @@ public class LineMove : MonoBehaviour
     //** public ---------------------------
 
     //** private ---------------------------
-    private int lastPower;
+    private int lineMs, lastPower;
     private int[] linePower = new int[2];
     private int lineIndex, triggerIndex;
     private bool isLineMoving = false;
@@ -22,7 +22,7 @@ public class LineMove : MonoBehaviour
     private List<LineNote> lineNotes;
     private List<LineTriggerNote> triggerNotes;
     private IEnumerator lineCoroutine;
-    private LineNote[] targetNote;
+    private LineNote[] targetNote = new LineNote[2];
     private LineTriggerNote targetTriggerNote;
 
     //** Serialize ---------------------------
@@ -36,6 +36,7 @@ public class LineMove : MonoBehaviour
     { 
         s_LineMove = this;
         PreviewNote.SetActive(false);
+        lineCoroutine = ICalculatePower();
         ResetLineSystem();
         EndPlay();
     }
@@ -54,25 +55,15 @@ public class LineMove : MonoBehaviour
         //* LineNote --------------------------------
         if (targetNote[0] != null)
         {
-            if (targetNote[0].ms <= s_nowMs)
+            if (lineMs <= s_nowMs)
             {
+                //* Initialize TargetNotes
+                UpdateTargetNote();
+
                 //* Initialize IEnumerator
                 StopCoroutine(lineCoroutine);
                 lineCoroutine = ICalculatePower();
                 StartCoroutine(lineCoroutine);
-
-                //* Initialize TargetNotes
-                lineIndex++;
-                if (lineIndex == lineNotes.Count) { targetNote[0] = null; }
-                else { targetNote[0] = lineNotes[lineIndex]; }
-                if (lineIndex + 1 >= lineNotes.Count) { targetNote[1] = null; }
-                else { targetNote[1] = lineNotes[lineIndex + 1]; }
-
-                //* Initialize linePower
-                if (targetNote[0].isSingle) { linePower[0] = targetNote[0].startPower; }
-                else { linePower[0] = targetNote[0].endPower; }
-                if (targetNote[1] == null) { linePower[1] = linePower[0]; }
-                else { linePower[1] = targetNote[1].startPower; }
             }
         }
 
@@ -105,6 +96,11 @@ public class LineMove : MonoBehaviour
         s_LineMove.line.positionCount = 2;
         s_LineMove.line.SetPosition(0, new Vector3(0, 0, 0));
         s_LineMove.line.SetPosition(1, new Vector3(0, 1600000, 0));
+
+        s_LineMove.LineObject[0].transform
+            .localPosition = new Vector3(0 / 200.0f, 15, 30);
+        s_LineMove.LineObject[0].transform
+            .localRotation = Quaternion.Euler(-20, 0, 0);
     }
     public static void ReDrewLine()
     {
@@ -156,8 +152,20 @@ public class LineMove : MonoBehaviour
     //** public void ---------------------------
 
     //** private void ---------------------------
+    private void UpdateTargetNote()
+    {
+        try { targetNote[0] = lineNotes[lineIndex]; }
+        catch { targetNote[0] = null; }
+        try { targetNote[1] = lineNotes[lineIndex + 1]; }
+        catch { targetNote[1] = null; }
+        try { lineMs = targetNote[1].ms; }
+        catch { lineMs = 9999999; }
+        lineIndex++;
+    }
     private void ResetData()
     {
+        StopCoroutine(lineCoroutine);
+
         lineNotes = new List<LineNote>();
         triggerNotes = new List<LineTriggerNote>();
 
@@ -178,10 +186,13 @@ public class LineMove : MonoBehaviour
         lastPower = 0;
         LineTilting();
 
-        if (lineNotes.Count == 0) { targetNote = null; }
-        else { targetNote[0] = lineNotes[0]; }
+        if (lineNotes.Count == 0) { targetNote[0] = null; lineMs = 9999999; }
+        else { targetNote[0] = lineNotes[0]; lineMs = targetNote[0].ms;}
+        if (lineNotes.Count >= 1) { targetNote[1] = lineNotes[1]; }
+
         if (triggerNotes.Count == 0) { targetTriggerNote = null; }
         else { targetTriggerNote = triggerNotes[0]; }
+        
         lineIndex = 0;
         triggerIndex = 0;
         isLineMoving = true; //! Debugging Code
@@ -190,72 +201,55 @@ public class LineMove : MonoBehaviour
     {
         if (!isLineMoving) { return; }
 
-        s_nowPower = Mathf.Clamp(-500, 500, s_nowPower);
+        s_nowPower = Mathf.Clamp(s_nowPower, -500, 500);
         LineObject[0].transform.localPosition = new Vector3(s_nowPower / 200.0f, 15, 30);
         LineObject[0].transform.localRotation = Quaternion.Euler(-20, 0, s_nowPower / 20.0f);
     }
     private IEnumerator ICalculatePower()
     {
-        int _startMs = 0, _endMs = 0, _runMs = 0;
+        float[] _targetPower = new float[2];
 
-        _startMs = targetNote[0].ms;
-
-        if (!targetNote[0].isSingle)
+        if (targetNote[0].isSingle)
         {
-            if (targetNote[1] == null) { yield break; }
-            else if (targetNote[0].startPower == targetNote[1].startPower) { yield break; }
-            else { _endMs = targetNote[1].ms - targetNote[0].ms; }
-
-            while (true)
-            {
-                _runMs = s_nowMs - _startMs;
-
-                s_nowPower = Mathf.RoundToInt(Mathf.Lerp(targetNote[0].startPower,
-                    targetNote[1].startPower, (_runMs * 1.0f) / _endMs));
-
-                if (s_nowMs - _startMs >= 500)
-                {
-                    s_nowPower = targetNote[0].endPower;
-                    break;
-                }
-                yield return null;
-            }
+            if (targetNote[1] == null) { print("A"); yield break; }
+            if (targetNote[0].startPower == targetNote[1].startPower) { print("B"); yield break; }
+            _targetPower[0] = targetNote[0].startPower;
+            _targetPower[1] = targetNote[1].startPower;
         }
         else
         {
+            float _timer = 0.0f;
             while (true)
             {
-                _runMs = s_nowMs - _startMs;
+                _timer += Time.deltaTime;
+                _timer = Mathf.Clamp(_timer, 0, 0.5f);
+                s_nowPower = Mathf.RoundToInt(Mathf.Lerp(
+                    targetNote[0].startPower, targetNote[0].endPower, _timer * 2));
+                if (_timer == 0.5f) { break;}
 
-                s_nowPower = Mathf.RoundToInt(Mathf.Lerp(targetNote[0].startPower,
-                    targetNote[0].endPower, (_runMs * 1.0f) / 500));
-
-                if (s_nowMs - _startMs >= 500)
-                {
-                    s_nowPower = targetNote[0].endPower;
-                    break;
-                }
                 yield return null;
             }
+            if (targetNote[0].endPower == targetNote[1].startPower) { yield break; }
+            _targetPower[0] = targetNote[0].endPower;
+            _targetPower[1] = targetNote[1].startPower;
+        }
 
-            if (targetNote[1] == null) { yield break; }
-            else if (targetNote[0].endPower == targetNote[1].startPower) { yield break; }
-            else { _endMs = targetNote[1].ms - targetNote[0].ms; }
+        float _startMs = 0, _endMs = 0, _runMs = 0;
+        _startMs = targetNote[0].ms;
+        _endMs = targetNote[1].ms - _startMs;
 
-            while (true)
+        while (true)
+        {
+            _runMs = s_nowMs - _startMs;
+            s_nowPower = Mathf.RoundToInt(Mathf.Lerp(
+                _targetPower[0], _targetPower[1], _runMs / _endMs));
+
+            if (_runMs / _endMs >= 1.0)
             {
-                _runMs = s_nowMs - _startMs;
-
-                s_nowPower = Mathf.RoundToInt(Mathf.Lerp(targetNote[0].endPower,
-                    targetNote[1].startPower, (_runMs * 1.0f) / _endMs));
-
-                if (s_nowMs >= _endMs)
-                {
-                    s_nowPower = targetNote[0].endPower;
-                    break;
-                }
-                yield return null;
+                s_nowPower = Mathf.RoundToInt(_targetPower[1]);
+                break;
             }
+            yield return null;
         }
     }
 }

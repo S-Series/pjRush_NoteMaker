@@ -490,6 +490,7 @@ public class NoteEdit : MonoBehaviour
     }
     public void inputValuePage()
     {
+        if (selectedType == SelectedType.Null) { return; }
         int page;
         Vector3 notePos;
         try { page = Convert.ToInt32(inputNotePage.text); }
@@ -514,7 +515,6 @@ public class NoteEdit : MonoBehaviour
             }
             return;
         }
-
         notePos = Selected.transform.localPosition;
         switch (selectedType)
         {
@@ -573,7 +573,7 @@ public class NoteEdit : MonoBehaviour
         }
         DisplayNoteInfo();
     }
-    // NormalNote
+    //$ NormalNote
     public void inputValueLine()
     {
         int line;
@@ -660,7 +660,7 @@ public class NoteEdit : MonoBehaviour
         SelectedNormal.noteObject.GetComponent<NoteOption>().ToPoweredNote(_isOn);
         DisplayNoteInfo();
     }
-    // SpeedNote
+    //$ SpeedNote
     public void inputValueBpm()
     {
         if (Selected == null) return;
@@ -705,7 +705,7 @@ public class NoteEdit : MonoBehaviour
         _speedNote.noteObject.GetComponentInChildren<TextMeshPro>().text
             = string.Format("{0:F2}", _speedNote.bpm) + " x " + string.Format("{0:F1}", _speedNote.multiply);
     }
-    // EffectNote
+    //$ EffectNote
     public void btnTypeChange()
     {
         if (selectedType != SelectedType.Effect) return;

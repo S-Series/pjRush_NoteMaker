@@ -96,12 +96,9 @@ public class InputManager : MonoBehaviour
                 PreviewNote[i].GetComponent<NoteOption>().ToLongNote(s_noteInputLegnth);
             }
         }
-        print(s_isInputLong);
     }
     public void NoteGenerate()
     {
-        print(inputIndexValue);
-
         NoteEdit.CheckSelect();
         GameObject copyObject;
         copyObject = Instantiate(NotePrefab[inputIndexValue], NoteField.transform);

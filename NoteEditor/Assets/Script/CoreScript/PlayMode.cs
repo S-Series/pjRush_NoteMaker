@@ -63,9 +63,8 @@ public class PlayMode : MonoBehaviour
         s_keyCodes[6] = KeyCode.L;
         s_keyCodes[7] = KeyCode.Semicolon;
 
-        s_keyCodes[4] = KeyCode.A;
-
-        s_keyCodes[5] = KeyCode.Quote;
+        s_keyCodes[8] = KeyCode.A;
+        s_keyCodes[9] = KeyCode.Quote;
         // */
     }
     private void Start()
@@ -155,8 +154,19 @@ public class PlayMode : MonoBehaviour
         isLoaded = false;
         for (int i = 0; i < 6; i++)
         {
+            KeyCode[] _keycode = new KeyCode[2];
+            if (i < 4) //$ index 0 to 7
+            {
+                _keycode[0] = s_keyCodes[i];
+                _keycode[1] = s_keyCodes[i + 4];
+            }
+            else //$ i == 4 || i == 5
+            {
+                _keycode[0] = s_keyCodes[i + 4];
+                _keycode[1] = KeyCode.None;
+            }
             judgeSystems[i].ResetSystem(_isResetList: true);
-            judgeSystems[i].SystemSetting(_kc: s_keyCodes[i], _line: i);
+            judgeSystems[i].SystemSetting(_kc: _keycode, _line: i);
             for (int j = 0; j < noteGenerateField[i].transform.childCount; j++)
             {
                 Destroy(noteGenerateField[i].transform.GetChild(0).gameObject);
@@ -252,15 +262,6 @@ public class PlayMode : MonoBehaviour
     }
     
     //** private Value ---------------------------
-    private bool isKeyCodeAvailable(KeyCode _kc)
-    {
-        if (_kc == KeyCode.Escape)
-        for (int i = 0; i < 5; i++)
-        {
-            if (s_keyCodes[i][0] == _kc || s_keyCodes[i][0] == _kc) { return false; }
-        }
-        return true;
-    }
     private IEnumerator IStartPlay()
     {
         if (playSpeedNotes.Count == 0) { isPlayTest[0] = false; }

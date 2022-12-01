@@ -39,13 +39,13 @@ public class LineEdit : MonoBehaviour
     public static void DeselectNote()
     {
         if (!s_isLineEdit) { return; }
+        SectorActivate(false);
         s_selectLineNote.noteObject.GetComponentInChildren<BoxCollider2D>().enabled = true;
         s_isLineEdit = false;
         s_lineEdit.selectLineOption.Selected(false);
         s_selectLineNote = null;
         s_lineEdit.selectLineOption = null;
         NoteClasses.EnableCollider(true);
-        SectorActivate(false);
     }
     public static void SelectLineNote(GameObject _object)
     {

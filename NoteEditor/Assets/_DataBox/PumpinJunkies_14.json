@@ -7897,6 +7897,37 @@
     "EffectPos": [],
     "EffectForce": [],
     "EffectIsPause": [],
+    "LineMs": [
+        0,
+        0,
+        0,
+        0
+    ],
+    "LinePos": [
+        12800,
+        19200,
+        28800,
+        35200
+    ],
+    "LinePower": [
+        0,
+        500,
+        500,
+        0
+    ],
+    "LineEndPower": [
+        0,
+        0,
+        0,
+        0
+    ],
+    "isLineSingle": [
+        true,
+        true,
+        true,
+        true
+    ],
+    "LineTriggerMs": [],
     "LineTriggerEndMs": [],
     "LineTriggerPos": [],
     "LineTriggerLegnth": []
