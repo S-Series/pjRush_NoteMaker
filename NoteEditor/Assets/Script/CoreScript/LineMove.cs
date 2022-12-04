@@ -38,7 +38,6 @@ public class LineMove : MonoBehaviour
         PreviewNote.SetActive(false);
         lineCoroutine = ICalculatePower();
         ResetLineSystem();
-        EndPlay();
     }
     private void OnEnable()
     {
@@ -202,9 +201,13 @@ public class LineMove : MonoBehaviour
         if (!isLineMoving) { return; }
 
         s_nowPower = Mathf.Clamp(s_nowPower, -500, 500);
-        LineObject[0].transform.localPosition = new Vector3(s_nowPower / 200.0f, 15, 30);
-        LineObject[0].transform.localRotation = Quaternion.Euler(-20, 0, s_nowPower / 20.0f);
+        LineObject[0].transform.localPosition = new Vector3(s_nowPower / 400.0f, 15, 30);
+        LineObject[0].transform.localRotation = Quaternion.Euler(-20, 0, s_nowPower / 40.0f);
     }
+    private float Sigmoid(float value)
+        { 
+            print(1.0f / (1.0f + Mathf.Exp(-6.75f * (value - 0.5f))));
+            return 1.0f / (1.0f + Mathf.Exp(-6.75f * (value - 0.5f))); }
     private IEnumerator ICalculatePower()
     {
         float[] _targetPower = new float[2];
@@ -222,10 +225,10 @@ public class LineMove : MonoBehaviour
             while (true)
             {
                 _timer += Time.deltaTime;
-                _timer = Mathf.Clamp(_timer, 0, 0.5f);
+                _timer = Mathf.Clamp(_timer, 0, 0.05f);
                 s_nowPower = Mathf.RoundToInt(Mathf.Lerp(
-                    targetNote[0].startPower, targetNote[0].endPower, _timer * 2));
-                if (_timer == 0.5f) { break;}
+                    targetNote[0].startPower, targetNote[0].endPower, Sigmoid(_timer * 20)));
+                if (_timer == 0.05f) { break;}
 
                 yield return null;
             }
@@ -242,7 +245,7 @@ public class LineMove : MonoBehaviour
         {
             _runMs = s_nowMs - _startMs;
             s_nowPower = Mathf.RoundToInt(Mathf.Lerp(
-                _targetPower[0], _targetPower[1], _runMs / _endMs));
+                _targetPower[0], _targetPower[1], Sigmoid(_runMs / _endMs)));
 
             if (_runMs / _endMs >= 1.0)
             {

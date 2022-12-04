@@ -80,7 +80,7 @@ public class AutoTest : MonoBehaviour
             s_isPause = !s_isPause;
         }
         if (s_isPause) return;
-        //* NormalNote
+        //$ NormalNote
         if (isTesting[0])
         {
             if (autoTestNormal.ms <= s_testMs * autoTestMultiply)
@@ -101,7 +101,7 @@ public class AutoTest : MonoBehaviour
                 else {autoTestNormal = autoTestNormalNotes[testIndex[0]];}
             }
         }
-        //* SppedNote
+        //$ SppedNote
         if (isTesting[1])
         {
             if (autoTestSpeed.ms <= s_testMs * autoTestMultiply)
@@ -119,7 +119,7 @@ public class AutoTest : MonoBehaviour
                 else {autoTestSpeed = autoTestSpeedNotes[testIndex[1]];}
             }
         }
-        //* EffectNote
+        //$ EffectNote
         if (isTesting[2])
         {
             if (autoTestEffect.ms <= s_testMs * autoTestMultiply)

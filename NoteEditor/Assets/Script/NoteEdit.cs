@@ -180,19 +180,19 @@ public class NoteEdit : MonoBehaviour
         if (Up)
         {
             int count;
-            float inputPos;
+            int inputPos;
             count = Mathf.FloorToInt(pos.y / (1600.0f / GuideGenerate.GuideCount)) + 1;
-            inputPos = Mathf.Floor(1600.0f / GuideGenerate.GuideCount * 100) * count / 100;
-            if (inputPos >= 1600.0f * 999) inputPos = 1600.0f * 999;
+            inputPos = Mathf.FloorToInt(1600.0f / GuideGenerate.GuideCount * 100) * count / 100;
+            if (inputPos >= 1600.0f * 999) inputPos = 1600 * 999;
             pos.y = inputPos;
         }
         else if (Down)
         {
             int count;
-            float inputPos;
+            int inputPos;
             count = Mathf.CeilToInt(pos.y / (1600.0f / GuideGenerate.GuideCount)) - 1;
-            inputPos = Mathf.Ceil(1600.0f / GuideGenerate.GuideCount * 100) * count / 100;
-            if (inputPos < 0.0f) inputPos = 0.0f;
+            inputPos = Mathf.CeilToInt(1600.0f / GuideGenerate.GuideCount * 100) * count / 100;
+            if (inputPos < 0.0f) inputPos = 0;
             pos.y = inputPos;
         }
         else if (Left)

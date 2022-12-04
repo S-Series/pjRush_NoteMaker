@@ -353,7 +353,7 @@ public class LineNote
         {
             if (A.pos > B.pos) return +1;
             else if (A.pos < B.pos) return -1;
-            else {Debug.LogError("Note Overlap"); return 0;}
+            else { return 0;}
         });
     }
     public static bool IsNoteOverlap(float _pos)

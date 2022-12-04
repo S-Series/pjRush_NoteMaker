@@ -50,7 +50,7 @@ public class InputManager : MonoBehaviour
             {
                 s_isNoteInputAble = false;
                 NoteTool.disableFrame();
-                NoteEdit.noteEdit.SectorSetOriginal();
+                NoteEdit.SectorNull();
                 for (int i = 0; i < 6; i++)
                 {
                     PreviewNote[i].SetActive(false);

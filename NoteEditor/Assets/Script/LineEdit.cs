@@ -85,7 +85,30 @@ public class LineEdit : MonoBehaviour
         if (s_selectLineNote == null) { return; }
         if (selectLineOption == null) { return; }
 
+        int pos;
+        pos = s_selectLineNote.pos;
 
+        if (_isUp)
+        {
+            int count;
+            int inputPos;
+            count = Mathf.FloorToInt(pos / (1600.0f / GuideGenerate.GuideCount)) + 1;
+            inputPos = Mathf.FloorToInt(1600.0f / GuideGenerate.GuideCount * 100) * count / 100;
+            if (inputPos >= 1600.0f * 999) inputPos = 1600 * 999;
+            pos = inputPos;
+        }
+        else
+        {
+            int count;
+            int inputPos;
+            count = Mathf.CeilToInt(pos / (1600.0f / GuideGenerate.GuideCount)) - 1;
+            inputPos = Mathf.CeilToInt(1600.0f / GuideGenerate.GuideCount * 100) * count / 100;
+            if (inputPos < 0.0f) inputPos = 0;
+            pos = inputPos;
+        }
+
+        s_selectLineNote.pos = pos;
+        s_selectLineNote.noteObject.transform.localPosition = new Vector3(0, pos, 0);
 
         LineMove.ReDrewLine();
     }

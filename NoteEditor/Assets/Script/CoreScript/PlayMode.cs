@@ -48,7 +48,6 @@ public class PlayMode : MonoBehaviour
     {
         playMode = this;
         playAudio = GetComponent<AudioSource>();
-        toPlayMode(false);
         btn_changeSpeed(PlayerPrefs.GetInt("playSpeed") - s_playModeSpeed);
 
         //Todo : KeyBinding 시스템 업데이트 전 임시 코드
@@ -71,6 +70,7 @@ public class PlayMode : MonoBehaviour
     {
         JudgeSystem.judgeSprite = judgeSprites;
         JudgeSystem.lineEffectSprite = lineEffectSprite;
+        toPlayMode(false);
     }
     private void Update()
     {
@@ -245,7 +245,8 @@ public class PlayMode : MonoBehaviour
         playEffectMs = 0;
         playEffectPos = 0;
         playEffectIndex = 0;
-
+        
+        LineMove.EndPlay();
         ScoreManager.ResetGamePlay();
     }
     private void ApplySpeed()
@@ -275,6 +276,7 @@ public class PlayMode : MonoBehaviour
             judgeSystem.StartGamePlay();
         }
         yield return new WaitForSeconds(1.0f);
+        LineMove.ReadyForPlay();
         JudgeSystem.s_isNowOnPlay = true;
         playAudio.clip = MusicLoad.MusicClip;
         yield return new WaitForSeconds(ValueManager.delay / 1000.0f);
