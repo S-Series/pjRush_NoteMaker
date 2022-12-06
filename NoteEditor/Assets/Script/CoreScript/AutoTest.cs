@@ -83,22 +83,26 @@ public class AutoTest : MonoBehaviour
         //$ NormalNote
         if (isTesting[0])
         {
-            if (autoTestNormal.ms <= s_testMs * autoTestMultiply)
+            while (true)
             {
-                if (autoTestNormal == null) {autoTestNormal = autoTestNormalNotes[testIndex[0]];}
-
-                if (autoTestNormal.legnth == 0) 
+                if (autoTestNormal.ms <= s_testMs * autoTestMultiply)
                 {
-                    autoTestNormal.noteObject.SetActive(false);
-                    autoJudgeEffect(autoTestNormal.line, isPowered:autoTestNormal.isPowered);
-                }
-                else {StartCoroutine(LongNoteEffect(autoTestNormal.line, autoTestNormal.legnth, autoTestNormal.noteObject));}
+                    if (autoTestNormal == null) { autoTestNormal = autoTestNormalNotes[testIndex[0]]; }
 
-                testIndex[0]++;
-                ScoreManager.ApplyJudge(0);
-                ScoreManager.ApplyCombo(true);
-                if (testIndex[0] >= autoTestNormalNotes.Count) {isTesting[0] = false;}
-                else {autoTestNormal = autoTestNormalNotes[testIndex[0]];}
+                    if (autoTestNormal.legnth == 0)
+                    {
+                        autoTestNormal.noteObject.SetActive(false);
+                        autoJudgeEffect(autoTestNormal.line, isPowered: autoTestNormal.isPowered);
+                    }
+                    else { StartCoroutine(LongNoteEffect(autoTestNormal.line, autoTestNormal.legnth, autoTestNormal.noteObject)); }
+
+                    testIndex[0]++;
+                    ScoreManager.ApplyJudge(0);
+                    ScoreManager.ApplyCombo(true);
+                    if (testIndex[0] >= autoTestNormalNotes.Count) { isTesting[0] = false; break; }
+                    else { autoTestNormal = autoTestNormalNotes[testIndex[0]]; }
+                }
+                else { break; }
             }
         }
         //$ SppedNote
@@ -354,7 +358,8 @@ public class AutoTest : MonoBehaviour
         MovingField[1].localPosition = MovingPos;
         ScoreManager.ResetGamePlay();
         NoteClasses.EnableCollider(true);
-        LineMove.s_isLineMoving = true;
+        LineMove.s_isLineMoving = false;
+        LineMove.EndPlay();
         StopAllCoroutines();
     }
     private void autoJudgeEffect(int line, bool isPowered = false, bool isLong = false)

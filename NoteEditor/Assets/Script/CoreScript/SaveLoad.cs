@@ -222,7 +222,7 @@ public class SaveLoad : MonoBehaviour
             }
         }
 
-        //try {
+        try {
             ValueManager.bpm = noteSaved.bpm;
             ValueManager.delay = noteSaved.startDelayMs;
             ValueManager.DisplayValue();
@@ -403,14 +403,14 @@ public class SaveLoad : MonoBehaviour
             PlayerPrefs.SetString("NoteFileName", inputFileName.text);
             s_isWorking = false;
             BlockObject[1].SetActive(false);
-        /*}
+        }
         catch
         {
             ResetSavedData();
             s_isWorking = false;
             BlockObject[1].SetActive(false);
             Debug.Log("파일 오류");
-        }*/
+        }
     }
     IEnumerator CreateNewJsonData()
     {

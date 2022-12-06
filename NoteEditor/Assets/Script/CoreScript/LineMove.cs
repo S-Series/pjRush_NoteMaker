@@ -205,9 +205,7 @@ public class LineMove : MonoBehaviour
         LineObject[0].transform.localRotation = Quaternion.Euler(-20, 0, s_nowPower / 40.0f);
     }
     private float Sigmoid(float value)
-        { 
-            print(1.0f / (1.0f + Mathf.Exp(-6.75f * (value - 0.5f))));
-            return 1.0f / (1.0f + Mathf.Exp(-6.75f * (value - 0.5f))); }
+        { return 1.0f / (1.0f + Mathf.Exp(-6.75f * (value - 0.5f))); }
     private IEnumerator ICalculatePower()
     {
         float[] _targetPower = new float[2];
@@ -225,10 +223,10 @@ public class LineMove : MonoBehaviour
             while (true)
             {
                 _timer += Time.deltaTime;
-                _timer = Mathf.Clamp(_timer, 0, 0.05f);
+                _timer = Mathf.Clamp(_timer, 0, 0.025f);
                 s_nowPower = Mathf.RoundToInt(Mathf.Lerp(
-                    targetNote[0].startPower, targetNote[0].endPower, Sigmoid(_timer * 20)));
-                if (_timer == 0.05f) { break;}
+                    targetNote[0].startPower, targetNote[0].endPower, Sigmoid(_timer * 40)));
+                if (_timer == 0.025f) { break;}
 
                 yield return null;
             }

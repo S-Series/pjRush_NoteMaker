@@ -40,4 +40,26 @@ public class NoteManager : MonoBehaviour
     {
 
     }
+    public static int CalculateNoteMs(int posValue)
+    {
+        NoteClasses.SortingNotes();
+
+        SpeedNote _target;
+        _target = null;
+        for (int i = SpeedNote.speedNotes.Count - 1; i > -1; i--)
+        {
+            if (SpeedNote.speedNotes[i].pos <= posValue) 
+            {
+                _target = SpeedNote.speedNotes[i];
+                break;
+            }
+        }
+        if (_target == null) 
+            { return Mathf.RoundToInt(posValue * 150 / ValueManager.bpm); }
+        else
+        {
+            return Mathf.RoundToInt(_target.ms + (
+                posValue - _target.pos) * 150 / (_target.bpm * _target.multiply));
+        }
+    }
 }

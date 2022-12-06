@@ -16,7 +16,6 @@ public class JudgeSystem : MonoBehaviour
     
     //** public ---------------------------
     public List<NormalNote> gameNotes = new List<NormalNote>();
-    public bool isBpmChanged = false;
     public KeyCode[] inputKey = new KeyCode[2]{KeyCode.None, KeyCode.None};
     
     //** private ---------------------------
@@ -196,55 +195,57 @@ public class JudgeSystem : MonoBehaviour
     //** private others ---------------------------
     private IEnumerator ILongCoroutine(NormalNote _note)
     {
-        isBpmChanged = false;
-
-        bool _isPassed = false;
-        bool _isAnimating = false;
-        float _delay = 15 / s_playBpm;
-        var _wait = new WaitForSeconds(_delay);
-
         Animator _animate;
+        int _targetMs, _maxCount = 0;
+        float _timer = 0.0f, _maxTimer = 0.0f;
+        bool _isAnimating = false, _isPassed = true;
+
         _animate = _note.noteObject.GetComponent<Animator>();
         _animate.enabled = true;
+        _targetMs = NoteManager.CalculateNoteMs(_note.pos + 100);
+        print(_targetMs);
 
         if (isLongJudge) { _animate.SetTrigger("Catch"); }
 
-        yield return _wait;
-        
-        for (int i = 0; i < _note.legnth - 2; i++)
+        _maxCount = _note.legnth - 1;
+        _maxTimer = 0.15f * 125 / s_playBpm;
+        for (int i = 0; i < _maxCount;)
         {
-            if (isBpmChanged)
-            {
-                _delay = 15 / s_playBpm;
-                isBpmChanged = false;
-            }
-
-            if (isLongJudge)
-            {
-                ApplyJudge(_note, 0, true, true);
-                if (!_isAnimating)
-                {
-                    _isAnimating = true;
-                    _animate.SetTrigger("Catch");
-                }
-                _isPassed = true;
-            }
+            if (isLongJudge) { _timer = 0.0f; _isPassed = true; }
             else
             {
-                ApplyJudge(_note, -100, true, true);
-                if (_isAnimating)
-                {
-                    _isAnimating = false;
-                    _animate.SetTrigger("Lost");
-                }
-                _isPassed = false;
+                _timer += Time.deltaTime;
+                if (_timer >= _maxTimer) { _isPassed = false; }
             }
-            yield return _wait;
-        }
-        if (_isPassed || isLongJudge) { ApplyJudge(_note, 0, true, true); }
-        else { ApplyJudge(_note, -100, true, true); }
 
-        yield return _wait;
+            if (!_isPassed)
+            {
+                _isAnimating = false;
+                _animate.SetTrigger("Lost");
+            }
+            else if (!_isAnimating)
+            {
+                _isAnimating = true;
+                _animate.SetTrigger("Catch");
+            }
+
+
+            if (_targetMs <= s_playMs)
+            {
+                if (_isPassed)
+                {
+                    ApplyJudge(_note, 0, true, true);
+                }
+                else
+                {
+                    ApplyJudge(_note, -100, true, true);
+                }
+                _targetMs = NoteManager.CalculateNoteMs(_note.pos + (100 * (i + 2)));
+                i++;
+            }
+            print("Long Note Running");
+            yield return null;
+        }
 
         _animate.SetTrigger("Exit");
         _animate.enabled = false;

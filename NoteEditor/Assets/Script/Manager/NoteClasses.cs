@@ -96,22 +96,8 @@ public class NoteClasses : MonoBehaviour
         for (int i = 0; i < NormalNote.normalNotes.Count; i++)
         {
             editNormal = NormalNote.normalNotes[i];
-
-            editMs = 0;
-            editPos = 0.0f;
-            editBpm = ValueManager.bpm;
-
-            for (int j = speedIndex; j > -1; j--)
-            {
-                if (SpeedNote.speedNotes[j].pos <= editNormal.pos)
-                {
-                    editMs = SpeedNote.speedNotes[j].ms;
-                    editPos = SpeedNote.speedNotes[j].pos;
-                    editBpm = SpeedNote.speedNotes[j].bpm * SpeedNote.speedNotes[j].multiply;
-                    break;
-                }
-            }
-            editNormal.ms = Mathf.RoundToInt(editMs + (editNormal.pos - editPos) * 150 / editBpm);
+            editNormal.ms = NoteManager.CalculateNoteMs(editNormal.pos);
+            print(String.Format("{0} -> {1}", editNormal.pos, editNormal.ms));
         }
 
         //* LineNote ---------- //
@@ -119,22 +105,7 @@ public class NoteClasses : MonoBehaviour
         for (int i = 0; i < LineNote.lineNotes.Count; i++)
         {
             editLine = LineNote.lineNotes[i];
-
-            editMs = 0;
-            editPos = 0.0f;
-            editBpm = ValueManager.bpm;
-
-            for (int j = speedIndex; j > -1; j--)
-            {
-                if (SpeedNote.speedNotes[j].pos <= editLine.pos)
-                {
-                    editMs = SpeedNote.speedNotes[j].ms;
-                    editPos = SpeedNote.speedNotes[j].pos;
-                    editBpm = SpeedNote.speedNotes[j].bpm * SpeedNote.speedNotes[j].multiply;
-                    break;
-                }
-            }
-            editLine.ms = Mathf.RoundToInt(editMs + (editLine.pos - editPos) * 150 / editBpm);
+            editLine.ms = NoteManager.CalculateNoteMs(editLine.pos);
         }
 
         //* EffectNote ---------- //

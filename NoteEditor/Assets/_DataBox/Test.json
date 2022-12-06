@@ -2,11 +2,21 @@
     "Version": 1.02,
     "bpm": 120.0,
     "startDelayMs": 0,
-    "NoteLegnth": [],
-    "NoteMs": [],
-    "NotePos": [],
-    "NoteLine": [],
-    "NotePowered": [],
+    "NoteLegnth": [
+        32
+    ],
+    "NoteMs": [
+        14000
+    ],
+    "NotePos": [
+        1600
+    ],
+    "NoteLine": [
+        2
+    ],
+    "NotePowered": [
+        false
+    ],
     "SpeedMs": [],
     "SpeedPos": [],
     "SpeedBpm": [],
@@ -17,11 +27,11 @@
     "EffectForce": [],
     "EffectIsPause": [],
     "LineMs": [
-        0,
-        0,
-        0,
-        0,
-        0
+        14000,
+        14500,
+        15000,
+        15500,
+        16000
     ],
     "LinePos": [
         11200,

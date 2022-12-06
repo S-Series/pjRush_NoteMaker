@@ -119,7 +119,7 @@ public class PlayMode : MonoBehaviour
                 JudgeSystem.s_isNowOnPlay = false;
                 playAudio.Stop();
                 noteMovingField.localPosition = new Vector3(0, 0, 0);
-                GenerateNote(false);
+                StartCoroutine(IGenerateNote(false));
                 ResetPlayData();
             }
         }
@@ -143,13 +143,13 @@ public class PlayMode : MonoBehaviour
         playMode.modeObject[1].SetActive(_isPlayMode);
 
         playMode.ResetPlayData();
-        playMode.GenerateNote(!_isPlayMode);
+        playMode.StartCoroutine(playMode.IGenerateNote(!_isPlayMode));
     }
     
     //** public void ---------------------------
     
     //** private void ---------------------------
-    private void GenerateNote(bool _isGameEnd)
+    private IEnumerator IGenerateNote(bool _isGameEnd)
     {
         isLoaded = false;
         for (int i = 0; i < 6; i++)
@@ -180,10 +180,10 @@ public class PlayMode : MonoBehaviour
             }
         }
 
-        if (_isGameEnd) { return; }
+        if (_isGameEnd) { print("returned"); yield break; }
         
         NoteClasses.SortingNotes();
-        NoteClasses.CalculateNoteMs();
+        yield return NoteClasses.CalculateNoteMs();
 
         playSpeedNotes = SpeedNote.speedNotes;
         playEffectNotes = EffectNote.effectNotes;
@@ -247,6 +247,8 @@ public class PlayMode : MonoBehaviour
         playEffectIndex = 0;
         
         LineMove.EndPlay();
+        NoteClasses.SortingNotes();
+        NoteClasses.CalculateNoteMs();
         ScoreManager.ResetGamePlay();
     }
     private void ApplySpeed()
