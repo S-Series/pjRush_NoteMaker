@@ -243,9 +243,10 @@ public class JudgeSystem : MonoBehaviour
                 _targetMs = NoteManager.CalculateNoteMs(_note.pos + (100 * (i + 2)));
                 i++;
             }
-            print("Long Note Running");
             yield return null;
         }
+
+        yield return new WaitForSeconds(0.1f);
 
         _animate.SetTrigger("Exit");
         _animate.enabled = false;

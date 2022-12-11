@@ -43,6 +43,8 @@ public class NoteClasses : MonoBehaviour
         NormalNote.Sorting();
         SpeedNote.Sorting();
         EffectNote.Sorting();
+        LineNote.Sorting();
+        LineTriggerNote.Sorting();
     }
     public static void EnableCollider(bool isActive)
     {

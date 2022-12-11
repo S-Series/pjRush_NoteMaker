@@ -12,7 +12,7 @@ public class SaveLoad : MonoBehaviour
     public static bool s_isWorking = false;
 
     static NoteSavedData noteSaved = new NoteSavedData();
-    private const double editorVersion = 1.02;
+    private const double editorVersion = 1.03;
     private float bpm;
     private static bool isSaving = false;
     private static bool isLoading = false;
@@ -85,14 +85,11 @@ public class SaveLoad : MonoBehaviour
 
         ResetSavedData();
 
-        NormalNote.Sorting();
-        SpeedNote.Sorting();
-        EffectNote.Sorting();
-        LineNote.Sorting();
+        NoteClasses.SortingNotes();
 
         yield return wait;
 
-        NoteClasses.CalculateNoteMs();
+        yield return NoteClasses.CalculateNoteMs();
 
         noteSaved.Version = editorVersion;
         noteSaved.bpm = ValueManager.bpm;
@@ -231,6 +228,7 @@ public class SaveLoad : MonoBehaviour
                 { Destroy(NoteField.transform.GetChild(i).gameObject); }
 
             NoteClasses.ResetNotes();
+            
             for (int i = 0; i < noteSaved.NoteMs.Count; i++)
             {
                 NormalNote normalNote = new NormalNote();
@@ -243,13 +241,6 @@ public class SaveLoad : MonoBehaviour
                 try { normalNote.isPowered = noteSaved.NotePowered[i]; }
                 catch { normalNote.isPowered = false; }
                 NormalNote.normalNotes.Add(normalNote);
-            }
-            if (NormalNote.normalNotes.Count != 0)
-            {
-                if (NormalNote.normalNotes[0].pos < 1600.0f)
-                {
-                    foreach(NormalNote _note in NormalNote.normalNotes) { _note.pos += 1600; }
-                }
             }
             for (int i = 0; i < noteSaved.SpeedMs.Count; i++)
             {
@@ -287,13 +278,9 @@ public class SaveLoad : MonoBehaviour
             {
 
             }
-            //*--------------------------------------
-            NormalNote.Sorting();
-            SpeedNote.Sorting();
-            EffectNote.Sorting();
-            LineNote.Sorting();
-            LineTriggerNote.Sorting();
-            //*--------------------------------------
+            
+            NoteClasses.SortingNotes();
+            
             for (int i = 0; i < NormalNote.normalNotes.Count; i++)
             {
                 NormalNote normalNote;
@@ -409,7 +396,7 @@ public class SaveLoad : MonoBehaviour
             ResetSavedData();
             s_isWorking = false;
             BlockObject[1].SetActive(false);
-            Debug.Log("파일 오류");
+            StartCoroutine(MusicFileMessage("Cannot Read File", new Color32(255, 0, 0, 255)));
         }
     }
     IEnumerator CreateNewJsonData()
