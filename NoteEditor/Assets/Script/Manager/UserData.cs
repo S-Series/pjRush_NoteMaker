@@ -39,7 +39,7 @@ public class UserData : MonoBehaviour
         }
         public static void SetDataToPlayMode()
         {
-            
+
         }
     }
     public static class PlayOption

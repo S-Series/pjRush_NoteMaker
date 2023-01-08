@@ -6,22 +6,20 @@ public class ShowFps : MonoBehaviour
 {
     float deltaTime = 0.0f;
 
-    GUIStyle style;
-    Rect rect;
-    float msec;
+    static GUIStyle style;
+    static Rect rect;
+    static float msec;
     float fps;
     string text;
 
     void Awake()
     {
-        Application.targetFrameRate = 240;
-
         int w = Screen.width, h = Screen.height;
 
-        rect = new Rect(0, 0, w, h * 2 / 100);
+        rect = new Rect(0, h - (h * 2 / 100), w, h * 2 / 100);
 
         style = new GUIStyle();
-        style.alignment = TextAnchor.UpperLeft;
+        style.alignment = TextAnchor.LowerLeft;
         style.fontSize = h * 2 / 100;
         style.normal.textColor = Color.white;
     }
@@ -38,5 +36,16 @@ public class ShowFps : MonoBehaviour
 
         text = " " + fps.ToString("F1") + "fps (" + msec.ToString("F1") + "ms" + ")";
         GUI.Label(rect, text, style);
+    }
+    public static void UpdateResolution()
+    {
+        int w = Screen.width, h = Screen.height;
+
+        rect = new Rect(0, h - (h * 2 / 100), w, h * 2 / 100);
+
+        style = new GUIStyle();
+        style.alignment = TextAnchor.LowerLeft;
+        style.fontSize = h * 2 / 100;
+        style.normal.textColor = Color.white;
     }
 }
