@@ -12,31 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 469c24fdb3bd6431b92cc1465bd9166b, type: 3}
   m_Name: RemoteConfigDataStoreAsset
   m_EditorClassIdentifier: 
-  rsKeyList:
-  - metadata:
-      entityId: b16b350e-f4d0-487f-8bdd-1831596e6dbd
-    rs:
-      key: asdf
-      type: int
-      value: 0
-  rsLastCachedKeyList:
-  - metadata:
-      entityId: b16b350e-f4d0-487f-8bdd-1831596e6dbd
-    rs:
-      key: asdf
-      type: int
-      value: 0
-  configId: 8877dc90-3134-4eb4-b27d-23742d74a363
-  currentEnvironmentId: 3ae050ef-0a0f-4016-b7d3-01bc2ac6069c
-  environments:
-  - id: 3ae050ef-0a0f-4016-b7d3-01bc2ac6069c
-    appId: 
-    name: production (Default)
-    description: 
-    createdAt: 2023-01-07T14:27:21Z
-    updatedAt: 2023-01-07T14:27:21Z
-  rulesList: []
-  lastCachedRulesList: []
-  addedRulesIDs: []
-  updatedRulesIDs: []
-  deletedRulesIDs: []
+  _rsKeyList: "[\r\n  {\r\n    \"metadata\": {\r\n      \"entityId\": \"e76937e6-068f-4648-ae50-7f1e0af46947\"\r\n   
+    },\r\n    \"rs\": {\r\n      \"key\": \"Update\",\r\n      \"type\": \"string\",\r\n     
+    \"value\": \"2023-01-24 02:18PM\"\r\n    }\r\n  }\r\n]"
+  _rsLastCachedKeyList: "[\r\n  {\r\n    \"metadata\": {\r\n      \"entityId\": \"e76937e6-068f-4648-ae50-7f1e0af46947\"\r\n   
+    },\r\n    \"rs\": {\r\n      \"key\": \"Update\",\r\n      \"type\": \"string\",\r\n     
+    \"value\": \"2023-01-24 02:18PM\"\r\n    }\r\n  }\r\n]"
+  _environments: "[\r\n  {\r\n    \"projectId\": \"90570862-5908-40be-9988-cbdf262bf0ff\",\r\n   
+    \"name\": \"production\",\r\n    \"id\": \"3ae050ef-0a0f-4016-b7d3-01bc2ac6069c\",\r\n   
+    \"isDefault\": true,\r\n    \"createdAt\": \"2023-01-07T14:27:21Z\",\r\n    \"updatedAt\":
+    \"2023-01-07T14:27:21Z\"\r\n  }\r\n]"
